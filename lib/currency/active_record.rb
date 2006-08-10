@@ -11,7 +11,7 @@ module Currency
       
     module ClassMethods
       def money(attr_name, *opts)
-        opts = Hash.[](*opts)
+        opts = Hash[*opts]
 
         attr_name = attr_name.to_s
 
