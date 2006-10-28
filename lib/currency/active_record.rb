@@ -11,7 +11,7 @@ module Currency
       
     module ClassMethods
       def money(attr_name, *opts)
-        opts = Hash[*opts]
+        opts = Hash.[](*opts)
 
         attr_name = attr_name.to_s
 
@@ -54,7 +54,7 @@ def #{attr_name}=(value)
 end
 def #{attr_name}_before_type_cast
   x = #{attr_name}
-  x &&= x.format(:no_symbol, :no_currency)
+  x &&= x.format(:no_symbol, :no_currency, :no_thousands)
   x
 end
 end_eval
