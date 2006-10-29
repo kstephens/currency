@@ -285,7 +285,9 @@ end
 # Automated upload to rubyforge.org
 PACKAGE_FILES = FileList["pkg/#{PKG_NAME}-#{PKG_VERSION}.*"]
 task :upload_package do
-# From activesuport/Rakefile, adapted for https://rubyforge.org login
+# From activesuport/Rakefile, 
+# See: http://dev.rubyonrails.org/svn/rails/tags/rel_1-0-0/activesupport/Rakefile
+# Adapted for https://rubyforge.org login
   require 'net/http'
   require 'net/https'
   require 'open-uri'
