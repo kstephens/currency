@@ -1,7 +1,33 @@
-THis is the rubyforge.com Currency package.
+= Currency
+
+This is the rubyforge.com Currency package.
+
+== Installation
+
+gem install currency
+
+== For User Documentation, see
 
 This package deals with currencies, conversions between currencies and monetary values in an object-oriented fashion.
 
-Kurt Stephens
-ks.ruby@kurtstephens.com
+== Home page
+
+* {Currency Home}[http://currency.rubyforge.org]
+
+== Additional directories
+
+[./lib/...]      the Currency library
+[./test/...]     unit and functional test
+[./examples/...] example programs
+
+== Credits
+
+Currency was developed by:
+
+* Kurt Stephens -- ruby-currency(at)umleta.com
+
+== Contributors
+
+Maybe you?
+
 
