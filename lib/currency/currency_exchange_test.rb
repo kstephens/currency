@@ -1,8 +1,5 @@
 module Currency
-  # Represents a method of converting between two currencies
-  # TODO: 
-  #  Create an ExchangeRateLoader class.
-  #  Create an ExchangeRateLoader subclass that interfaces to xe.com or other FX quote source.
+  # This can convert only between USD and CAD
   class CurrencyExchangeTest < CurrencyExchange
     @@instance = nil
     def self.instance(*opts)
