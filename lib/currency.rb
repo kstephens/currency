@@ -7,6 +7,7 @@ require 'currency/money'
 require 'currency/currency_factory'
 require 'currency/currency'
 require 'currency/money'
+require 'currency/exchange_rate'
 require 'currency/currency_exchange'
 require 'currency/core_extensions'
 

@@ -1,13 +1,16 @@
-# REAL
+# Base Test class
 
 require 'test/unit'
 require 'currency'
+require 'currency/currency_exchange_test'
 
 module Currency
 
 class TestBase < Test::Unit::TestCase
   def setup
     super
+    # Force XE Exchange.
+    CurrencyExchange.default = CurrencyExchangeTest.instance
   end
 
   # Avoid "No test were specified" error.

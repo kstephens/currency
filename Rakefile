@@ -1,6 +1,6 @@
 # Rakefile for currency      -*- ruby -*-
-# Taken from RubyGems/Rakefile
-# NOT WORKING YET
+# Adapted from RubyGems/Rakefile
+# upload_package NOT WORKING YET
 
 #require 'rubygems'
 require 'rake/clean'
@@ -282,25 +282,22 @@ file "pkg/#{PKG_NAME}.gemspec" => ["pkg", "Rakefile"] do |t|
   open(t.name, "w") do |f| f.puts Spec.to_yaml end
 end
 
-PACKAGE_FILES = [
-  "pkg/#{PKG_NAME}-#{PKG_VERSION}.gem",
-  "pkg/#{PKG_NAME}-#{PKG_VERSION}.tgz",
-  "pkg/#{PKG_NAME}-#{PKG_VERSION}.zip"
-]
-
+# Automated upload to rubyforge.org
+PACKAGE_FILES = FileList["pkg/#{PKG_NAME}-#{PKG_VERSION}.*"]
 task :upload_package do
-# From activesuport/Rakefile
+# From activesuport/Rakefile, adapted for https://rubyforge.org login
   require 'net/http'
   require 'net/https'
   require 'open-uri'
    
+  puts "Preparing to upload #{PACKAGE_FILES} to rubyforge.org"
   project_uri = "http://rubyforge.org/projects/#{RUBY_FORGE_PROJECT}/"
   project_data = open(project_uri) { |data| data.read }
   group_id = project_data[/[?&]group_id=(\d+)/, 1]
   raise "Couldn't get group id" unless group_id
   puts "  group_id = #{group_id}"
 
-  # This echos password to shell which is a bit sucky
+  # This echos password to terminal which is a bit sucky
   if ENV["RUBY_FORGE_PASSWORD"]
     password = ENV["RUBY_FORGE_PASSWORD"]
   else
