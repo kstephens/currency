@@ -15,6 +15,8 @@ end
 
 PKG_Name = 'Currency'
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
+RUBY_FORGE_PROJECT = PKG_NAME
+RUBY_FORGE_USER = "kstephens"
 
 def package_version
   '0.1.0'
@@ -189,8 +191,8 @@ desc "Publish the RDOCs on RubyForge"
 task :publish_rdoc => ["html/index.html"] do
   # NOTE: This task assumes that you have an SSH alias setup for rubyforge.
   mkdir_p "emptydir"
-  sh "scp -rq emptydir rubyforge:/var/www/gforge-projects/#{PKG_NAME}/rdoc"
-  sh "scp -rq html/* rubyforge:/var/www/gforge-projects/#{PKG_NAME}/rdoc"
+  sh "scp -rq emptydir rubyforge:/var/www/gforge-projects/#{RUBY_FORGE_PROJECT}/rdoc"
+  sh "scp -rq html/* rubyforge:/var/www/gforge-projects/#{RUBY_FORGE_PROJECT}/rdoc"
   rm_r "emptydir"
 end
 
@@ -256,7 +258,7 @@ Spec = Gem::Specification.new do |s|
   s.author = "Kurt Stephens"
   s.email = "ruby-#{PKG_NAME}@umleta.com"
   s.homepage = "http://#{PKG_NAME}.rubyforge.org"
-  s.rubyforge_project = "#{PKG_NAME}"
+  s.rubyforge_project = "#{RUBY_FORGE_PROJECT}"
   #s.bindir = "bin"                               # Use these for applications.
   #s.executables = ["update_rubygems"]
   certdir = ENV['CERT_DIR']
@@ -273,13 +275,139 @@ end
 
 Rake::GemPackageTask.new(Spec) do |p| end
 
+GEMSPEC = "pkg/#{PKG_NAME}.gemspec"
 desc "Build the Gem spec file for the #{PKG_NAME} package"
-task :gemspec => "pkg/#{PKG_NAME}.gemspec"
+task :gemspec => GEMSPEC
 file "pkg/#{PKG_NAME}.gemspec" => ["pkg", "Rakefile"] do |t|
   open(t.name, "w") do |f| f.puts Spec.to_yaml end
 end
 
-# Install RubyGems
+PACKAGE_FILES = [
+  "pkg/#{PKG_NAME}-#{PKG_VERSION}.gem",
+  "pkg/#{PKG_NAME}-#{PKG_VERSION}.tgz",
+  "pkg/#{PKG_NAME}-#{PKG_VERSION}.zip"
+]
+
+task :upload_package do
+# From activesuport/Rakefile
+  require 'net/http'
+  require 'net/https'
+  require 'open-uri'
+   
+  project_uri = "http://rubyforge.org/projects/#{RUBY_FORGE_PROJECT}/"
+  project_data = open(project_uri) { |data| data.read }
+  group_id = project_data[/[?&]group_id=(\d+)/, 1]
+  raise "Couldn't get group id" unless group_id
+  puts "  group_id = #{group_id}"
+
+  # This echos password to shell which is a bit sucky
+  if ENV["RUBY_FORGE_PASSWORD"]
+    password = ENV["RUBY_FORGE_PASSWORD"]
+  else
+    print "#{RUBY_FORGE_USER}@rubyforge.org's password: "
+    password = STDIN.gets.chomp
+  end
+
+  # rubyforge.org now uses https for login
+  login_response = Net::HTTP.start("rubyforge.org", 443) do |http|
+    http.use_ssl = true
+    data = [
+            "login=1",
+            "form_loginname=#{RUBY_FORGE_USER}",
+            "form_pw=#{password}"
+           ].join("&")
+    http.post("/account/login.php", data)
+  end
+
+  puts "  login_response = #{login_response.inspect}"
+  cookie = login_response["set-cookie"]
+  raise "Login failed" unless cookie
+  headers = { "Cookie" => cookie }
+  
+  release_uri = "http://rubyforge.org/frs/admin/?group_id=#{group_id}"
+  release_data = open(release_uri, headers) { |data| data.read }
+  package_id = release_data[/[?&]package_id=(\d+)/, 1]
+  raise "Couldn't get package id" unless package_id
+  puts "  package_id = #{package_id}"
+
+  first_file = true
+  release_id = ""
+  
+  files = PACKAGE_FILES
+  files.each do |filename|
+    basename  = File.basename(filename)
+    file_ext  = File.extname(filename)
+    file_data = File.open(filename, "rb") { |file| file.read }
+    
+    puts "Releasing #{basename}..."
+    
+    release_response = Net::HTTP.start("rubyforge.org", 443) do |http|
+      http.use_ssl = true
+      release_date = Time.now.strftime("%Y-%m-%d %H:%M")
+      type_map = {
+        ".zip"    => "3000",
+        ".tgz"    => "3110",
+        ".gz"     => "3110",
+        ".gem"    => "1400"
+      }; type_map.default = "9999"
+      type = type_map[file_ext]
+      boundary = "rubyqMY6QN9bp6e4kS21H4y0zxcvoor"
+      
+      query_hash = if first_file then
+                     {
+          "group_id" => group_id,
+          "package_id" => package_id,
+          "release_name" => RELEASE_NAME,
+          "release_date" => release_date,
+          "type_id" => type,
+          "processor_id" => "8000", # Any
+          "release_notes" => "",
+          "release_changes" => "",
+          "preformatted" => "1",
+          "submit" => "1"
+        }
+                   else
+                     {
+          "group_id" => group_id,
+          "release_id" => release_id,
+          "package_id" => package_id,
+          "step2" => "1",
+          "type_id" => type,
+          "processor_id" => "8000", # Any
+          "submit" => "Add This File"
+        }
+                   end
+      
+      query = "?" + query_hash.map do |(name, value)|
+        [name, URI.encode(value)].join("=")
+      end.join("&")
+      
+      data = [
+              "--" + boundary,
+              "Content-Disposition: form-data; name=\"userfile\"; filename=\"#{basename}\"",
+              "Content-Type: application/octet-stream",
+              "Content-Transfer-Encoding: binary",
+              "", file_data, ""
+             ].join("\x0D\x0A")
+      
+      release_headers = headers.merge(
+                                      "Content-Type" => "multipart/form-data; boundary=#{boundary}"
+                                      )
+
+      target = first_file ? "/frs/admin/qrs.php" : "/frs/admin/editrelease.php"
+      http.post(target + query, data, release_headers)
+    end
+    
+    if first_file then
+      release_id = release_response.body[/release_id=(\d+)/, 1]
+      raise("Couldn't get release id") unless release_id
+      puts " release_id = #{release_id}"
+    end
+    
+    first_file = false
+  end
+end
+
 
 desc "Install #{PKG_Name}"
 task :install do
