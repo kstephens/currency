@@ -1,9 +1,9 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'currency'
-require 'currency/currency_exchange_xe'
+require 'currency/exchange/xe'
 
-ex = Currency::CurrencyExchangeXe.new()
+ex = Currency::Exchange::Xe.new()
 
 puts ex.inspect
 puts ex.parse_page_rates.inspect

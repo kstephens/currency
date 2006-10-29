@@ -157,7 +157,7 @@ class MoneyTest < TestBase
     assert_equal_float 3.0, m
     
     assert_kind_of Numeric, m = (usd / cad)
-    assert_equal_float CurrencyExchangeTest.USD_CAD, m, 0.0001
+    assert_equal_float Exchange::Test.USD_CAD, m, 0.0001
   end
 
 end

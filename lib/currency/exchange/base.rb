@@ -1,17 +1,8 @@
 module Currency
-  # Represents a method of converting between two currencies
-  # TODO: 
-  #  Create an ExchangeRateLoader class.
-  #  Create an ExchangeRateLoader subclass that interfaces to xe.com or other FX quote source.
-  class CurrencyExchange
-    @@default = nil
-    def self.default 
-      @@default ||= self.new
-    end
-    def self.default=(x)
-      @@default = x
-    end
+module Exchange
 
+  # Represents a method of converting between two currencies
+  class Base
     def initialize(*opt)
       @exchange_rate = { }
     end 
@@ -45,6 +36,7 @@ module Currency
     end
   end
 
-  # END MODULE
-end
+  
+end # module
+end # module
 

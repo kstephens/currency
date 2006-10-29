@@ -2,9 +2,10 @@ require 'net/http'
 require 'open-uri'
 
 module Currency
+module Exchange
   # Represents connects to http://xe.com and groks "XE.com Quick Cross Rates"
 
-  class CurrencyExchangeXe < CurrencyExchange
+  class Xe < Base
     @@instance = nil
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
@@ -128,13 +129,14 @@ module Currency
 
       # $stderr.puts "XE Rate: #{c1.code} / #{c2.code} = #{rate}"
 
-      rate > 0 ? ExchangeRate.new(c1, c2, rate, self.class.name, @rate_timestamp) : nil
+      rate > 0 ? Rate.new(c1, c2, rate, self.class.name, @rate_timestamp) : nil
     end
   end
 
-  # END MODULE
-end
+end # module
+end # module
+
 
 # Install as current
-Currency::CurrencyExchange.default = Currency::CurrencyExchangeXe.instance
+Currency::Exchange.default = Currency::Exchange::Xe.instance
 

@@ -1,6 +1,8 @@
 module Currency
+module Exchange
+
   # This can convert only between USD and CAD
-  class CurrencyExchangeTest < CurrencyExchange
+  class Test < Base
     @@instance = nil
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
@@ -15,13 +17,13 @@ module Currency
       if ( c1.code == :USD && c2.code == :CAD )
         rate = self.class.USD_CAD
       end
-      rate > 0 ? ExchangeRate.new(c1, c2, rate, self.class.name) : nil
+      rate > 0 ? Rate.new(c1, c2, rate, self.class.name) : nil
     end
   end
 
-  # END MODULE
-end
+end # module
+end # module
 
 # Install as current
-Currency::CurrencyExchange.default = Currency::CurrencyExchangeTest.instance
+Currency::Exchange.default = Currency::Exchange::Test.instance
 

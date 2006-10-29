@@ -76,7 +76,7 @@ module Currency
       if @currency == currency
         self
       else
-        CurrencyExchange.default.convert(self, currency)
+        Exchange.default.convert(self, currency)
       end
     end
 
@@ -184,7 +184,7 @@ module Currency
     #def inspect_deep(*opts)
     #  self.class.superclass.instance_method(:inspect).bind(self).call 
     #end
-  end
 
-  # END MODULE
-end
+  end # class
+
+end # module

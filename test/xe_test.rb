@@ -3,7 +3,7 @@
 
 require 'test/test_base'
 require 'currency' # For :type => :money
-require 'currency/currency_exchange_xe'
+require 'currency/exchange/xe'
 
 module Currency
 
@@ -11,11 +11,11 @@ class XeTest < TestBase
   def setup
     super
     # Force XE Exchange.
-    CurrencyExchange.default = CurrencyExchangeXe.instance
+    Exchange.default = Exchange::Xe.instance
   end
 
   def test_xe_usd_cad
-    assert_not_nil rates = CurrencyExchange.default.rates
+    assert_not_nil rates = Exchange.default.rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
 

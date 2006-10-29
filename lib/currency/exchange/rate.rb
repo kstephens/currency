@@ -1,6 +1,7 @@
 module Currency
+module Exchange
   # Represents a convertion rate between two currencies
-  class ExchangeRate
+  class Rate
     def initialize(c1, c2, c1_to_c2_rate, source = "UNKNOWN", date = nil, recip = true)
       @c1 = c1
       @c2 = c2
@@ -42,6 +43,8 @@ module Currency
     end
   end
 
-  # END MODULE
-end
+  
+end # module
+end # module
+
 
