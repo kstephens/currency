@@ -19,9 +19,7 @@ examples/xe1.rb
 examples/ex1.rb
 ChangeLog
 Rakefile
-setup.rb
 TODO
 Releases
 README
-scripts/gemdoc.rb
 Manifest.txt
