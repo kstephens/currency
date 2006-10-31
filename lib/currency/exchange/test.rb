@@ -1,10 +1,13 @@
+# This class is a text Exchange.
+# It can convert only between USD and CAD.
+
 module Currency
 module Exchange
 
-  # This class is a text Exchange.
-  # It can convert only between USD and CAD
   class Test < Base
     @@instance = nil
+
+    # Returns a singleton instance.
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
     end
@@ -13,10 +16,11 @@ module Exchange
       super(*opts)
     end
 
-    # Sample constant.
+    # Test rate from :USD to :CAD.
     def self.USD_CAD; 1.1708; end
 
-    def load_exchange_rate(c1, c2)
+    # Returns test Rate for USD and CAD pairs. 
+    def get_rate(c1, c2)
       # $stderr.puts "load_exchange_rate(#{c1}, #{c2})"
       rate = 0.0
       if ( c1.code == :USD && c2.code == :CAD )
@@ -24,11 +28,12 @@ module Exchange
       end
       rate > 0 ? Rate.new(c1, c2, rate, self) : nil
     end
-  end
+
+  end # class
 
 end # module
 end # module
 
-# Install as current
+# Install as default.
 Currency::Exchange.default = Currency::Exchange::Test.instance
 

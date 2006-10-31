@@ -12,7 +12,7 @@ require 'hoe'
 PKG_Name = 'Currency'
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
 
-hoe = Hoe.new("currency", '0.1.2') do |p|
+hoe = Hoe.new("currency", '0.2.0') do |p|
   p.author = 'Kurt Stephens'
   p.description = %{Currency models currencies, monetary values, foreign exchanges.}
   p.email = "ruby-#{PKG_NAME}@umleta.com"

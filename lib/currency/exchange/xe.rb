@@ -1,17 +1,24 @@
+# Connects to http://xe.com and parses "XE.com Quick Cross Rates"
+# from home page HTML.
+
 require 'net/http'
 require 'open-uri'
 
 module Currency
 module Exchange
-  # Represents connects to http://xe.com and groks "XE.com Quick Cross Rates"
 
   class Xe < Base
     @@instance = nil
+
+    # Returns a singleton instance.
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
     end
 
+    # Defaults to "http://xe.com/"
     attr_accessor :uri
+
+    # This Exchange's name is the same as its #uri.
     def name
       uri
     end
@@ -22,6 +29,10 @@ module Exchange
       @rates = nil
     end
 
+    # Returns a cached Hash of rates:
+    #
+    #    xe.rates[:USD][:CAD] => 1.01
+    #
     def rates
       return @rates if @rates
 
@@ -34,6 +45,7 @@ module Exchange
       @rates
     end
 
+    # Returns the URI content.
     def get_page
       data = open(uri) { |data| data.read }
       
@@ -42,6 +54,8 @@ module Exchange
       data
     end
 
+    # Parses http://xe.com homepage HTML for
+    # quick rates of 10 currencies.
     def parse_page_rates(data = nil)
       data = get_page unless data
       
@@ -114,7 +128,9 @@ module Exchange
       rate
     end
 
-    def load_exchange_rate(c1, c2)
+    # Loads cached rates from xe.com and creates Rate objects
+    # for 10 currencies.
+    def get_rate(c1, c2)
       rates # Load rates
 
       # $stderr.puts "load_exchange_rate(#{c1}, #{c2})"
@@ -134,12 +150,13 @@ module Exchange
 
       rate > 0 ? Rate.new(c1, c2, rate, self, @rate_timestamp) : nil
     end
-  end
+
+  end # class
 
 end # module
 end # module
 
 
-# Install as current
+# Install as default.
 Currency::Exchange.default = Currency::Exchange::Xe.instance
 

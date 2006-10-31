@@ -1,49 +1,72 @@
+# -*- ruby -*-
+#
+# = Currency::Currency
+#
+# Represents a currency.
+#
+#
+
 module Currency
   #include Currency::Exceptions
 
   class Currency
-    # Create a new currency
+    # Create a new currency.
+    # This should only be called from Currency::CurrencyFactory.
     def initialize(code, symbol = nil, scale = 100)
       self.code = code
       self.symbol = symbol
       self.scale = scale
     end
 
+    # Returns the Currency object from the default CurrencyFactory
+    # by its 3-letter uppercase Symbol name, such as :USD, or :CAD.
     def self.get(code)
       CurrencyFactory.default.get_by_code(code)
     end
 
+    # Internal method for converting currency codes to internal
+    # Symbol format.
     def self.cast_code(x)
      x = x.upcase.intern if x.kind_of?(String)
      raise InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
      x
     end
 
+    # Returns the hash of the Currency's code.
     def hash
       @code.hash
     end
 
+    # Returns true if the Currency's are equal.
     def eql?(x)
       self.class == x.class && @code == x.code
     end
 
+    # Returns true if the Currency's are equal.
     def ==(x)
       self.class == x.class && @code == x.code
     end
 
-    # Accessors
+    # Get the Currency's code.
     def code
       @code
     end
+
+
+    # Client should never call this directly.
     def code=(x)
       x = self.class.cast_code(x) unless x.nil?
       @code = x
       #$stderr.puts "#{self}.code = #{@code}"; x
     end
 
+    # Get the Currency's scale factor.  
+    # E.g: the :USD scale factor is 100.
     def scale
       @scale
     end
+
+    # Client should never call this directly.
     def scale=(x)
       @scale = x
       return x if x.nil?
@@ -53,21 +76,32 @@ module Currency
       x
     end
 
+    # Get the Currency's scale factor.  
+    # E.g: the :USD scale factor is 2, where 10 ^ 2 == 100.
     def scale_exp
       @scale_exp
     end
 
+    # Get the Currency's symbol. 
+    # E.g. :USD, :CAD, etc.
     def symbol
       @symbol
     end
+
+    # Client should never call this directly.
     def symbol=(x)
       @symbol = x
     end
 
-    # Parse a Money string
+    # Parse a Money string.
+    # Options:
+    #   :currency => Currency object.
+    # Look for a matching currency code at the beginning or end of the string.
+    # If the currency does not match IncompatibleCurrency is raised.
+    #
     def parse(str, *opt)
       x = str
-      opt = Hash.[](*opt)
+      opt = Hash[*opt]
 
       md = nil # match data
 
@@ -194,22 +228,22 @@ module Currency
     #  @code.to_s
     #end
 
-    # Convience
-    # Default currency
+    # Returns the default CurrencyFactory's currency.
     def self.default
       CurrencyFactory.default.currency
     end
 
+    # Returns the USD Currency.
     def self.USD
       CurrencyFactory.default.USD
     end
 
+    # Returns the CAD Currency.
     def self.CAD
       CurrencyFactory.default.CAD
     end
-  end
 
-
-  # END MODULE
-end
+  end # class
+  
+end # module
 

@@ -1,16 +1,7 @@
 # -*- ruby -*-
-
-$:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
-
-require 'currency/exception'
-require 'currency/money'
-require 'currency/currency_factory'
-require 'currency/currency'
-require 'currency/money'
-require 'currency/exchange'
-require 'currency/core_extensions'
-
+#
+# = Currency
+#
 # The Currency package provides an object-oriented model of:
 #
 # * currencies 
@@ -22,10 +13,12 @@ require 'currency/core_extensions'
 #
 # * Currency::Money - uses a scaled integer representation of a monetary value and performs accurate conversions to and from string values.
 # * Currency::Currency - provides an object-oriented representation of a currency.
-# * Currency::Exchange::Base - the base class for a "currency exchange rate" provider.
+# * Currency::Exchange::Base - the base class for a currency exchange rate provider.
 # * Currency::Exchange::Rate - represents a exchange rate between two currencies.
 #
-# Below is a basic example:
+# 
+# The example below uses Currency::Exchange::Xe to automatically get 
+# exchange rates from http://xe.com/ :
 #
 #    require 'currency'
 #    require 'currency/exchange/xe'
@@ -34,8 +27,6 @@ require 'currency/core_extensions'
 #    puts "usd = #{usd.format}"
 #    cad = usd.convert(:CAD)
 #    puts "cad = #{cad.format}"
-#
-# The example above uses Currency::Exchange::Xe automatically get exchange rates from http://xe.com/.
 #
 # == ActiveRecord Suppport
 #
@@ -63,7 +54,25 @@ require 'currency/core_extensions'
 #
 # == Examples
 #
-# * The "test programs":http://rubyforge.org/cgi-bin/viewvc.cgi/currency/trunk/examples?root=currency
-# * The "test cases":http://rubyforge.org/cgi-bin/viewvc.cgi/currency/trunk/test/?root=currency
+# See the examples/ and test/ directorys
 #
+# == Author
+#
+# Kurt Stephens http://kurtstephens.com
+#
+# == Support
+#
+# ruby-currency(at)umleta.com
+#
+
+$:.unshift(File.dirname(__FILE__)) unless
+  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
+
+require 'currency/exception'
+require 'currency/money'
+require 'currency/currency_factory'
+require 'currency/currency'
+require 'currency/money'
+require 'currency/exchange'
+require 'currency/core_extensions'
 
