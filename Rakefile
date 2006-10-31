@@ -14,7 +14,7 @@ end
 
 #################################################################
 
-#require 'rubygems'
+require 'rubygems'
 require 'rake/clean'
 require 'rake/testtask'
 require 'rake/packagetask'
@@ -184,14 +184,14 @@ end
 # Create a task to build the RDOC documentation tree.
 
 desc "Create the RDOC html files"
-rd = Rake::RDocTask.new("rdoc") { |rdoc|
+rd = Rake::RDocTask.new("rdoc") do |rdoc|
   rdoc.rdoc_dir = 'html'
   rdoc.title    = "#{PKG_Name}"
   rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'README'
   rdoc.rdoc_files.include('README', 'TODO', 'Releases')
   rdoc.rdoc_files.include('lib/**/*.rb')
 #  rdoc.rdoc_files.include('test/**/*.rb')
-}
+end
 
 file "html/index.html" => [:rdoc]
 
