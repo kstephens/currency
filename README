@@ -8,7 +8,14 @@ gem install currency
 
 == For User Documentation, see
 
-This package deals with currencies, conversions between currencies and monetary values in an object-oriented fashion.
+http://rubyforge.org/projects/currency/
+
+The RubyForge package currency
+implements an object-oriented representation of currencies, monetary values, foreign exchanges and rates.
+
+Currency::Money uses a scaled integer representation of the monetary value and performs accurate conversions from string values.
+
+See: http://umleta.com/node/5 for more details.
 
 == Home page
 

@@ -4,9 +4,9 @@ module Currency
   class Currency
     # Create a new currency
     def initialize(code, symbol = nil, scale = 100)
-      self.code= code
-      self.symbol= symbol
-      self.scale= scale
+      self.code = code
+      self.symbol = symbol
+      self.scale = scale
     end
 
     def self.get(code)
@@ -17,6 +17,18 @@ module Currency
      x = x.upcase.intern if x.kind_of?(String)
      raise InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
      x
+    end
+
+    def hash
+      @code.hash
+    end
+
+    def eql?(x)
+      self.class == x.class && @code == x.code
+    end
+
+    def ==(x)
+      self.class == x.class && @code == x.code
     end
 
     # Accessors

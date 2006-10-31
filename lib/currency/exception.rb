@@ -1,10 +1,15 @@
 module Currency
-  class InvalidMoneyString < Exception
+  class Error < Exception; end
+
+  class InvalidMoneyString < Error
   end
   
-  class InvalidCurrencyCode < Exception
+  class InvalidCurrencyCode < Error
   end
   
-  class IncompatibleCurrency < Exception
+  class IncompatibleCurrency < Error
+  end
+
+  class UndefinedExchange < Error
   end
 end

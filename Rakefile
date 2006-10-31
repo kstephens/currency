@@ -2,6 +2,18 @@
 # Adapted from RubyGems/Rakefile
 # upload_package NOT WORKING YET
 
+#################################################################
+
+PKG_Name = 'Currency'
+def package_version
+  '0.1.1'
+end
+def package_description
+  %{Currency models currencies, monetary values, foreign exchanges.}
+end
+
+#################################################################
+
 #require 'rubygems'
 require 'rake/clean'
 require 'rake/testtask'
@@ -9,17 +21,14 @@ require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 
+#################################################################
+
 def announce(msg='')
   STDERR.puts msg
 end
 
-PKG_Name = 'Currency'
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
 RUBY_FORGE_PROJECT = PKG_NAME
-
-def package_version
-  '0.1.0'
-end
 
 if ENV['REL']
   PKG_VERSION = ENV['REL']
@@ -250,8 +259,7 @@ Spec = Gem::Specification.new do |s|
   s.name = PKG_NAME 
   s.version = PKG_VERSION
   s.summary = "#{PKG_Name} GEM"
-  s.description = %{Currency models currencies, monetary values, foreign exchanges.
-}
+  s.description = package_description
   s.files = PKG_FILES.to_a
   s.require_path = 'lib'
   s.author = "Kurt Stephens"

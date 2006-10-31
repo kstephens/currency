@@ -3,7 +3,10 @@ module Exchange
 
   # Represents a method of converting between two currencies
   class Base
+    attr_accessor :name
+
     def initialize(*opt)
+      @name = nil
       @exchange_rate = { }
     end 
 
@@ -34,6 +37,11 @@ module Exchange
     def load_exchange_rate(c1, c2)
       raise "Subclass responsibility: load_exchange_rate"
     end
+
+    def to_s
+      "#<#{self.class.name} #{self.name && self.name.inspect}>"
+    end
+
   end
 
   

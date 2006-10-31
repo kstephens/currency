@@ -12,6 +12,9 @@ module Exchange
     end
 
     attr_accessor :uri
+    def name
+      uri
+    end
 
     def initialize(*opt)
       super(*opt)
@@ -129,7 +132,7 @@ module Exchange
 
       # $stderr.puts "XE Rate: #{c1.code} / #{c2.code} = #{rate}"
 
-      rate > 0 ? Rate.new(c1, c2, rate, self.class.name, @rate_timestamp) : nil
+      rate > 0 ? Rate.new(c1, c2, rate, self, @rate_timestamp) : nil
     end
   end
 

@@ -1,11 +1,16 @@
 module Currency
 module Exchange
 
-  # This can convert only between USD and CAD
+  # This class is a text Exchange.
+  # It can convert only between USD and CAD
   class Test < Base
     @@instance = nil
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
+    end
+
+    def initialize(*opts)
+      super(*opts)
     end
 
     # Sample constant.
@@ -17,7 +22,7 @@ module Exchange
       if ( c1.code == :USD && c2.code == :CAD )
         rate = self.class.USD_CAD
       end
-      rate > 0 ? Rate.new(c1, c2, rate, self.class.name) : nil
+      rate > 0 ? Rate.new(c1, c2, rate, self) : nil
     end
   end
 

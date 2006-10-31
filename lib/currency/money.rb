@@ -76,11 +76,15 @@ module Currency
       if @currency == currency
         self
       else
-        Exchange.default.convert(self, currency)
+        Exchange.current.convert(self, currency)
       end
     end
 
     # Relational operations on Money values.
+    def hash
+      @rep.hash ^ @currency.hash
+    end
+
     def eql?(x)
       @rep == x.rep && @currency == x.currency
     end
