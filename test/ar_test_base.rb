@@ -21,12 +21,6 @@ class ArTestBase < TestBase
 
   class CurrencyTestMigration < AR_M
     def self.up
-      begin
-        down
-      rescue Object => e
-        announce("Warning: #{e}")
-      end
-
       create_table TABLE_NAME.intern do |t|
         t.column :name,     :string
         t.column :amount,   :integer # Money
@@ -73,12 +67,15 @@ class ArTestBase < TestBase
   end
 
   def schema_up
-    @currency_test_migration.migrate(:up)
-
+    begin
+      @currency_test_migration.migrate(:up)
+    rescue Object =>e
+      $stderr.puts "Warning: #{e}"
+    end
   end
 
   def schema_down
-    #@currency_test_migration.migrate(:down)
+    # @currency_test_migration.migrate(:down)
   end
 
   ##################################################
@@ -101,7 +98,7 @@ class ArTestBase < TestBase
 
   ##################################################
 
-  def assert_currency_test(a,b)
+  def assert_equal_money(a,b)
     assert_not_nil a
     assert_not_nil b
     # Make sure a and b are not the same object.
@@ -116,22 +113,22 @@ class ArTestBase < TestBase
     assert_equal   a.amount.convert(b.amount.currency).rep, b.amount.rep
   end
 
-  def test_simple
-    insert_records
+  def assert_same_currency(a,b)
 
-    assert_not_nil usd = @currency_test.find(@usd.id)
-    assert_currency_test usd, @usd
+    assert_equal_money a, b
 
-    assert_equal   usd.amount.rep, @usd.amount.rep
-    assert_equal   usd.amount.currency, @usd.amount.currency
-    assert_equal   usd.amount.currency.code, @usd.amount.currency.code
+    assert_equal   a.amount.rep, b.amount.rep
+    assert_equal   a.amount.currency, b.amount.currency
+    assert_equal   a.amount.currency.code, b.amount.currency.code
 
-    assert_not_nil cad = @currency_test.find(@cad.id)
-    assert_currency_test cad, @cad
+  end
 
-    assert_equal   cad.amount.currency.code, :USD
-
-    delete_records
+  ##################################################
+  # 
+  # 
+  
+  def test_dummy
+    true
   end
 
 end

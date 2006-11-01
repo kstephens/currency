@@ -12,6 +12,10 @@ module Currency
     # Error during string parsing.
     class InvalidMoneyString < Base
     end
+
+    # Error during coercion of external Money values.
+    class InvalidMoneyValue < Base
+    end
   
     # Error in Currency code formeat.
     class InvalidCurrencyCode < Base

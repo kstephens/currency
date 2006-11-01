@@ -20,6 +20,8 @@ Rakefile
 README
 Releases
 test/ar_test_base.rb
+test/ar_simple_test.rb
+test/ar_column_test.rb
 test/money_test.rb
 test/test_base.rb
 test/xe_test.rb

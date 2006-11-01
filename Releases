@@ -1,5 +1,10 @@
 = Currency Release History
 
+== Release 0.3.0: 2006/10/31
+
+* ActiveRecord money :*_field options are now named :*_column.
+* More ActiveRecord tests
+
 == Release 0.2.1: 2006/10/31
 
 * Fixed Manifest.txt
