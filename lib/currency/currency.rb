@@ -212,7 +212,7 @@ module Currency
       x = "-" + x if neg
 
       # Add symbol?
-      x = @symbol + x unless opt.include?(:no_symbol)
+      x = (@symbol || '') + x unless opt.include?(:no_symbol)
 
       # Suffix currency code.
       if opt.include?(:with_currency)
