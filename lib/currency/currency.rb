@@ -233,6 +233,10 @@ module Currency
     def self.default
       CurrencyFactory.default.currency
     end
+    # Sets the default CurrencyFactory's currency.
+    def self.default=(x)
+      CurrencyFactory.default.currency = x
+    end
 
     # Returns the USD Currency.
     def self.USD

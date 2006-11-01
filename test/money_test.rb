@@ -16,10 +16,25 @@ class MoneyTest < TestBase
   #
 
   def test_create
-   assert_kind_of Money, m = Money.
-      new(1.99)
+    assert_kind_of Money, m = Money.new(1.99)
+    assert_equal m.currency, Currency.default
+    assert_equal m.currency.code, :USD
 
     m
+  end
+
+  def test_create_on_object
+    assert_kind_of Money, m = 1.99.money(:USD)
+    assert_equal m.currency.code, :USD
+    assert_equal m.rep, 199
+
+    assert_kind_of Money, m = 199.money(:CAD)
+    assert_equal m.currency.code, :CAD
+    assert_equal m.rep, 19900
+
+    assert_kind_of Money, m = "13.98".money(:CAD)
+    assert_equal m.currency.code, :CAD
+    assert_equal m.rep, 1398
   end
 
   def test_zero

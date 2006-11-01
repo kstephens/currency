@@ -106,17 +106,19 @@ module Currency
       @rep
     end
 
-    # Returns the money representation (usually an Integer).
+    # Returns the Money representation (usually an Integer).
     def rep
       @rep
     end
 
-    # Get the money's Currency.
+    # Get the Money's Currency.
     def currency
       @currency
     end
 
     # Convert Money to another Currency.
+    # currency can be a Symbol or a Currency object.
+    # If currency is nil, the Currency.default is used.
     def convert(currency)
       currency = Currency.default if currency.nil?
       currency = Currency.get(currency) unless currency.kind_of?(Currency)
@@ -147,6 +149,8 @@ module Currency
         @currency == x.currency
     end
 
+    # Compares Money values.
+    # Will convert x currency before comparision.
     def <=>(x)
       if @currency == x.currency
         @rep <=> x.rep
@@ -155,32 +159,31 @@ module Currency
       end
     end
 
-    # Operations on Money values.
-
 
     #   - Money => Money
+    #
     # Negates a Money value.
     def -@
       new_rep(- @rep)
     end
 
-    #    Money + (Number|Money) => Money
+    #    Money + (Money | Number) => Money
     #
-    # Right side maybe coerced to Money.
+    # Right side may be coerced to left side's Currency.
     def +(x)
       new_rep(@rep + x.Money_rep(@currency))
     end
 
-    #    Money - (Number|Money) => Money
+    #    Money - (Money | Number) => Money
     #
-    # Right side maybe coerced to Money.
+    # Right side may be coerced to left side's Currency.
     def -(x)
       new_rep(@rep - x.Money_rep(@currency))
     end
 
     #    Money * Number => Money
     #
-    # Right side must be number.
+    # Right side must be Number.
     def *(x)
        new_rep(@rep * x)
     end
@@ -188,7 +191,7 @@ module Currency
     #    Money / Money => Number (ratio)
     #    Money / Number => Money
     #
-    # Right side must be a number or Money.
+    # Right side must be Money or Number.
     # Right side Integers are not coerced to Float before
     # division.
     def /(x)
