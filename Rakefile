@@ -8,7 +8,9 @@ require 'rubygems'
 require 'hoe'
 
 PKG_Name = 'Currency'
-PKG_DESCRIPTION = %{Currency models currencies, monetary values, foreign exchanges.}
+PKG_DESCRIPTION = %{Currency models currencies, monetary values, foreign exchanges and rates.
+Supports ActiveRecord.
+}
 
 #################################################################
 # Release notes
