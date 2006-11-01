@@ -1,8 +1,8 @@
-# REAL
+
 #require File.dirname(__FILE__) + '/../test_helper'
 
 require 'test/test_base'
-require 'currency' # For :type => :money
+require 'currency'
 
 module Currency
 
@@ -105,7 +105,7 @@ class MoneyTest < TestBase
   end
 
   def test_op
-    # Using default load_exchange_rate
+    # Using default get_rate
     assert_not_nil usd = Money.new(123.45, :USD)
     assert_not_nil cad = Money.new(123.45, :CAD)
 
@@ -160,6 +160,14 @@ class MoneyTest < TestBase
     assert_equal_float Exchange::Test.USD_CAD, m, 0.0001
   end
 
+  def test_invalid_currency_code
+    assert_raise Exception::InvalidCurrencyCode do
+      Money.new(123, :asdf)
+    end
+    assert_raise Exception::InvalidCurrencyCode do
+      Money.new(123, 5)
+    end
+  end
 end
 
 end # module

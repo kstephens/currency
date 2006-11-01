@@ -8,30 +8,46 @@
 # and a Currency object.
 #
 # TODO:
-# * we need to store a time, so we can use historical FX rates.
+# * Need to store a time, so we can use historical FX rates.
 #
 
 module Currency
+
+  # Use this function instead of Money#new:
+  #
+  #    Currency::Money("12.34", :CAD)
+  #
+  # not
+  #
+  #    Currency::Money.new("12.34", :CAD)
+  #
+  # See Money#new.
+  def self.Money(*opts)
+    Money.new(*opts)
+  end
 
   class Money
     include Comparable
 
     #
-    # Construct from a pre-scaled external representation:
+    # Construct a Money value object 
+    # from a pre-scaled external representation:
     # where x is a Float, Integer, String, etc.
     #
     # If a currency is not specified, Currency#default is used.
     #
     #    x.Money_rep(currency) 
     #
-    # is invoked to coerce x into Money representation value.
+    # is invoked to coerce x into a Money representation value.
     #
-    # For:
+    # For example:
+    #
     #    123.Money_rep(:USD) => 12300
     #
     # Because the USD Currency object has a #scale of 100
     #
     # See #Money_rep(currency) mixin.
+    # See Currency#Money() function.
     #
     def initialize(x, currency = nil)
       # Xform currency

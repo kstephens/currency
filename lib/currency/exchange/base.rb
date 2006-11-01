@@ -57,7 +57,7 @@ module Exchange
     #
     # Subclasses are required to implement this method.
     def get_rate(c1, c2)
-      raise "Subclass responsibility: get_rate"
+      raise Exception::UnknownRate.new("Subclass responsibility: get_rate")
     end
 
     # Returns a simple string rep of an Exchange object.

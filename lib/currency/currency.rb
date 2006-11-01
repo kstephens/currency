@@ -28,7 +28,8 @@ module Currency
     # Symbol format.
     def self.cast_code(x)
      x = x.upcase.intern if x.kind_of?(String)
-     raise InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
+     raise Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
+     raise Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
      x
     end
 
@@ -113,7 +114,7 @@ module Currency
         x = md[2]
         if curr != self
           if opt[:currency] && opt[:currency] != curr
-            raise IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
+            raise Exception::IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
           end
           return Money.new(x, curr);
         end
@@ -123,7 +124,7 @@ module Currency
         x = md[1]
         if curr != self
           if opt[:currency] && opt[:currency] != curr
-            raise IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
+            raise Exception::IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
           end
           return Money.new(x, curr);
         end
@@ -170,7 +171,7 @@ module Currency
       else
         # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
         #x.to_f.Money_rep(self)
-        raise InvalidMoneyString.new("#{str} #{self}")
+        raise Exception::InvalidMoneyString.new("#{str} #{self}")
       end
     end
 

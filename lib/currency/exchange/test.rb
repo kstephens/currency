@@ -1,4 +1,4 @@
-# This class is a text Exchange.
+# This class is a test Exchange.
 # It can convert only between USD and CAD.
 
 module Currency

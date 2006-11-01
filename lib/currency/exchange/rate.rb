@@ -6,6 +6,7 @@ module Exchange
       @c1 = c1
       @c2 = c2
       @rate = c1_to_c2_rate
+      raise Exception::InvalidRate.new(@rate) unless @rate > 0.0
       @source = source
       @date = date || Time.now
       @reciprocal = recip
