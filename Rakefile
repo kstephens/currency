@@ -12,7 +12,7 @@ require 'hoe'
 PKG_Name = 'Currency'
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
 
-hoe = Hoe.new("currency", '0.3.0') do |p|
+hoe = Hoe.new("currency", '0.3.1') do |p|
   p.author = 'Kurt Stephens'
   p.description = %{Currency models currencies, monetary values, foreign exchanges.}
   p.email = "ruby-#{PKG_NAME}@umleta.com"
@@ -34,7 +34,7 @@ end
 
 version_rb = "lib/#{PKG_NAME}/#{PKG_NAME}_version.rb"
 
-task :update_version => 'Rakefile' do
+task :update_version do
   announce "Updating #{PKG_Name} version to #{PKG_VERSION}: #{version_rb}"
   open(version_rb, "w") do |f|
     f.puts "# DO NOT EDIT"
@@ -47,7 +47,7 @@ task :update_version => 'Rakefile' do
   if ENV['RELTEST']
     announce "Release Task Testing, skipping commiting of new version"
   else
-    sh %{svn commit -m "Updated to version #{PKG_VERSION}" #{version_rb}}
+    sh %{svn commit -m "Updated to version #{PKG_VERSION}" #{version_rb} Rakefile}
   end
 end
 
