@@ -6,16 +6,18 @@ This is the rubyforge.com Currency package.
 
 gem install currency
 
-== For User Documentation, see
+== Documentation
 
-http://rubyforge.org/projects/currency/
+"Project Info":http://rubyforge.org/projects/currency/
+
+"API Documentation":http://currency.rubyforge.org/
 
 The RubyForge package currency
 implements an object-oriented representation of currencies, monetary values, foreign exchanges and rates.
 
 Currency::Money uses a scaled integer representation of the monetary value and performs accurate conversions from string values.
 
-See: http://umleta.com/node/5 for more details.
+See also: http://umleta.com/node/5
 
 == Home page
 
@@ -31,7 +33,7 @@ See: http://umleta.com/node/5 for more details.
 
 Currency was developed by:
 
-* Kurt Stephens -- ruby-currency(at)umleta.com
+* Kurt Stephens -- ruby-currency(at)umleta.com, sponsored by umleta.com
 
 == Contributors
 
