@@ -9,7 +9,6 @@ module Exchange
 
   class Xe < Base
     @@instance = nil
-
     # Returns a singleton instance.
     def self.instance(*opts)
       @@instance ||= self.new(*opts)
@@ -18,32 +17,117 @@ module Exchange
     # Defaults to "http://xe.com/"
     attr_accessor :uri
 
+    # Defines the number of seconds rates until rates
+    # become invalid, causing a request of new rates.
+    #
+    # Defaults to 600 seconds.
+    attr_accessor :time_to_live
+
+    # Defines the number of random seconds to add before
+    # rates become invalid.
+    #
+    # Defaults to 30 seconds.
+    attr_accessor :time_to_live_fudge
+
     # This Exchange's name is the same as its #uri.
     def name
       uri
     end
 
     def initialize(*opt)
-      super(*opt)
       self.uri = 'http://xe.com/'
-      @rates = nil
+      self.time_to_live = 600
+      self.time_to_live_fudge = 30
+      @xe_rates = nil
+      super(*opt)
+    end
+
+    def clear_rates
+      @xe_rates && @xe_rates.clear
+      super
+    end
+
+    def expired?
+      if @time_to_live &&
+         @xe_rates_renew_time &&
+         (Time.now > @xe_rates_renew_time)
+
+        if @xe_rates 
+          $stderr.puts "#{self}: rates expired on #{@xe_rates_renew_time}" if @verbose
+          
+          @old_rates ||= @xe_rates
+         
+          @xe_rates = nil
+        end
+
+        true
+      else
+        false
+      end
+    end
+
+    # Check expired? before returning a Rate.
+    def rate(c1, c2)
+      if expired?
+        clear_rates
+      end
+      super(c1, c2)
     end
 
     # Returns a cached Hash of rates:
     #
-    #    xe.rates[:USD][:CAD] => 1.01
+    #    xe.xe_rates[:USD][:CAD] => 1.0134
     #
-    def rates
-      return @rates if @rates
+    def xe_rates
+      old_rates = nil
+      # Check expiration.
+      expired?
 
-      @rates = parse_page_rates
-      return @rates unless @rates
+      # Return rates, if cached.
+      return @xe_rates if @xe_rates
 
-      @rates_usd_cur = @rates[:USD]
-      @rate_timestamp = Time.now
+      # Force load of rates
+      @xe_rates = xe_rates_load
+
+      # Flush old rates.
+      @old_rates = nil
+
+      # Update expiration.
+      if time_to_live
+        @xe_rates_renew_time = @rate_timestamp + (time_to_live + (time_to_live_fudge || 0))
+        $stderr.puts "#{self}: rates expire on #{@xe_rates_renew_time}" if @verbose
+      end
       
-      @rates
+      @xe_rates
     end
+
+    def xe_rates_load
+      # Do not allow re-entrancy
+      raise "Reentrant!" if @processing_rates
+
+      # Begin processing new rate request.
+      @processing_rates = true
+
+      # Clear cached Rates.
+      clear_rates
+
+      # Parse rates from HTML page.
+      rates = parse_page_rates
+      
+      unless rates 
+        # FIXME: raise Exception::???
+        return rates 
+      end
+
+      # Compute new rate timeps
+      @rate_timestamp = Time.now # TODO: Extract this from HTML page!
+
+      # End processsing new rate request.
+      @processing_rates = false
+
+      rates
+    end
+
 
     # Returns the URI content.
     def get_page
@@ -131,18 +215,22 @@ module Exchange
     # Loads cached rates from xe.com and creates Rate objects
     # for 10 currencies.
     def get_rate(c1, c2)
-      rates # Load rates
+      rates = xe_rates # Load rates
 
       # $stderr.puts "load_exchange_rate(#{c1}, #{c2})"
       rate = 0.0
       r1 = nil
       r2 = nil
 
-      if ( c1.code == :USD && (r2 = @rates_usd_cur[c2.code]) )
+      rates_usd = rates[:USD]
+
+      raise Exception::UnknownRate.new("#{self}: base rate :USD") unless rates_usd
+
+      if ( c1.code == :USD && (r2 = rates_usd[c2.code]) )
         rate = r2
-      elsif ( c2.code == :USD && (r1 = @rates_usd_cur[c2.code]) )
+      elsif ( c2.code == :USD && (r1 = rates_usd[c2.code]) )
         rate = 1.0 / r1
-      elsif ( (r1 = @rates_usd_cur[c1.code]) && (r2 = @rates_usd_cur[c2.code]) )
+      elsif ( (r1 = rates_usd[c1.code]) && (r2 = rates_usd[c2.code]) )
         rate = r2 / r1
       end
 

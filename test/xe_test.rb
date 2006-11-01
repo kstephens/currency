@@ -12,7 +12,7 @@ class XeTest < TestBase
   end
 
   def test_xe_usd_cad
-    assert_not_nil rates = Exchange.default.rates
+    assert_not_nil rates = Exchange.default.xe_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
 

@@ -14,11 +14,18 @@ module Exchange
 
   # Represents a method of converting between two currencies
   class Base
+
+    # The name of this Exchange.
     attr_accessor :name
 
+    # If true, this Exchange will log information.
+    attr_accessor :verbose
+    
     def initialize(*opt)
       @name = nil
       @rate = { }
+      opt = Hash[*opt]
+      opt.each{|k,v| self.send(k, v)}
     end 
 
     # Converts Money m in Currency c1 to a new
@@ -34,7 +41,7 @@ module Exchange
 
     # Flush all cached Rate.
     def clear_rates
-      @rate.empty!
+      @rate.clear
     end
 
     # Flush any cached Rate between Currency c1 and c2.
@@ -47,6 +54,10 @@ module Exchange
     #
     # This will call #get_rate(c1, c2) if the
     # Rate has not already been cached.
+    #
+    # Subclasses can override this method to implement
+    # rate expiration rules.
+    #
     def rate(c1, c2)
       (@rate[c1.code.to_s + c2.code.to_s] ||= get_rate(c1, c2)) ||
       (@rate[c2.code.to_s + c1.code.to_s] ||= get_rate(c2, c1))

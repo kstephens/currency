@@ -1,5 +1,12 @@
 = Currency Release History
 
+== Release 0.3.2: 2006/10/31
+
+* BOO!
+* Fixed Currency.symbol formatting when Currency.symbol.nil?
+* Added expiration of rates in Xe.
+* Added more Money tests.
+
 == Release 0.3.1: 2006/10/31
 
 * Remove debug puts.

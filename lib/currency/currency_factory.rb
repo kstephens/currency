@@ -34,7 +34,7 @@ module Currency
     # This method initializes a Currency object as
     # requested from #get_by_code or #get_by_symbol.
     #
-    # This method must define:
+    # This method must initialize:
     #
     #    currency.code
     #    currency.symbol
