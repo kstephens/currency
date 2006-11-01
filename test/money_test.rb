@@ -120,6 +120,34 @@ class MoneyTest < TestBase
   end
 
   def test_eql
+    assert_not_nil usd1 = Money.new(123, :USD)
+    assert_not_nil usd2 = Money.new("123", :USD)
+
+    assert_equal :USD, usd1.currency.code
+    assert_equal :USD, usd2.currency.code
+    
+    assert_equal usd1.rep, usd2.rep
+
+    assert usd1 == usd2
+
+  end
+
+  def test_not_eql  
+ 
+    assert_not_nil usd1 = Money.new(123, :USD)
+    assert_not_nil usd2 = Money.new("123.01", :USD)
+
+    assert_equal :USD, usd1.currency.code
+    assert_equal :USD, usd2.currency.code
+    
+    assert_not_equal usd1.rep, usd2.rep
+
+    assert usd1 != usd2
+
+    ################
+    # currency !=
+    # rep ==
+
     assert_not_nil usd = Money.new(123, :USD)
     assert_not_nil cad = Money.new(123, :CAD)
 
@@ -130,7 +158,7 @@ class MoneyTest < TestBase
     assert usd.currency != cad.currency
 
     assert usd != cad
-    
+
   end
 
   def test_op
