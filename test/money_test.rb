@@ -23,7 +23,7 @@ class MoneyTest < TestBase
     m
   end
 
-  def test_create_on_object
+  def test_object_money_method
     assert_kind_of Money, m = 1.99.money(:USD)
     assert_equal m.currency.code, :USD
     assert_equal m.rep, 199
@@ -83,6 +83,20 @@ class MoneyTest < TestBase
     assert   p == p
 
     assert   z == test_zero
+  end
+
+  def test_compare
+    n = test_negative
+    z = test_zero
+    p = test_positive
+
+    assert (n <=> p) == -1
+    assert (p <=> n) == 1
+    assert (p <=> z) == 1
+
+    assert (n <=> n) == 0
+    assert (z <=> z) == 0
+    assert (p <=> p) == 0    
   end
 
   def test_rep
