@@ -47,12 +47,14 @@ class ArTestBase < TestBase
     @currency_test_migration ||= CurrencyTestMigration 
     @currency_test ||= CurrencyTest
 
+    # schema_down
+
     schema_up
   end
 
   def teardown
     super
-    schema_down
+    # schema_down
   end
 
   def database_spec
@@ -75,7 +77,11 @@ class ArTestBase < TestBase
   end
 
   def schema_down
-    # @currency_test_migration.migrate(:down)
+    begin
+      @currency_test_migration.migrate(:down)
+    rescue Object => e
+      $stderr.puts "Warning: #{e}"
+    end
   end
 
   ##################################################
@@ -83,6 +89,8 @@ class ArTestBase < TestBase
   # 
 
   def insert_records
+    delete_records
+
     @currency_test.reset_column_information
 
     @usd = @currency_test.new(:name => '#1: USD', :amount => Money.new("12.34", :USD))
@@ -93,7 +101,7 @@ class ArTestBase < TestBase
   end
 
   def delete_records
-    # Simp
+    @currency_test.destroy_all
   end
 
   ##################################################
@@ -113,7 +121,7 @@ class ArTestBase < TestBase
     assert_equal   a.amount.convert(b.amount.currency).rep, b.amount.rep
   end
 
-  def assert_same_currency(a,b)
+  def assert_equal_currency(a,b)
 
     assert_equal_money a, b
 
@@ -128,7 +136,7 @@ class ArTestBase < TestBase
   # 
   
   def test_dummy
-    true
+    insert_records
   end
 
 end
