@@ -16,7 +16,7 @@ Supports ActiveRecord.
 # Release notes
 #
 
-def get_release_notes(relfile = "Releases")
+def get_release_notes(relfile = "Releases.txt")
 
   release = nil
   notes = [ ]
