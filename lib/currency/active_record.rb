@@ -135,7 +135,7 @@ def #{attr_name}_before_type_cast
 end
 
 end_eval
-        $stderr.puts "   CODE = #{x}"
+        # $stderr.puts "   CODE = #{x}"
       end
     end
   end

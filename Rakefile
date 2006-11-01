@@ -47,7 +47,7 @@ task :update_version => 'Rakefile' do
   if ENV['RELTEST']
     announce "Release Task Testing, skipping commiting of new version"
   else
-    sh %{svn commit -m "Updated to version #{PKG_VERSION}" #{version_rb} Rakefile}
+    sh %{svn commit -m "Updated to version #{PKG_VERSION}" #{version_rb}}
   end
 end
 
