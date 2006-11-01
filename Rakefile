@@ -7,16 +7,50 @@
 require 'rubygems'
 require 'hoe'
 
+PKG_Name = 'Currency'
+PKG_DESCRIPTION = %{Currency models currencies, monetary values, foreign exchanges.}
+
+#################################################################
+# Release notes
+#
+
+def get_release_notes(relfile = "Releases")
+
+  release = nil
+  notes = [ ]
+
+  File.open(relfile) do |f|
+    while line = f.readline
+      if md = /^== Release ([\d\.]+)/i.match(line)
+        release = md[1]
+        notes << line
+        break
+      end
+    end
+
+    while line = f.readline
+      if md = /^== Release ([\d\.]+)/i.match(line)
+        break
+      end
+      notes << line
+    end
+  end
+
+  [ release, notes.join('') ]
+end
+
 #################################################################
 
-PKG_Name = 'Currency'
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
 
-hoe = Hoe.new("currency", '0.3.1') do |p|
+release, release_notes = get_release_notes
+
+hoe = Hoe.new("currency", release) do |p|
   p.author = 'Kurt Stephens'
-  p.description = %{Currency models currencies, monetary values, foreign exchanges.}
+  p.description = PKG_DESCRIPTION
   p.email = "ruby-#{PKG_NAME}@umleta.com"
   p.summary = p.description
+  p.changes = release_notes
   p.url = "http://rubyforge.org/projects/#{PKG_NAME}"
   
   p.test_globs = ['test/**/*.rb']
