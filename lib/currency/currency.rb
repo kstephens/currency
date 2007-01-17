@@ -248,6 +248,16 @@ module Currency
       CurrencyFactory.default.CAD
     end
 
+    # Returns the EUR Currency.
+    def self.EUR
+      CurrencyFactory.default.EUR
+    end
+
+    # Returns the GBP Currency.
+    def self.GBP
+      CurrencyFactory.default.GBP
+    end
+
   end # class
   
 end # module
