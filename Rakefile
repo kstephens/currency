@@ -1,6 +1,16 @@
 # Rakefile for currency      -*- ruby -*-
 # Adapted from RubyGems/Rakefile
-# upload_package NOT WORKING YET
+
+# For release
+"
+svn status
+rake update_version
+rake package
+rake release VERSION=x.x.x
+rake svn_release
+rake publish_docs
+rake announce
+"
 
 #################################################################
 
@@ -30,7 +40,7 @@ def get_release_notes(relfile = "Releases.txt")
   notes = [ ]
 
   File.open(relfile) do |f|
-    while line = f.readline
+    while ! f.eof && line = f.readline
       if md = /^== Release ([\d\.]+)/i.match(line)
         release = md[1]
         notes << line
@@ -38,7 +48,7 @@ def get_release_notes(relfile = "Releases.txt")
       end
     end
 
-    while line = f.readline
+    while ! f.eof && line = f.readline
       if md = /^== Release ([\d\.]+)/i.match(line)
         break
       end
@@ -52,6 +62,8 @@ end
 #################################################################
 
 PKG_NAME = PKG_Name.gsub(/[a-z][A-Z]/) {|x| "#{x[0,1]}_#{x[1,1]}"}.downcase
+
+PKG_SVN_ROOT="svn+ssh://rubyforge.org/var/svn/#{PKG_NAME}/#{PKG_NAME}"
 
 release, release_notes = get_release_notes
 
@@ -97,6 +109,14 @@ end
 
 task version_rb => :update_version
 
+#################################################################
+# SVN
+#
+
+task :svn_release do
+  sh %{svn cp -m 'Release #{PKG_VERSION}' . #{PKG_SVN_ROOT}/release/#{PKG_VERSION}}
+end
+
 # task :test => :update_version
 
 
@@ -131,4 +151,11 @@ task :rubyfiles do
   puts Dir['**/*.rb'].reject { |fn| fn =~ /^pkg/ }
   puts Dir['bin/*'].reject { |fn| fn =~ /CVS|.svn|(~$)|(\.rb$)/ }
 end
+
+task :make_manifest do 
+  open("Manifest.txt", "w") do |f|
+    f.puts Dir['**/*'].reject { |fn| ! test(?f, fn) || fn =~ /CVS|.svn|(~$)|(.gem$)|(^pkg\/)|(^doc\/)/ }.sort.join("\n") + "\n"
+  end
+end
+
 
