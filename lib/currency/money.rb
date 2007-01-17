@@ -29,6 +29,9 @@ module Currency
   class Money
     include Comparable
 
+    @@empty_hash = { }
+    @@empty_hash.freeze
+
     #
     # Construct a Money value object 
     # from a pre-scaled external representation:
@@ -49,7 +52,9 @@ module Currency
     # See #Money_rep(currency) mixin.
     # See Currency#Money() function.
     #
-    def initialize(x, currency = nil)
+    def initialize(x, currency = nil, time = nil)
+      opts ||= @@empty_hash
+
       # Xform currency
       currency = Currency.default if currency.nil?
       currency = Currency.get(currency) unless currency.kind_of?(Currency)
@@ -57,6 +62,8 @@ module Currency
       # Set ivars
       @currency = currency;
       @rep = x.Money_rep(@currency)
+      @time = time
+      @time = Time.new if @time == :now
 
       # Handle conversion of "USD 123.45"
       if @rep.kind_of?(Money)
@@ -65,10 +72,13 @@ module Currency
       end
     end
 
+
     # Compatibility with Money package.
     def self.us_dollar(x)
       self.new(x, :USD)
     end
+
+
     # Compatibility with Money package.
     def cents
       @rep
@@ -76,8 +86,8 @@ module Currency
 
 
     # Construct from post-scaled internal representation
-    def self.new_rep(r, currency = nil)
-      x = self.new(0, currency)
+    def self.new_rep(r, currency = nil, time = nil)
+      x = self.new(0, currency, time)
       x.set_rep(r)
       x
     end
@@ -86,18 +96,26 @@ module Currency
     #    x = Currency::Money.new("1.98", :USD)
     #    x.new_rep(100) => "$1.00 USD"
     #
-    def new_rep(r)
-      x = self.class.new(0, @currency)
+    def new_rep(r, time = nil)
+      time ||= @time
+      x = self.class.new(0, @currency, time)
       x.set_rep(r)
       x
     end
 
-    # Do not call this method directly
+    # Do not call this method directly.
     # CLIENTS SHOULD NEVER CALL set_rep DIRECTLY.
     # You have been warned in ALL CAPS.
     def set_rep(r)
       r = r.to_i unless r.kind_of?(Integer)
       @rep = r
+    end
+
+    # Do not call this method directly.
+    # CLIENTS SHOULD NEVER CALL set_time DIRECTLY.
+    # You have been warned in ALL CAPS.
+    def set_time(time)
+      @time = time
     end
 
     # Returns the money representation for the requested currency.
@@ -116,16 +134,21 @@ module Currency
       @currency
     end
 
+    # Get the Money's time.
+    def time
+      @time
+    end
+
     # Convert Money to another Currency.
     # currency can be a Symbol or a Currency object.
     # If currency is nil, the Currency.default is used.
-    def convert(currency)
+    def convert(currency, time = nil)
       currency = Currency.default if currency.nil?
       currency = Currency.get(currency) unless currency.kind_of?(Currency)
       if @currency == currency
         self
       else
-        Exchange.current.convert(self, currency)
+        Exchange.current.convert(self, currency, time)
       end
     end
 
@@ -240,10 +263,10 @@ module Currency
     end
 
     # Returns the Money's value representation in another currency.
-    def Money_rep(currency)
+    def Money_rep(currency, time = nil)
       # Attempt conversion?
       if @currency != currency
-	self.convert(currency).rep
+	self.convert(currency, time).rep
         # raise("Incompatible Currency: #{@currency} != #{currency}")
       else
         @rep

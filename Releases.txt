@@ -1,5 +1,12 @@
 = Currency Release History
 
+== Release 0.4.0: 2007/01/17
+
+* Refactor derived rates using pivot currencies and reciprocals.
+* Initial support for historical money values and rates.
+* Added EUR, GBP short-cuts.
+* Initial Currency::Exchange::Historical using ActiveRecord.
+
 == Release 0.3.3: 2006/10/31
 
 * Inclusion of README.txt and Releases.txt into documentation.

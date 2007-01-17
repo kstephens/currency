@@ -12,21 +12,45 @@ module Exchange
       @@instance ||= self.new(*opts)
     end
 
+
+    # Install as default.
+    def self.make_default
+      ::Currency::Exchange.default = ::Currency::Exchange::Test.instance
+    end
+
+
     def initialize(*opts)
       super(*opts)
+      self.name = self.class.name
     end
+
 
     # Test rate from :USD to :CAD.
     def self.USD_CAD; 1.1708; end
 
-    # Returns test Rate for USD and CAD pairs. 
-    def get_rate(c1, c2)
-      # $stderr.puts "load_exchange_rate(#{c1}, #{c2})"
+
+    # Test rate from :USD to :EUR.
+    def self.USD_EUR; 0.7737; end
+
+
+    # Test rate from :USD to :EUR.
+    def self.USD_GBP; 0.5098; end
+
+
+    # Returns test Rate for USD to [ CAD, EUR, GBP ]. 
+    def get_rate_base(c1, c2, time)
+      # $stderr.puts "get_rate_base(#{c1}, #{c2}, #{time})"
       rate = 0.0
-      if ( c1.code == :USD && c2.code == :CAD )
+
+      if    c1.code == :USD && c2.code == :CAD
         rate = self.class.USD_CAD
+      elsif c1.code == :USD && c2.code == :EUR
+        rate = self.class.USD_EUR
+      elsif c1.code == :USD && c2.code == :GBP
+        rate = self.class.USD_GBP
       end
-      rate > 0 ? Rate.new(c1, c2, rate, self) : nil
+
+      rate > 0 ? new_rate(c1, c2, rate, time) : nil
     end
 
   end # class
@@ -35,5 +59,5 @@ end # module
 end # module
 
 # Install as default.
-Currency::Exchange.default = Currency::Exchange::Test.instance
+Currency::Exchange::Test.make_default
 

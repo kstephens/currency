@@ -59,7 +59,19 @@ module Currency
       # allowing SQL summary operations on the normalized Money values
       # to still be valid.
       #
-      def money(attr_name, *opts)
+      #    :time_column => undef
+      #
+      # Defines the name of a DATETIME column used to store and
+      # retrieve the Money's time.  If this option is used, each
+      # Money value will use this column for use in historical Currency
+      # conversions.
+      #
+      #    :time_column_readonly => undef
+      #
+      # If true, the Money value is read-only.  This is useful for
+      # Money values that share a column (like created_on).
+      #
+       def money(attr_name, *opts)
         opts = Hash[*opts]
 
         attr_name = attr_name.to_s
@@ -83,9 +95,17 @@ module Currency
           write_preferred_currency = "write_attribute(:#{currency_preferred_column}, @#{attr_name}_money.currency.code)"
         end
 
+        time_column = opts[:time_column]
+        if time_column
+          time_column = "#{attr_name}_time" if time_column == true
+          read_time = "self.#{time_column}"
+        end
+
         currency ||= ':USD'
+        time ||= 'nil'
 
         read_currency ||= currency
+        read_time ||= time
 
         validate = "# Validation\n"
         validate << "\nvalidates_numericality_of :#{attr_name}\n" unless opts[:allow_nil]
@@ -99,7 +119,7 @@ def #{attr_name}
   unless @#{attr_name}
     #{attr_name}_rep = read_attribute(:#{attr_name})
     unless #{attr_name}_rep.nil?
-      @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency})
+        @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
       #{read_preferred_currency}
     end
   end

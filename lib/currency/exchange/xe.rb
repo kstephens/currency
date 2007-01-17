@@ -1,5 +1,8 @@
 # Connects to http://xe.com and parses "XE.com Quick Cross Rates"
 # from home page HTML.
+#
+# This is for demonstration purposes.
+#
 
 require 'net/http'
 require 'open-uri'
@@ -14,8 +17,10 @@ module Exchange
       @@instance ||= self.new(*opts)
     end
 
+
     # Defaults to "http://xe.com/"
     attr_accessor :uri
+
 
     # Defines the number of seconds rates until rates
     # become invalid, causing a request of new rates.
@@ -23,30 +28,43 @@ module Exchange
     # Defaults to 600 seconds.
     attr_accessor :time_to_live
 
+
     # Defines the number of random seconds to add before
     # rates become invalid.
     #
     # Defaults to 30 seconds.
     attr_accessor :time_to_live_fudge
 
+
+    # Defines the pivot currency for http://xe.com/.
+    PIVOT_CURRENCY = :USD
+
+
     # This Exchange's name is the same as its #uri.
     def name
       uri
     end
 
+
     def initialize(*opt)
+      self.pivot_currency = PIVOT_CURRENCY
       self.uri = 'http://xe.com/'
       self.time_to_live = 600
       self.time_to_live_fudge = 30
       @xe_rates = nil
+      @processing_rates = false
       super(*opt)
     end
+
 
     def clear_rates
       @xe_rates && @xe_rates.clear
       super
     end
 
+
+    # Returns true if the cache of xe.com rates
+    # is expired.
     def expired?
       if @time_to_live &&
          @xe_rates_renew_time &&
@@ -66,13 +84,15 @@ module Exchange
       end
     end
 
+
     # Check expired? before returning a Rate.
-    def rate(c1, c2)
+    def rate(c1, c2, time)
       if expired?
         clear_rates
       end
-      super(c1, c2)
+      super(c1, c2, time)
     end
+
 
     # Returns a cached Hash of rates:
     #
@@ -100,6 +120,7 @@ module Exchange
       
       @xe_rates
     end
+
 
     def xe_rates_load
       # Do not allow re-entrancy
@@ -137,6 +158,7 @@ module Exchange
 
       data
     end
+
 
     # Parses http://xe.com homepage HTML for
     # quick rates of 10 currencies.
@@ -205,7 +227,7 @@ module Exchange
           usd_to_cur = md[1].to_f
           cur_i = cur_i + 1
           cur = currency[cur_i]
-          (rate[:USD] ||= {})[cur] = usd_to_cur
+          (rate[PIVOT_CURRENCY] ||= {})[cur] = usd_to_cur
         end
       end
 
@@ -214,30 +236,46 @@ module Exchange
 
     # Loads cached rates from xe.com and creates Rate objects
     # for 10 currencies.
-    def get_rate(c1, c2)
-      rates = xe_rates # Load rates
+    def get_rate_base(c1, c2, time)
+      # $stderr.puts "get_rate(#{c1}, #{c2}, #{time.inspect})"
+      raise Exception::UnknownRate.new("#{self}: cannot get historical rates") if time
 
-      # $stderr.puts "load_exchange_rate(#{c1}, #{c2})"
+      rates = xe_rates # Load rates
+      rates_pivot = rates[PIVOT_CURRENCY]
+      raise Exception::UnknownRate.new("#{self}: cannot get base currency #{PIVOT_CURRENCY.inspect}") unless rates_pivot
+
       rate = 0.0
       r1 = nil
       r2 = nil
 
-      rates_usd = rates[:USD]
-
-      raise Exception::UnknownRate.new("#{self}: base rate :USD") unless rates_usd
-
-      if ( c1.code == :USD && (r2 = rates_usd[c2.code]) )
+      # Use USD as pivot to convert between c1 and c2.
+      if ( c1.code == PIVOT_CURRENCY && (r2 = rates_pivot[c2.code]) )
         rate = r2
-      elsif ( c2.code == :USD && (r1 = rates_usd[c2.code]) )
-        rate = 1.0 / r1
-      elsif ( (r1 = rates_usd[c1.code]) && (r2 = rates_usd[c2.code]) )
-        rate = r2 / r1
       end
 
       # $stderr.puts "XE Rate: #{c1.code} / #{c2.code} = #{rate}"
 
-      rate > 0 ? Rate.new(c1, c2, rate, self, @rate_timestamp) : nil
+      rate > 0 ? new_rate(c1, c2, rate, @rate_timestamp) : nil
     end
+
+
+    # Return a list of base rates.
+    def get_rates(time)
+      # $stderr.puts "get_rates(#{time})"
+      raise Exception::UnknownRate.new("#{self}: cannot get historical rates") if time
+      result = [ ]
+
+      rates = xe_rates # Load rates
+      rates_pivot = rates[PIVOT_CURRENCY]
+      raise Exception::UnknownRate.new("#{self}: cannot get base rate #{PIVOT_CURRENCY.inspect}") unless rates_pivot
+
+      rates_pivot.keys.each do | c2 |
+        result << get_rate(c1, c2, time)
+      end
+
+      result
+    end
+
 
   end # class
 

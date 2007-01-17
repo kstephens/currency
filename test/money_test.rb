@@ -35,6 +35,10 @@ class MoneyTest < TestBase
     assert_kind_of Money, m = "13.98".money(:CAD)
     assert_equal m.currency.code, :CAD
     assert_equal m.rep, 1398
+
+    assert_kind_of Money, m = "45.99".money(:EUR)
+    assert_equal m.currency.code, :EUR
+    assert_equal m.rep, 4599
   end
 
   def test_zero
@@ -216,6 +220,25 @@ class MoneyTest < TestBase
     assert_kind_of Numeric, m = (usd / cad)
     assert_equal_float Exchange::Test.USD_CAD, m, 0.0001
   end
+
+  def test_pivot_conversions
+    # Using default get_rate
+    assert_not_nil cad = Money.new(123.45, :CAD)
+    assert_not_nil eur = cad.convert(:EUR)
+    assert_kind_of Numeric, m = (eur.to_f / cad.to_f)
+    m_expected = (1.0 / Exchange::Test.USD_CAD) * Exchange::Test.USD_EUR
+    # $stderr.puts "m = #{m}, expected = #{m_expected}"
+    assert_equal_float m_expected, m, 0.001
+
+
+    assert_not_nil gbp = Money.new(123.45, :GBP)
+    assert_not_nil eur = gbp.convert(:EUR)
+    assert_kind_of Numeric, m = (eur.to_f / gbp.to_f)
+    m_expected = (1.0 / Exchange::Test.USD_GBP) * Exchange::Test.USD_EUR
+    # $stderr.puts "m = #{m}, expected = #{m_expected}"
+    assert_equal_float m_expected, m, 0.001
+  end
+
 
   def test_invalid_currency_code
     assert_raise Exception::InvalidCurrencyCode do
