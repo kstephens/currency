@@ -52,6 +52,7 @@ module Exchange
       self.time_to_live = 600
       self.time_to_live_fudge = 30
       @xe_rates = nil
+      @xe_rates_renew_time = nil
       @processing_rates = false
       super(*opt)
     end

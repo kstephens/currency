@@ -39,6 +39,7 @@ module Exchange
 
     def initialize(*opt)
       @name = nil
+      @verbose = nil unless defined? @verbose
       @pivot_currency    ||= :USD
       @time_quant_size   ||= 60 * 60 * 24
       @time_quant_offset ||= nil
