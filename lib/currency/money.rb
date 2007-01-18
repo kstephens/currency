@@ -7,8 +7,6 @@
 # A Money object stores its value using a scaled Integer representation
 # and a Currency object.
 #
-# TODO:
-# * Need to store a time, so we can use historical FX rates.
 #
 
 module Currency

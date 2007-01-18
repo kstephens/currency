@@ -8,7 +8,25 @@ module Currency
       super
       base.extend(ClassMethods)
     end
-      
+
+
+    @@money_attributes = { }
+
+    # Called by money macro when a money attribute
+    # is created.
+    def self.register_money_attribute(cls, attr_name, attr_opts)
+      (@@money_attributes[cls] ||= { })[attr_name] = attr_opts
+    end
+
+    # Returns an array of option hashes for all the money attributes of
+    # this class.
+    #
+    # Superclass attributes are not included.
+    def self.money_attributes_for_class(cls)
+      (@@money_atttributes[cls] || { }).values
+    end
+    
+  
 
 # == ActiveRecord Suppport
 #
@@ -59,22 +77,32 @@ module Currency
       # allowing SQL summary operations on the normalized Money values
       # to still be valid.
       #
-      #    :time_column => undef
+      #    :time => undef
       #
-      # Defines the name of a DATETIME column used to store and
+      # Defines the name of attribute used to 
       # retrieve the Money's time.  If this option is used, each
-      # Money value will use this column for use in historical Currency
+      # Money value will use this attribute during historical Currency
       # conversions.
       #
-      #    :time_column_readonly => undef
+      # Money values can share a time value with other attributes
+      # (e.g. a created_on column).
       #
-      # If true, the Money value is read-only.  This is useful for
-      # Money values that share a column (like created_on).
+      # If this option is true, the money time attribute will be named
+      # "#{attr_name}_time" and :time_update will be true.
       #
-       def money(attr_name, *opts)
+      #    :time_update => undef
+      #
+      # If true, the Money time value is updated upon setting the
+      # money attribute.  
+      #
+      def money(attr_name, *opts)
         opts = Hash[*opts]
 
         attr_name = attr_name.to_s
+        opts[:class] = self
+        opts[:table] = self.table_name
+        opts[:attr_name] = attr_name.intern
+        ActiveRecord::Base.register_money_attribute(self, opts[:attr_name], opts)
 
         currency = opts[:currency]
 
@@ -87,6 +115,7 @@ module Currency
           read_currency = "read_attribute(:#{currency_column.to_s})"
           write_currency = "write_attribute(:#{currency_column}, #{attr_name}_money.nil? ? nil : #{attr_name}_money.currency.code.to_s)"
         end
+        opts[:currency_column] = currency_column
 
         currency_preferred_column = opts[:currency_preferred_column]
         if currency_preferred_column
@@ -95,10 +124,18 @@ module Currency
           write_preferred_currency = "write_attribute(:#{currency_preferred_column}, @#{attr_name}_money.currency.code)"
         end
 
-        time_column = opts[:time_column]
-        if time_column
-          time_column = "#{attr_name}_time" if time_column == true
-          read_time = "self.#{time_column}"
+        time = opts[:time]
+        write_time = ''
+        if time
+          if time == true
+            time = "#{attr_name}_time"
+            opts[:time_update] = true
+          end
+          read_time = "self.#{time}"
+        end
+        opts[:time] = time
+        if opts[:time_update]
+          write_time = "self.#{time} = #{attr_name}_money && #{attr_name}_money.time"
         end
 
         currency ||= ':USD'
@@ -119,7 +156,7 @@ def #{attr_name}
   unless @#{attr_name}
     #{attr_name}_rep = read_attribute(:#{attr_name})
     unless #{attr_name}_rep.nil?
-        @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
+      @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
       #{read_preferred_currency}
     end
   end
@@ -128,11 +165,11 @@ end
 
 def #{attr_name}=(value)
   if value.nil?
-    ;
+    #{attr_name}_money = nil
   elsif value.kind_of?(Integer) || value.kind_of?(String) || value.kind_of?(Float)
-    #{attr_name}_money = Currency::Money.new(value, #{currency})
+    #{attr_name}_money = ::Currency::Money(value, #{currency})
     #{write_preferred_currency}
-  elsif value.kind_of?(Money)
+  elsif value.kind_of?(::Currency::Money)
     #{attr_name}_money = value
     #{write_preferred_currency}
     #{write_currency ? write_currency : "#{attr_name}_money = #{attr_name}_money.convert(#{currency})"}
@@ -143,6 +180,7 @@ def #{attr_name}=(value)
   @#{attr_name} = #{attr_name}_money
   
   write_attribute(:#{attr_name}, #{attr_name}_money.nil? ? nil : #{attr_name}_money.rep)
+  #{write_time}
 
   value
 end
