@@ -27,6 +27,14 @@ module Currency
   class Money
     include Comparable
 
+    @@default_time = nil
+    def self.default_time
+      @@default_time
+    end
+    def self.default_time=(x)
+      @@default_time = x
+    end
+
     @@empty_hash = { }
     @@empty_hash.freeze
 
@@ -60,7 +68,7 @@ module Currency
       # Set ivars
       @currency = currency;
       @rep = x.Money_rep(@currency)
-      @time = time
+      @time = time || Money.default_time
       @time = Time.new if @time == :now
 
       # Handle conversion of "USD 123.45"
@@ -114,12 +122,6 @@ module Currency
     # You have been warned in ALL CAPS.
     def set_time(time)
       @time = time
-    end
-
-    # Returns the money representation for the requested currency.
-    def Money_rep(currency)
-      $stderr.puts "@currency != currency (#{@currency.inspect} != #{currency.inspect}" unless @currency == currency
-      @rep
     end
 
     # Returns the Money representation (usually an Integer).
@@ -176,7 +178,7 @@ module Currency
       if @currency == x.currency
         @rep <=> x.rep
       else
-        @rep <=> convert(@currency).rep
+        @rep <=> convert(@currency, @time).rep
       end
     end
 
@@ -263,7 +265,7 @@ module Currency
     # Returns the Money's value representation in another currency.
     def Money_rep(currency, time = nil)
       # Attempt conversion?
-      if @currency != currency
+      if @currency != currency || (time && @time != time)
 	self.convert(currency, time).rep
         # raise("Incompatible Currency: #{@currency} != #{currency}")
       else

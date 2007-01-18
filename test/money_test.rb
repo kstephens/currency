@@ -171,10 +171,10 @@ class MoneyTest < TestBase
     assert_not_nil cad = Money.new(123.45, :CAD)
 
     # - Money => Money
-    assert_equal -12345, (- usd).rep
+    assert_equal(-12345, (- usd).rep)
     assert_equal :USD, (- usd).currency.code
 
-    assert_equal -12345, (- cad).rep
+    assert_equal(-12345, (- cad).rep)
     assert_equal :CAD, (- cad).currency.code
 
     # Money + Money => Money
@@ -248,6 +248,27 @@ class MoneyTest < TestBase
       Money.new(123, 5)
     end
   end
+
+  def test_time
+    Money.default_time = nil
+
+    assert_not_nil usd = Money.new(123.45, :USD)
+    assert_nil usd.time
+
+    Money.default_time = :now
+
+    assert_not_nil usd = Money.new(123.45, :USD)
+    assert_not_nil usd.time
+
+    sleep 1
+
+    assert_not_nil usd2 = Money.new(123.45, :USD)
+    assert_not_nil usd2.time
+    assert usd.time != usd2.time
+
+    Money.default_time = nil
+  end
+
 end
 
 end # module

@@ -167,7 +167,7 @@ module Currency
         
         x = whole.to_i
 
-        x = Money.new_rep(x, opt[:currency])
+        x = Money.new_rep(x, opt[:currency], opt[:time])
       else
         # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
         #x.to_f.Money_rep(self)

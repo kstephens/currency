@@ -1,21 +1,14 @@
 require 'active_record/base'
 require File.join(File.dirname(__FILE__), '..', 'currency')
 
-module Currency
-  module ActiveRecord
-    def self.append_features(base) # :nodoc:
-      # $stderr.puts "  Currency::ActiveRecord#append_features(#{base})"
-      super
-      base.extend(ClassMethods)
-    end
-
-
+module ActiveRecord
+  class Base
     @@money_attributes = { }
 
     # Called by money macro when a money attribute
     # is created.
-    def self.register_money_attribute(cls, attr_name, attr_opts)
-      (@@money_attributes[cls] ||= { })[attr_name] = attr_opts
+    def self.register_money_attribute(attr_opts)
+      (@@money_attributes[attr_opts[:class]] ||= { })[attr_opts[:attr_name]] = attr_opts
     end
 
     # Returns an array of option hashes for all the money attributes of
@@ -25,8 +18,33 @@ module Currency
     def self.money_attributes_for_class(cls)
       (@@money_atttributes[cls] || { }).values
     end
-    
-  
+
+    # Iterates through all known money attributes in all classes.
+    #
+    # each_money_attribute { | money_opts |
+    #   ...
+    # }
+    def self.each_money_attribute(&blk)
+      @@money_attributes.each do | cls, hash |
+        hash.each do | attr_name, attr_opts |
+          yield attr_opts
+        end
+      end
+    end
+
+  end
+end
+
+
+module Currency
+  module ActiveRecord
+    def self.append_features(base) # :nodoc:
+      # $stderr.puts "  Currency::ActiveRecord#append_features(#{base})"
+      super
+      base.extend(ClassMethods)
+    end
+
+
 
 # == ActiveRecord Suppport
 #
@@ -47,6 +65,11 @@ module Currency
       # INTEGER.
       #
       # Options:
+      #
+      #    :column => undef
+      #
+      # Defines the column to use for storing the money value.
+      # Defaults to the attribute name.
       #
       #    :currency => :USD
       #
@@ -102,14 +125,17 @@ module Currency
         opts[:class] = self
         opts[:table] = self.table_name
         opts[:attr_name] = attr_name.intern
-        ActiveRecord::Base.register_money_attribute(self, opts[:attr_name], opts)
+        ::ActiveRecord::Base.register_money_attribute(opts)
+
+        column = opts[:column] || opts[:attr_name]
+        opts[:column] = column
 
         currency = opts[:currency]
 
         currency_column = opts[:currency_column]
         if currency_column && ! currency_column.kind_of?(String)
           currency_column = currency_column.to_s
-          currency_column = "#{attr_name}_currency"
+          currency_column = "#{column}_currency"
         end
         if currency_column
           read_currency = "read_attribute(:#{currency_column.to_s})"
@@ -144,6 +170,8 @@ module Currency
         read_currency ||= currency
         read_time ||= time
 
+        money_rep ||= "#{attr_name}_money.rep"
+
         validate = "# Validation\n"
         validate << "\nvalidates_numericality_of :#{attr_name}\n" unless opts[:allow_nil]
         validate << "\nvalidates_format_of :#{currency_column}, :with => /^[A-Z][A-Z][A-Z]$/\n" if currency_column && ! opts[:allow_nil]
@@ -154,7 +182,7 @@ module Currency
 def #{attr_name}
   # $stderr.puts "  \#{self.class.name}##{attr_name}"
   unless @#{attr_name}
-    #{attr_name}_rep = read_attribute(:#{attr_name})
+    #{attr_name}_rep = read_attribute(:#{column})
     unless #{attr_name}_rep.nil?
       @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
       #{read_preferred_currency}
@@ -179,7 +207,7 @@ def #{attr_name}=(value)
 
   @#{attr_name} = #{attr_name}_money
   
-  write_attribute(:#{attr_name}, #{attr_name}_money.nil? ? nil : #{attr_name}_money.rep)
+  write_attribute(:#{column}, #{attr_name}_money.nil? ? nil : #{money_rep})
   #{write_time}
 
   value
