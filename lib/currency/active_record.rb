@@ -62,7 +62,7 @@ module Currency
       # Defines a Money object attribute that is bound
       # to a database column.  The database column to store the
       # Money value representation is assumed to be
-      # INTEGER.
+      # INTEGER and will store Money#rep values.
       #
       # Options:
       #
@@ -71,17 +71,21 @@ module Currency
       # Defines the column to use for storing the money value.
       # Defaults to the attribute name.
       #
-      #    :currency => :USD
+      # If this column is different from the attribute name,
+      # the money object will intercept column=(x) to flush
+      # any cached Money object.
+      #
+      #    :currency => currency_code (e.g.: :USD)
       #
       # Defines the Currency to use for storing a normalized Money 
-      # value.  
+      # value.
       #
       # All Money values will be converted to this Currency before
-      # storing in the column.  This allows SQL summary operations, 
+      # storing.  This allows SQL summary operations, 
       # like SUM(), MAX(), AVG(), etc., to produce meaningful results,
       # regardless of the initial currency specified.  If this
       # option is used, subsequent reads will be in the specified
-      # normalization :currency.  Defaults to :USD.
+      # normalization :currency.
       #
       #    :currency_column => undef
       #
@@ -130,6 +134,18 @@ module Currency
         column = opts[:column] || opts[:attr_name]
         opts[:column] = column
 
+        if column.to_s != attr_name.to_s
+          alias_accessor = <<-"end_eval"
+alias :before_money_#{column}=, :#{column}=
+
+def #{column}=(__value)
+  @{attr_name} = nil # uncache
+  before_money#{column} = __value
+end
+
+end_eval
+        end
+
         currency = opts[:currency]
 
         currency_column = opts[:currency_column]
@@ -176,8 +192,13 @@ module Currency
         validate << "\nvalidates_numericality_of :#{attr_name}\n" unless opts[:allow_nil]
         validate << "\nvalidates_format_of :#{currency_column}, :with => /^[A-Z][A-Z][A-Z]$/\n" if currency_column && ! opts[:allow_nil]
 
-        module_eval (x = <<-"end_eval"), __FILE__, __LINE__
+ 
+        alias_accessor ||= ''
+
+        module_eval (opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__
 #{validate}
+
+#{alias_accessor}
 
 def #{attr_name}
   # $stderr.puts "  \#{self.class.name}##{attr_name}"
@@ -202,7 +223,7 @@ def #{attr_name}=(value)
     #{write_preferred_currency}
     #{write_currency ? write_currency : "#{attr_name}_money = #{attr_name}_money.convert(#{currency})"}
   else
-    throw Currency::Exception::InvalidMoneyValue.new(value)
+    throw ::Currency::Exception::InvalidMoneyValue.new(value)
   end
 
   @#{attr_name} = #{attr_name}_money
@@ -221,7 +242,7 @@ def #{attr_name}_before_type_cast
 end
 
 end_eval
-        # $stderr.puts "   CODE = #{x}"
+        $stderr.puts "   CODE = #{x}"
       end
     end
   end

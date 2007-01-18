@@ -97,6 +97,7 @@ module Currency
       x.set_rep(r)
       x
     end
+
     # Construct from post-scaled internal representation
     # using the same currency.
     #    x = Currency::Money.new("1.98", :USD)

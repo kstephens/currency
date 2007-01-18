@@ -249,12 +249,20 @@ class MoneyTest < TestBase
     end
   end
 
-  def test_time
+  def test_time_default
     Money.default_time = nil
 
     assert_not_nil usd = Money.new(123.45, :USD)
     assert_nil usd.time
 
+    Money.default_time = Time.now
+    assert_not_nil usd = Money.new(123.45, :USD)
+    assert_equal usd.time, Money.default_time
+  end
+
+
+  def test_time_now
+    # Test
     Money.default_time = :now
 
     assert_not_nil usd = Money.new(123.45, :USD)
@@ -267,6 +275,20 @@ class MoneyTest < TestBase
     assert usd.time != usd2.time
 
     Money.default_time = nil
+  end
+
+  def test_time_fixed
+    # Test for fixed time.
+    Money.default_time = Time.new
+
+    assert_not_nil usd = Money.new(123.45, :USD)
+    assert_not_nil usd.time
+
+    sleep 1
+
+    assert_not_nil usd2 = Money.new(123.45, :USD)
+    assert_not_nil usd2.time
+    assert usd.time == usd2.time
   end
 
 end
