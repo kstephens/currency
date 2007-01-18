@@ -40,7 +40,7 @@ module Exchange
 
 
     def derived
-      @dervied
+      @derived
     end
 
 
