@@ -1,21 +1,21 @@
 require 'test/test_base'
 
 require 'currency' # For :type => :money
-require 'currency/exchange/rate/source/xe'
+require 'currency/exchange/rate/source/new_york_fed'
 
 module Currency
 
-class XeTest < TestBase
+class NewYorkFedTest < TestBase
   def setup
     super
     # Force XE Exchange.
-    source = Exchange::Rate::Source::Xe.new
+    source = Exchange::Rate::Source::NewYorkFed.new
     deriver = Exchange::Rate::Deriver.new(:source => source)
     Exchange.default = deriver
   end
 
 
-  def test_xe_usd_cad
+  def test_usd_cad
     assert_not_nil rates = Exchange.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
@@ -29,7 +29,7 @@ class XeTest < TestBase
   end
 
 
-  def test_xe_cad_eur
+  def test_cad_eur
     assert_not_nil rates = Exchange.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]

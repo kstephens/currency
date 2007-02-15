@@ -14,6 +14,7 @@ require 'rexml/document'
 module Currency
 module Exchange
 class Rate
+class Source
 
 class NewYorkFed < ::Currency::Exchange::Rate::Source
   # Defines the pivot currency for http://xe.com/.
@@ -71,11 +72,19 @@ class NewYorkFed < ::Currency::Exchange::Rate::Source
   end
 
 
+  def raw_rates
+    rates
+    @raw_rates
+  end
+
+
   # Parses XML for rates.
   def parse_rates(data = nil)
     data = get_content unless data
     
     rates = [ ]
+
+    @raw_rates = { }
 
     doc = REXML::Document.new(data).root
     doc.elements.to_a('//frbny:Series').each do | series |
@@ -91,6 +100,10 @@ class NewYorkFed < ::Currency::Exchange::Rate::Source
       date = Time.parse("#{date} 12:00:00 -05:00") # USA NY => EST
 
       rates << new_rate(c1, c2, rate, date)
+
+      (@raw_rates[c1] ||= { })[c2] ||= rate
+      (@raw_rates[c2] ||= { })[c1] ||= 1.0 / rate
+
     end
 
     rates
@@ -105,6 +118,7 @@ class NewYorkFed < ::Currency::Exchange::Rate::Source
  
 end # class
 
+end # class
 end # class
 end # module
 end # module

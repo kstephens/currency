@@ -2,7 +2,7 @@
 
 require 'test/unit'
 require 'currency'
-require 'currency/exchange/test'
+require 'currency/exchange/rate/source/test'
 
 module Currency
 
@@ -10,7 +10,9 @@ class TestBase < Test::Unit::TestCase
   def setup
     super
     # Force Test Exchange.
-    Exchange.default = Exchange::Test.instance
+    source = Exchange::Rate::Source::Test.instance
+    deriver = Exchange::Rate::Deriver.new(:source => source)
+    Exchange.default = deriver
   end
 
   # Avoid "No test were specified" error.

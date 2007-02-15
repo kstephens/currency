@@ -13,6 +13,7 @@ require 'open-uri'
 module Currency
 module Exchange
 class Rate
+class Source
 
 class Xe < ::Currency::Exchange::Rate::Source
   # Defines the pivot currency for http://xe.com/.
@@ -21,7 +22,7 @@ class Xe < ::Currency::Exchange::Rate::Source
   def initialize(*opt)
     self.uri = 'http://xe.com/'
     self.pivot_currency = PIVOT_CURRENCY
-    @xe_rates = nil
+    @raw_rates = nil
     super(*opt)
   end
   
@@ -32,7 +33,7 @@ class Xe < ::Currency::Exchange::Rate::Source
 
 
   def clear_rates
-    @xe_rates = nil
+    @raw_rates = nil
     super
   end
   
@@ -41,9 +42,9 @@ class Xe < ::Currency::Exchange::Rate::Source
   #
   #    xe.xe_rates[:USD][:CAD] => 1.0134
   #
-  def xe_rates
+  def raw_rates
     # Force load of rates
-    @xe_rates ||= xe_rates_load
+    @raw_rates ||= xe_rates_load
   end
   
   
@@ -176,7 +177,7 @@ class Xe < ::Currency::Exchange::Rate::Source
   
   # Return a list of known base rates.
   def load_rates
-    rates = xe_rates # Load rates
+    rates = raw_rates # Load rates
     rates_pivot = rates[PIVOT_CURRENCY]
     raise Exception::UnknownRate.new("#{self}: cannot get base rate #{PIVOT_CURRENCY.inspect}") unless rates_pivot
     
@@ -191,6 +192,7 @@ class Xe < ::Currency::Exchange::Rate::Source
 end # class
 
 
+end # class
 end # class
 end # module
 end # module

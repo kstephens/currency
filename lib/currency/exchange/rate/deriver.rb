@@ -49,6 +49,8 @@ class Deriver < ::Currency::Exchange::Base
   end
 
 
+  # Return list of known Rates.
+  # source may have more Rates underneath this object.
   def rates
     @rate.values
   end
@@ -135,23 +137,6 @@ class Deriver < ::Currency::Exchange::Base
     end
   end
 
-
-  # Called by implementors to construct new Rate objects.
-  def new_rate(c1, c2, c1_to_c2_rate, time = nil, derived = nil)
-    rate = ::Currency::Exchange::Rate.new(c1, c2, c1_to_c2_rate, source.name, time, derived)
-    # $stderr.puts "new_rate = #{rate}"
-    rate
-  end
-
-
-
-  # Normalizes rate time to a quantitized value.
-  #
-  # Subclasses can override this method.
-  def normalize_time(time)
-    time && ::Currency::Exchange::TimeQuantitizer.current.quantitize_time(time)
-  end
-  
 
   # Returns a simple string rep of an Exchange object.
   def to_s

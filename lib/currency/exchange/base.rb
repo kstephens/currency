@@ -63,7 +63,7 @@ module Exchange
     # rate expiration rules.
     #
     def rate(c1, c2, time)
-      raise('Subclass responsibility')
+      raise("Subclass responsibility: #{self.class}#rate")
     end
 
 
@@ -73,26 +73,26 @@ module Exchange
     # rates.
     #
     def get_rate(c1, c2, time)
-      raise('Subclass responsibility: get_rate')
+      raise("Subclass responsibility: #{self.class}#get_rate")
     end
 
     # Returns a base Rate.
     #
     # Subclasses are required to implement this method.
     def get_rate_base(c1, c2, time)
-      raise Exception::UnknownRate.new("Subclass responsibility: get_rate_base")
+      raise Exception::UnknownRate.new("Subclass responsibility: #{self.class}#get_rate_base")
     end
 
 
     # Returns an array of all base Rates.
     def get_all_rate_bases(time)
-      raise Exception::UnknownRate.new("Subclass responsibility: get_all_rate_bases")
+      raise Exception::UnknownRate.new("Subclass responsibility: #{self.class}#get_all_rate_bases")
     end
 
 
     # Called by implementors to construct new Rate objects.
     def new_rate(c1, c2, c1_to_c2_rate, time = nil, derived = nil)
-      rate = Rate.new(c1, c2, c1_to_c2_rate, self, time, derived)
+      rate = Rate.new(c1, c2, c1_to_c2_rate, name, time, derived)
       # $stderr.puts "new_rate = #{rate}"
       rate
     end

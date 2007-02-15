@@ -218,7 +218,7 @@ class MoneyTest < TestBase
     assert_equal_float 3.0, m
     
     assert_kind_of Numeric, m = (usd / cad)
-    assert_equal_float Exchange::Test.USD_CAD, m, 0.0001
+    assert_equal_float Exchange::Rate::Source::Test.USD_CAD, m, 0.0001
   end
 
   def test_pivot_conversions
@@ -226,7 +226,7 @@ class MoneyTest < TestBase
     assert_not_nil cad = Money.new(123.45, :CAD)
     assert_not_nil eur = cad.convert(:EUR)
     assert_kind_of Numeric, m = (eur.to_f / cad.to_f)
-    m_expected = (1.0 / Exchange::Test.USD_CAD) * Exchange::Test.USD_EUR
+    m_expected = (1.0 / Exchange::Rate::Source::Test.USD_CAD) * Exchange::Rate::Source::Test.USD_EUR
     # $stderr.puts "m = #{m}, expected = #{m_expected}"
     assert_equal_float m_expected, m, 0.001
 
@@ -234,7 +234,7 @@ class MoneyTest < TestBase
     assert_not_nil gbp = Money.new(123.45, :GBP)
     assert_not_nil eur = gbp.convert(:EUR)
     assert_kind_of Numeric, m = (eur.to_f / gbp.to_f)
-    m_expected = (1.0 / Exchange::Test.USD_GBP) * Exchange::Test.USD_EUR
+    m_expected = (1.0 / Exchange::Rate::Source::Test.USD_GBP) * Exchange::Rate::Source::Test.USD_EUR
     # $stderr.puts "m = #{m}, expected = #{m_expected}"
     assert_equal_float m_expected, m, 0.001
   end
