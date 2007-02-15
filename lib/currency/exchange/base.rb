@@ -139,7 +139,7 @@ module Exchange
     end
 
 
-    # Returns a cached base rate.
+    # Returns a cached base Rate.
     #
     def get_rate_base_cached(c1, c2, time)
       rate = (@rate[c1.code.to_s + c2.code.to_s + (time || '')] ||= get_rate_base(c1, c2, time))
@@ -147,13 +147,17 @@ module Exchange
     end
 
 
-    # Returns a base rate.
+    # Returns a base Rate.
     #
     # Subclasses are required to implement this method.
     def get_rate_base(c1, c2, time)
       raise Exception::UnknownRate.new("Subclass responsibility: get_rate_base")
     end
 
+    # Returns an array of all base Rates.
+    def get_all_rate_bases(time)
+      raise Exception::UnknownRate.new("Subclass responsibility: get_all_rate_bases")
+    end
 
     # Normalizes rate time to a quantitized value.
     # For example: a time_quant_size of 60 * 60 * 24 will

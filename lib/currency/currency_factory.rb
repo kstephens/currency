@@ -1,10 +1,12 @@
+
+
 module Currency
   class CurrencyFactory
     @@default = nil
 
     # Returns the default CurrencyFactory.
     def self.default
-      @@default ||= CurrencyFactory.new
+      @@default ||= self.new
     end
     # Sets the default CurrencyFactory.
     def self.default=(x)
@@ -27,7 +29,7 @@ module Currency
 
     # Lookup Currency by code.
     def get_by_code(x)
-      x = Currency.cast_code(x)
+      x = ::Currency::Currency.cast_code(x)
       # $stderr.puts "get_by_code(#{x})"
       @currency_by_code[x] ||= install(load(Currency.new(x)))
     end
@@ -35,7 +37,7 @@ module Currency
 
     # Lookup Currency by symbol.
     def get_by_symbol(symbol)
-      @currency_by_symbol[symbol] ||= install(load(Currency.new(nil, symbol)))
+      @currency_by_symbol[symbol] ||= install(load(::Currency::Currency.new(nil, symbol)))
     end
 
 

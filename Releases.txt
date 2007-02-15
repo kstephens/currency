@@ -1,6 +1,12 @@
 = Currency Release History
 
-== Release 0.4.0: 2007/01/17
+== Release 0.4.1: 2007/02/15
+
+* Refactored rate sources into Currency::Exchange::Rate::Source.
+* Refactored xe.com rate source as a Currency::Exchange::Rate::Source.
+* Added nyfed.org rate source.
+
+== Release 0.4.0: 2007/01/18
 
 * Refactor derived rates using pivot currencies and reciprocals.
 * Money attribute macros for classes not using ActiveRecord.

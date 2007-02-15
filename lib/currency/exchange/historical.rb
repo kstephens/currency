@@ -1,51 +1,15 @@
-# Connects to http://xe.com and parses "XE.com Quick Cross Rates"
-# from home page HTML.
-#
-# This is for demonstration purposes.
+# Gets historical rates.
 #
 
-require 'active_record/base'
 
 module Currency
 module Exchange
-
-  class Historical < Base
-    class Rate < ::ActiveRecord::Base
-      TABLE_NAME = 'currency_historical_rates'
-      set_table_name TABLE_NAME
-
-      def self.schema(table_name = TABLE_NAME)
-        table_name = table_name.intern 
-        create_table table_name do |t|
-          t.column :c1,       :char,     :null => false
-          t.column :c2,       :char,     :null => false
-          t.column :rate,     :float,    :null => false
-          t.column :rate_avg, :float,
-          t.column :rate_hi,  :float,
-          t.column :rate_lo,  :float,
-          t.column :rate_0,   :float,
-          t.column :rate_1,   :float,
-          t.column :src,      :string,   :null => false
-          t.column :date,     :datetime, :null => false
-          t.column :date_0,   :datetime, :null => false
-          t.column :date_1,   :datetime, :null => false
-        end
-
-        add_index table_name :c1
-        add_index table_name :c2
-        add_index table_name :src
-        add_index table_name :date
-        add_index table_name :date_0
-        add_index table_name :date_1
-      end
-    end
+ class Historical < Base
 
     # Select specific rate source.
     # Defaults to nil
     attr_accessor :source
 
-    # Defines the pivot currency.
-    PIVOT_CURRENCY = :USD
 
     # This Exchange's name is the same as its #uri.
     def name

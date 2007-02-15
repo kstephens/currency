@@ -217,11 +217,8 @@ end_eval
           write_preferred_currency = "self.#{currency_preferred} = @#{attr_name}_money.currency.code"
         end
 
-
-
         currency ||= currency_fixed
         read_currency ||= currency
-
 
         alias_accessor ||= ''
 
@@ -245,7 +242,7 @@ end
 
 
 def #{attr_name}=(value)
-  if value.nil?
+  if value == nil
     #{attr_name}_money = nil
   elsif value.kind_of?(Integer) || value.kind_of?(Float) || value.kind_of?(String)
     #{attr_name}_money = ::Currency::Money(value, #{read_currency}, #{read_time})
@@ -267,7 +264,7 @@ def #{attr_name}=(value)
 end
 
 end_eval
-        $stderr.puts "   CODE = #{x}"
+        # $stderr.puts "   CODE = #{x}"
         module_eval *eval_opts
       end
     end
