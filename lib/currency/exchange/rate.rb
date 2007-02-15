@@ -35,7 +35,7 @@ module Exchange
       @c1 = c1
       @c2 = c2
       @rate = c1_to_c2_rate
-      raise Exception::InvalidRate.new(@rate) unless @rate >= 0.0
+      raise Exception::InvalidRate.new(@rate) unless @rate && @rate >= 0.0
       @source = source
       @date = date || Time.now
       @derived = derived
@@ -51,18 +51,23 @@ module Exchange
 
     # Returns a cached reciprocal Rate object from c2 to c1.
     def reciprocal
-      @reciprocal ||= self.class.new(@c2, @c1, 1.0 / @rate, @source, @date, "reciprocal: #{self.derived}", self,
-                                     { 
-                                       :rate_avg     => @rate_avg    && 1.0 / @rate_avg,
-                                       :rate_samples => @rate_samples,                            
-                                       :rate_lo      => @rate_lo     && 1.0 / @rate_lo,
-                                       :rate_hi      => @rate_hi     && 1.0 / @rate_hi,
-                                       :rate_date_0  => @rate_date_0 && 1.0 / @rate_date_0,
-                                       :rate_date_1  => @rate_date_1 && 1.0 / @rate_date_1,
-                                       :date_0       => @date_0,
-                                       :date_1       => @date_1,
-                                     }
-                                     )
+      @reciprocal ||= @rate == 1.0 ? self :
+        self.class.new(@c2, @c1, 
+                       1.0 / @rate, 
+                       @source, 
+                       @date, 
+                       "reciprocal(#{derived || "#{c1.code}#{c2.code}"})", self,
+                       { 
+                         :rate_avg     => @rate_avg    && 1.0 / @rate_avg,
+                         :rate_samples => @rate_samples,                            
+                         :rate_lo      => @rate_lo     && 1.0 / @rate_lo,
+                         :rate_hi      => @rate_hi     && 1.0 / @rate_hi,
+                         :rate_date_0  => @rate_date_0 && 1.0 / @rate_date_0,
+                         :rate_date_1  => @rate_date_1 && 1.0 / @rate_date_1,
+                         :date_0       => @date_0,
+                         :date_1       => @date_1,
+                       }
+                       )
     end
 
 
@@ -147,7 +152,7 @@ module Exchange
     def to_s(extended = false)
       extended = "#{date_0} #{rate_0} |< #{rate_lo} #{rate} #{rate_hi} >| #{rate_1} #{date_1}" if extended
       extended ||= ''
-      "#<#{self.class.name} #{c1.code} #{c2.code} #{rate} #{source.inspect} #{date.xmlschema} #{derived} #{extended}>"
+      "#<#{self.class.name} #{c1.code} #{c2.code} #{rate} #{source.inspect} #{date.xmlschema} #{derived && derived.inspect} #{extended}>"
     end
 
     def inspect; to_s; end

@@ -11,7 +11,11 @@ require 'open-uri'
 require 'rexml/document'
 
 
-class Currency::Exchange::Rate::NewYorkFed < Currency::Exchange::Rate::Source
+module Currency
+module Exchange
+class Rate
+
+class NewYorkFed < ::Currency::Exchange::Rate::Source
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
   
@@ -37,13 +41,16 @@ class Currency::Exchange::Rate::NewYorkFed < Currency::Exchange::Rate::Source
     @query_date ||= Time.now - 24 * 60 * 60 # yesterday.
   end
 
+
   def date_YYYY
     '%04d' % query_date.year
   end
 
+
   def date_MM
     '%02d' % query_date.month
   end
+
 
   def date_DD
     '%02d' % query_date.day
@@ -98,5 +105,8 @@ class Currency::Exchange::Rate::NewYorkFed < Currency::Exchange::Rate::Source
  
 end # class
 
+end # class
+end # module
+end # module
 
 

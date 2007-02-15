@@ -10,12 +10,17 @@ require 'net/http'
 require 'open-uri'
 
 
-class Currency::Exchange::Rate::Xe < Currency::Exchange::Rate::Source
+module Currency
+module Exchange
+class Rate
+
+class Xe < ::Currency::Exchange::Rate::Source
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
   
   def initialize(*opt)
     self.uri = 'http://xe.com/'
+    self.pivot_currency = PIVOT_CURRENCY
     @xe_rates = nil
     super(*opt)
   end
@@ -186,4 +191,7 @@ class Currency::Exchange::Rate::Xe < Currency::Exchange::Rate::Source
 end # class
 
 
+end # class
+end # module
+end # module
 

@@ -36,32 +36,31 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
      add_index table_name :date
      add_index table_name :date_0
      add_index table_name :date_1
+     add_index table_name [:c1, :c2, :source, :date_0, :date_1], :unique => true
    end
 
 
-
-   def initialize(opts = { })
-     super
-     if rate = opts[:rate]
-       self.c1 = rate.c1.code
-       self.c2 = rate.c2.code
-       self.rate = rate.rate
-       self.rate_avg = rate.rate_avg
-       self.rate_lo  = rate.rate_lo
-       self.rate_hi  = rate.rate_hi
-       self.rate_date_0  = rate.rate_date_0
-       self.rate_date_1  = rate.rate_date_1
-       self.source = rate.source
-       self.date = rate.date
-       self.date_0 = rate.date_0
-       self.date_1 = rate.date_1
-     end
+   def from_rate(rate)
+     self.c1 = rate.c1.code
+     self.c2 = rate.c2.code
+     self.rate = rate.rate
+     self.rate_avg = rate.rate_avg
+     self.rate_lo  = rate.rate_lo
+     self.rate_hi  = rate.rate_hi
+     self.rate_date_0  = rate.rate_date_0
+     self.rate_date_1  = rate.rate_date_1
+     self.source = rate.source
+     self.date = rate.date
+     self.date_0 = rate.date_0
+     self.date_1 = rate.date_1
+     self
    end
 
-   def convert_to_rate
+
+   def to_rate
      ::Currency::Exchange::Rate.new(
-                                  Currency::Currency.get(self.c1), 
-                                  Currency::Currency.get(self.c2),
+                                  ::Currency::Currency.get(self.c1), 
+                                  ::Currency::Currency.get(self.c2),
                                   self.rate,
                                   "historical #{self.source}",
                                   self.date,
@@ -82,5 +81,6 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
      self.date_0 = self.date unless self.date_0
      self.date_1 = self.date unless self.date_1
    end
- end
+
+  end
  

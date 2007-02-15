@@ -10,7 +10,7 @@ require 'open-uri'
 module Currency
 module Exchange
 
-  class Xe < Base
+  class Xe < Cashe
     @@instance = nil
     # Returns a singleton instance.
     def self.instance(*opts)

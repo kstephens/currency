@@ -1,6 +1,7 @@
 require 'test/test_base'
+
 require 'currency' # For :type => :money
-require 'currency/exchange/xe'
+require 'currency/exchange/rate/xe'
 
 module Currency
 
@@ -8,11 +9,14 @@ class XeTest < TestBase
   def setup
     super
     # Force XE Exchange.
-    Exchange.default = Exchange::Xe.instance
+    source = Exchange::Rate::Xe.new
+    deriver = Exchange::Rate::Deriver.new(:source => source)
+    Exchange.default = deriver
   end
 
+
   def test_xe_usd_cad
-    assert_not_nil rates = Exchange.default.xe_rates
+    assert_not_nil rates = Exchange.default.source.xe_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
 
@@ -24,8 +28,9 @@ class XeTest < TestBase
     assert_equal_float usd_cad, m, 0.001
   end
 
+
   def test_xe_cad_eur
-    assert_not_nil rates = Exchange.default.xe_rates
+    assert_not_nil rates = Exchange.default.source.xe_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
     assert_not_nil usd_eur = rates[:USD][:EUR]
