@@ -1,10 +1,8 @@
 
-module Currency
-module Exchange
-class Historical
+require 'currency/exchange/rate/source/historical'
 
 # Responsible for writing historical rates from a rate source.
-class Writer
+class Currency::Exchange::Rate::Source::Historical::Writer
   # The source of rates.
   attr_accessor :source
 
@@ -134,7 +132,7 @@ class Writer
   def write_rates(rates = selected_rates)
  
     # Create Historical::Rate objects.
-    h_rate_class = ::Currency::Exchange::Historical::Rate
+    h_rate_class = ::Currency::Exchange::Rate::Source::Historical::Rate
 
     # Most Rates from the same Source will probably have the same time,
     # so cache the computed date_range.
@@ -191,8 +189,5 @@ class Writer
 
 end # class
 
-end # class
-end # module
-end # module
 
 

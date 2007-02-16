@@ -7,7 +7,7 @@ require 'currency/exchange/rate/source/base'
 #
 # See Currency::Exchange::Historical::Writer for a rate archiver.
 #
-class Currency::Exchange::Historical < ::Currency::Exchange::Rate::Source::Base
+class Currency::Exchange::Rate::Source::Historical < Currency::Exchange::Rate::Source::Base
 
     # Select specific rate source.
     # Defaults to nil
@@ -46,9 +46,10 @@ class Currency::Exchange::Historical < ::Currency::Exchange::Rate::Source::Base
 
     # Returns a Rate.
     def get_rate(c1, c2, time)
-      rate = get_rates(time).select{ | r | r.c1 == c1 && r.c2 == c2 }[0]
-      $stderr.puts "#{self}.get_rate(#{c1}, #{c2}, #{time.inspect}) => #{rate.inspect}"
-      rate
+      # rate = 
+      get_rates(time).select{ | r | r.c1 == c1 && r.c2 == c2 }[0]
+      # $stderr.puts "#{self}.get_rate(#{c1}, #{c2}, #{time.inspect}) => #{rate.inspect}"
+      # rate
     end
 
 
@@ -64,13 +65,13 @@ class Currency::Exchange::Historical < ::Currency::Exchange::Rate::Source::Base
     # Return a list of raw rates.
     def get_raw_rates(time = nil)
       @raw_rates_cache["#{source_key}:#{time}"] ||= 
-        ::Currency::Exchange::Historical::Rate.new(:c1 => nil, :c2 => nil, :date => time, :source => source).
+        ::Currency::Exchange::Rate::Source::Historical::Rate.new(:c1 => nil, :c2 => nil, :date => time, :source => source).
           find_matching_this(:all)
     end
 
 end # class
 
 
-require 'currency/exchange/historical/rate'
+require 'currency/exchange/rate/source/historical/rate'
 
 

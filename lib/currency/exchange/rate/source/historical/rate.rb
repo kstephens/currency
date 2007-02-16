@@ -1,6 +1,8 @@
 require 'active_record/base'
 
-class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
+require 'currency/exchange/rate/source/historical'
+
+class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    TABLE_NAME = 'currency_historical_rates'
    set_table_name TABLE_NAME
 

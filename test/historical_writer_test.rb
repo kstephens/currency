@@ -6,8 +6,8 @@ require 'active_record/migration'
 
 require 'currency' # For :type => :money
 
-require 'currency/exchange/historical'
-require 'currency/exchange/historical/writer'
+require 'currency/exchange/rate/source/historical'
+require 'currency/exchange/rate/source/historical/writer'
 require 'currency/exchange/rate/source/xe'
 require 'currency/exchange/rate/source/new_york_fed'
 
@@ -16,11 +16,12 @@ module Currency
 
 class HistoricalWriterTest < ArTestBase
 
-  TABLE_NAME = Exchange::Historical::Rate.table_name
+  RATE_CLASS = Exchange::Rate::Source::Historical::Rate
+  TABLE_NAME = RATE_CLASS.table_name
 
   class HistoricalRateMigration < AR_M
     def self.up
-      Exchange::Historical::Rate.__create_table(self)
+      RATE_CLASS.__create_table(self)
     end
 
     def self.down
@@ -46,7 +47,7 @@ class HistoricalWriterTest < ArTestBase
   
   def test_writer
     assert_not_nil src = @src
-    assert_not_nil writer = Exchange::Historical::Writer.new()
+    assert_not_nil writer = Exchange::Rate::Source::Historical::Writer.new()
     writer.time_quantitizer = :current
     writer.required_currencies = [ :USD, :GBP, :EUR, :CAD ]
     writer.base_currencies = [ :USD ]
@@ -80,7 +81,7 @@ class HistoricalWriterTest < ArTestBase
 
 
   def xxx_test_required_failure
-    assert_not_nil writer = Exchange::Historical::Writer.new()
+    assert_not_nil writer = Exchange::Rate::Source::Historical::Writer.new()
     assert_not_nil src = @src
     writer.source = src
     writer.required_currencies = [ :USD, :GBP, :EUR, :CAD, :ZZZ ]
@@ -95,7 +96,7 @@ class HistoricalWriterTest < ArTestBase
     writer_src2
     
     # Force Historical Rate Source.
-    source = Exchange::Historical.new
+    source = Exchange::Rate::Source::Historical.new
     deriver = Exchange::Rate::Deriver.new(:source => source)
     Exchange::Rate::Source.default = deriver
 
