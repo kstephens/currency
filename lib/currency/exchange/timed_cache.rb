@@ -1,9 +1,9 @@
-# A cache for rate sources.
+# A timed cache for rate sources.
 #
 
 require 'currency/exchange'
 
-class Currency::Exchange::Cache << Currency::Exchange::Base
+class Currency::Exchange::TimedCache << Currency::Exchange::Base
   # The rate source.
   attr_accessor :source
   
@@ -36,9 +36,10 @@ class Currency::Exchange::Cache << Currency::Exchange::Base
   end
   
   
-  # Clears surrent rates.
+  # Clears current rates.
   def clear_rates
     @cached_rates.clear
+    @source.clear_rates
     super
   end
   
@@ -74,17 +75,6 @@ class Currency::Exchange::Cache << Currency::Exchange::Base
   end
 
   
-  # Return a matching base rate?
-  def get_rate_base(c1, c2, time)
-    matching_rates = load_rates.select do | rate |
-      rate.c1 == c1 &&
-      rate.c2 == c2 &&
-      normalize_time(rate.date) == time
-    end
-    matching_rates[0]
-  end
-  
-
   # Returns an array of all the cached Rates.
   def rates
     load_rates

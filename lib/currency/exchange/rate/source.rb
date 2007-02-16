@@ -31,6 +31,7 @@ class Source
   # Clears current rates.
   def clear_rates
     @rates = nil
+    @currencies = nil
   end
   
   
@@ -40,6 +41,11 @@ class Source
   end
   
   
+  # Returns a list of Currency that the rate source provides.
+  def currencies
+    @currencies ||= rates.collect{| r | [ r.c1.code, r.c2.code ]}.flatten.uniq
+  end
+
   # Returns an array of base Rates from the rate source.
   #
   # Subclasses must define this method.
@@ -75,7 +81,15 @@ class Source
   def normalize_time(time)
     time && ::Currency::Exchange::TimeQuantitizer.current.quantitize_time(time)
   end
+  
 
+  def to_s
+    "#<#{self.class.name} #{name.inspect}>"
+  end
+
+  def inspect
+    to_s
+  end
 end # class
 
 

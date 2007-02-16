@@ -2,6 +2,8 @@
 #
 
 
+require 'currency/exchange/historical/rate'
+
 module Currency
 module Exchange
  class Historical < Base
@@ -13,7 +15,7 @@ module Exchange
 
     # This Exchange's name is the same as its #uri.
     def name
-      "historical #{source}"
+      "historical #{source.inspect}"
     end
 
 
@@ -29,8 +31,7 @@ module Exchange
     end
 
 
-    # Loads cached rates from xe.com and creates Rate objects
-    # for 10 currencies.
+    # Loads 
     def get_rate(c1, c2, time)
       rates = get_rates(time)
  

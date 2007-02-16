@@ -166,6 +166,7 @@ class Xe < ::Currency::Exchange::Rate::Source
         cur_i = cur_i + 1
         cur = currency[cur_i]
         next unless cur
+        next if cur.to_s == PIVOT_CURRENCY.to_s
         (rate[PIVOT_CURRENCY] ||= {})[cur] = usd_to_cur
         $stderr.puts "#{cur.inspect} => #{usd_to_cur}" if @verbose
       end

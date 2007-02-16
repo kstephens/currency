@@ -131,7 +131,7 @@ class Deriver < ::Currency::Exchange::Base
   # Returns a base Rate from the Source.
   def get_rate_base(c1, c2, time)
     if c1 == c2
-      new_rate(c1, c2, 1.0, time, "identity")
+      new_rate(c1, c2, 1.0, nil, "identity")
     else
       source.get_rate_base(c1, c2, time)
     end

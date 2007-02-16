@@ -2,16 +2,33 @@
 module Currency
 module Exchange
 class Historical
+
+# Responsible for writing
 class Writer
   # The source of rates.
   attr_accessor :source
 
   # If true, compute all Rates between rates.
-  attr_accessor :compute_all_rates
+  # This can be used to aid complex join reports that may assume
+  # c1 as the from currency and c2 as the to currency.
+  attr_accessor :all_rates
 
-  # If true, store unity rates.
-  # This can be used to aid complex joins.
-  attr_accessor :store_unity_rates
+  # If true, store identity rates.
+  # This can be used to aid complex join reports.
+  attr_accessor :identity_rates
+
+  # If set, a set of preferred currencies.
+  attr_accessor :preferred_currencies
+
+  # If set, a list of required currencies.
+  attr_accessor :required_currencies
+
+  # If set, a list of required base currencies.
+  # base currencies must have rates as c1.
+  attr_accessor :base_currencies
+
+  # If true, compute and store all reciprocal rates.
+  attr_accessor :reciprocal_rates
 
   # If set, use this time quantitizer to
   # manipulate the Rate date_0 date_1 time ranges.
@@ -19,28 +36,91 @@ class Writer
 
 
   def initialize(opt = { })
-    super
-    opt.each_pair{|k,v| self.send("#{k}=", v)}
+    @identity_rates = false
+    @preferred_currencies = nil
+    @base_currencies = nil
+    @time_quantitizer = nil
+    opt.each_pair{| k, v | self.send("#{k}=", v) }
   end
 
 
-  def write_rates
-    # Get Rates from source.
-    rates = source.rates
-
+  def selected_rates
     # Produce a list of all currencies.
-    currencys = rates.collect{| r | [ r.c1, r.c2 ]}.flatten.uniq
+    currencies = source.currencies
 
-    # Produce Rates for all pairs of currencies.
-    all_rates = [ ]
-    currencys.each do | c1 |
-      currencys.each do | c2 |
-        rate = source.rate(c1, c2)
-        all_rates << rate
+    selected_rates = [ ]
+
+    # Get list of preferred_currencies.
+    if preferred_currencies
+      currencies = currencies.select{ | c | preferred_currencies.include?(c)}.uniq
+    end
+
+
+    # Check for required currencies.
+    if required_currencies
+      required_currencies.each do | c |
+        currencies.include?(c) || raise("Required currency #{c.inspect} not in #{currencies.inspect}")
       end
     end
 
 
+    $stderr.puts "currencies = #{currencies.inspect}"
+
+    deriver = ::Currency::Exchange::Rate::Deriver.new(:source => source)
+
+    # Produce Rates for all pairs of currencies.
+    if all_rates
+      currencies.each do | c1 |
+        currencies.each do | c2 |
+          next if c1 == c2
+          c1 = ::Currency::Currency.get(c1)
+          c2 = ::Currency::Currency.get(c2)
+          rate = deriver.rate(c1, c2, nil)
+          selected_rates << rate unless selected_rates.include?(rate)
+        end
+      end
+    elsif base_currencies
+      base_currencies.each do | c1 |
+        currencies.each do | c2 |
+          next if c1 == c2
+          c1 = ::Currency::Currency.get(c1)
+          c2 = ::Currency::Currency.get(c2)
+          rate = deriver.rate(c1, c2, nil)
+          selected_rates << rate unless selected_rates.include?(rate)
+        end
+      end
+    else
+      selected_rates = source.rates.select do | r |
+        currencies.include?(r.c1.code) && currencies.include?(r.c2.code)
+      end
+    end
+
+    if identity_rates
+      currencies.each do | c1 |
+        c1 = ::Currency::Currency.get(c1)
+        c2 = c1
+        rate = deriver.rate(c1, c2, nil)
+        selected_rates << rate unless selected_rates.include?(rate)
+      end
+    end
+
+    if reciprocal_rates
+      selected_rates.clone.each do | r |
+        c1 = r.c2
+        c2 = r.c1
+        rate = deriver.rate(c1, c2, nil)
+        selected_rates << rate unless selected_rates.include?(rate)
+      end
+    end
+
+    $stderr.puts "selected_rates = #{selected_rates.inspect}\n [#{selected_rates.size}]"
+
+    selected_rates
+  end
+
+
+  def write_rates(rates = selected_rates)
+ 
     # Create Historical::Rate objects.
     h_rate_class = ::Currency::Exchange::Historical::Rate
 
@@ -50,10 +130,13 @@ class Writer
 
     h_rates = rates.collect do | r |
       rr = h_rate_class.new.from_rate(r)
-      if time_quantitizer
-        date_range = date_range_cache[r.date] ||= time_quantitizer.time_range
+      rr.dates_to_localtime!
+      if time_quantitizer = self.time_quantitizer
+        time_quantitizer = ::Currency::Exchange::TimeQuantitizer.current if time_quantitizer == :current
+        date_range = date_range_cache[r.date] ||= time_quantitizer.quantitize_time_range(rr.date)
         rr.date_0 = date_range.begin
         rr.date_1 = date_range.end
+        rr.date = rr.date_0 unless rr.date
       end
       rr
     end
