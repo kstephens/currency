@@ -1,4 +1,5 @@
-require 'test/ar_test_base'
+
+require 'test/ar_test_core'
 require 'currency'
 
 require 'rubygems'
@@ -8,7 +9,7 @@ require 'currency/active_record'
 
 module Currency
 
-class ArSimpleTest < ArTestBase
+class ArSimpleTest < ArTestCore
 
   def test_simple
     insert_records

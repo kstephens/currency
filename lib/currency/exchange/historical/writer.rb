@@ -127,18 +127,32 @@ class Writer
     # Most Rates from the same Source will probably have the same time,
     # so cache the computed date_range.
     date_range_cache = { } 
+    rate_0 = nil
+    if time_quantitizer = self.time_quantitizer
+      time_quantitizer = ::Currency::Exchange::TimeQuantitizer.current if time_quantitizer == :current
+    end
 
     h_rates = rates.collect do | r |
       rr = h_rate_class.new.from_rate(r)
       rr.dates_to_localtime!
-      if time_quantitizer = self.time_quantitizer
-        time_quantitizer = ::Currency::Exchange::TimeQuantitizer.current if time_quantitizer == :current
-        date_range = date_range_cache[r.date] ||= time_quantitizer.quantitize_time_range(rr.date)
+
+      if rr.date && time_quantitizer
+        date_range = date_range_cache[rr.date] ||= time_quantitizer.quantitize_time_range(rr.date)
         rr.date_0 = date_range.begin
         rr.date_1 = date_range.end
-        rr.date = rr.date_0 unless rr.date
       end
+
+      rate_0 ||= rr if rr.date_0 && rr.date_1
+
       rr
+    end
+
+    # Fix any dateless Rates.
+    if rate_0
+      h_rates.each do | rr |
+        rr.date_0 = rate_0.date_0 unless rr.date_0
+        rr.date_1 = rate_0.date_1 unless rr.date_1
+      end
     end
 
     # Save them all or none.
@@ -147,6 +161,8 @@ class Writer
         rr.save!
       end
     end
+
+   h_rates
   end
 
 end # class

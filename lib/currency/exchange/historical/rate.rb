@@ -62,7 +62,7 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
 
 
    def dates_to_localtime!
-     self.date = self.date && self.date.clone.localtime
+     self.date   = self.date   && self.date.clone.localtime
      self.date_0 = self.date_0 && self.date_0.clone.localtime
      self.date_1 = self.date_1 && self.date_1.clone.localtime
    end
@@ -89,14 +89,18 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
 
 
    def before_validation
-     self.date_0 = self.date unless self.date_0
-     self.date_1 = self.date unless self.date_1
      self.rate_avg = self.rate unless self.rate_avg
      self.rate_samples = 1 unless self.rate_samples
      self.rate_lo = self.rate unless self.rate_lo
      self.rate_hi = self.rate unless self.rate_hi
      self.rate_date_0 = self.rate unless self.rate_date_0
      self.rate_date_1 = self.rate unless self.rate_date_1
+
+     self.date_0 = self.date unless self.date_0
+     self.date_1 = self.date unless self.date_1
+     self.date = self.date_0 + (self.date_1 - self.date_0) * 0.5 if ! self.date && self.date_0 && self.date_1
+     self.date = self.date_0 unless self.date
+     self.date = self.date_1 unless self.date
    end
 
 

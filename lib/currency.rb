@@ -14,6 +14,7 @@
 # * Currency::Money - uses a scaled integer representation of a monetary value and performs accurate conversions to and from string values.
 # * Currency::Currency - provides an object-oriented representation of a currency.
 # * Currency::Exchange::Base - the base class for a currency exchange rate provider.
+# * Currency::Exchange::Rate::Source - the base class for a currency exchange rate data provider.
 # * Currency::Exchange::Rate - represents a exchange rate between two currencies.
 #
 # 
@@ -42,11 +43,19 @@
 # In the example above, the entries.amount database column is an INTEGER that represents US cents. 
 # The currency code of the money value can be stored in an additional database column or a default currency can be used.
 #
+# == Recent Enhancements
+#
+# === Storage and retrival of historical exchange rates
+#
+# See Currency::Exchange::Historical
+#
+# === Exchange rate polling for population of historical rates
+#
+# See Currency::Exchange::Historical::Writer
+#
 # == Future Enhancements
 #
-# * storage and retrival of historical exchange rates
-# * exchange rate polling for population of historical rates
-# * support for inflationary rates within a currency, e.g. $10 USD in the year 1955 in 2006 USD.
+# * Support for inflationary rates within a currency, e.g. $10 USD in the year 1955 converted to 2006 USD.
 # 
 # == SVN Repo
 #

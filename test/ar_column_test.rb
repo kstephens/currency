@@ -1,4 +1,4 @@
-require 'test/ar_test_base'
+require 'test/ar_test_core'
 require 'currency'
 
 require 'rubygems'
@@ -8,7 +8,7 @@ require 'currency/active_record'
 
 module Currency
 
-class ArFieldTest < ArTestBase
+class ArFieldTest < ArTestCore
 
   ##################################################
   # Basic CurrenyTest AR::B class

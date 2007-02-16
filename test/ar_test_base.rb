@@ -14,51 +14,34 @@ module Currency
 class ArTestBase < TestBase
 
   ##################################################
-  # Basic CurrenyTest AR::B class
-  #
-
-  TABLE_NAME = 'currency_test'
-
-  class CurrencyTestMigration < AR_M
-    def self.up
-      create_table TABLE_NAME.intern do |t|
-        t.column :name,     :string
-        t.column :amount,   :integer # Money
-      end
-    end
-
-    def self.down
-      drop_table TABLE_NAME.intern
-    end
-  end
-
-  class CurrencyTest < AR_B
-    set_table_name TABLE_NAME
-    money :amount
-  end 
-
-  ##################################################
 
   def setup
     super
     AR_B.establish_connection(database_spec)
 
     # Subclasses can override this.
-    @currency_test_migration ||= CurrencyTestMigration 
-    @currency_test ||= CurrencyTest
+    @currency_test_migration ||= nil
+    @currency_test ||= nil
 
     # schema_down
 
     schema_up
   end
 
+
   def teardown
     super
     # schema_down
   end
 
+
   def database_spec
     # TODO: Get from ../config/database.yml:test
+    # sudo mysqladmin create test;
+    # sudo mysql
+    # grant all on test.* to test@localhost identified by 'test';
+    # flush privileges;
+
     @database_spec = {
       :adapter  => "mysql",
       :host     => "localhost",
@@ -68,7 +51,9 @@ class ArTestBase < TestBase
     }
   end
 
+
   def schema_up
+    return unless @currency_test_migration
     begin
       @currency_test_migration.migrate(:up)
     rescue Object =>e
@@ -76,13 +61,16 @@ class ArTestBase < TestBase
     end
   end
 
+
   def schema_down
+    return unless @currency_test_migration
     begin
       @currency_test_migration.migrate(:down)
     rescue Object => e
       $stderr.puts "Warning: #{e}"
     end
   end
+
 
   ##################################################
   # Scaffold
@@ -100,11 +88,14 @@ class ArTestBase < TestBase
     @cad.save
   end
 
+
   def delete_records
     @currency_test.destroy_all
   end
 
+
   ##################################################
+
 
   def assert_equal_money(a,b)
     assert_not_nil a
@@ -121,8 +112,8 @@ class ArTestBase < TestBase
     assert_equal   a.amount.convert(b.amount.currency).rep, b.amount.rep
   end
 
-  def assert_equal_currency(a,b)
 
+  def assert_equal_currency(a,b)
     assert_equal_money a, b
 
     assert_equal   a.amount.rep, b.amount.rep
@@ -131,12 +122,14 @@ class ArTestBase < TestBase
 
   end
 
+
   ##################################################
   # 
   # 
+
   
   def test_dummy
-    insert_records
+    
   end
 
 end

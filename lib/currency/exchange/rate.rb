@@ -1,3 +1,4 @@
+
 module Currency
 module Exchange
   # Represents a convertion rate between two currencies
@@ -37,7 +38,7 @@ module Exchange
       @rate = c1_to_c2_rate
       raise Exception::InvalidRate.new(@rate) unless @rate && @rate >= 0.0
       @source = source
-      @date = date || Time.now
+      @date = date
       @derived = derived
       @reciprocal = reciprocal
 
@@ -152,7 +153,7 @@ module Exchange
     def to_s(extended = false)
       extended = "#{date_0} #{rate_0} |< #{rate_lo} #{rate} #{rate_hi} >| #{rate_1} #{date_1}" if extended
       extended ||= ''
-      "#<#{self.class.name} #{c1.code} #{c2.code} #{rate} #{source.inspect} #{date.xmlschema} #{derived && derived.inspect} #{extended}>"
+      "#<#{self.class.name} #{c1.code} #{c2.code} #{rate} #{source.inspect} #{date ? date.strftime('%Y/%m/%d-%H:%M:%S') : 'nil'} #{derived && derived.inspect} #{extended}>"
     end
 
     def inspect; to_s; end

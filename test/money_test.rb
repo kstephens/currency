@@ -249,6 +249,7 @@ class MoneyTest < TestBase
     end
   end
 
+
   def test_time_default
     Money.default_time = nil
 
