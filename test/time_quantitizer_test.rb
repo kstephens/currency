@@ -1,3 +1,5 @@
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 #require File.dirname(__FILE__) + '/../test_helper'
 
@@ -39,26 +41,39 @@ class TimeQuantitizerTest < TestBase
 
 
   def test_random
-    (1 .. 100).each do
+    (1 .. 1000).each do
       t0 = Time.at(rand(1234567901).to_i)
       assert_test_day(t0)
       assert_test_hour(t0)
+      # Problem year?
+      t0 = Time.parse('1977/01/01') + rand(60 * 60 * 24 * 7 * 52).to_i
+      assert_test_day(t0)
+      assert_test_hour(t0)
+      # Problem year?
+      t0 = Time.parse('1995/01/01') + rand(60 * 60 * 24 * 7 * 52).to_i
+      assert_test_day(t0)
+      assert_test_hour(t0)     
     end
 
+   
   end
 
 
   def assert_test_day(t0)
     tq = test_create
 
-    assert_not_nil t1 = tq.quantitize_time(t0)
-    #$stderr.puts "t0 = #{t0}"
-    #$stderr.puts "t1 = #{t1}"
-
-    assert_equal t0.year, t1.year
-    assert_equal t0.month, t1.month
-    assert_equal t0.day, t1.day
-    assert_time_beginning_of_day(t1)
+    begin
+      assert_not_nil t1 = tq.quantitize_time(t0)
+      #$stderr.puts "t0 = #{t0}"
+      #$stderr.puts "t1 = #{t1}"
+      
+      assert_equal t0.year, t1.year
+      assert_equal t0.month, t1.month
+      assert_equal t0.day, t1.day
+      assert_time_beginning_of_day(t1)
+    rescue Object => err
+      raise("#{err}\nDuring quantitize_time(#{t0} (#{t0.to_i}))")
+    end
 
     t1
   end

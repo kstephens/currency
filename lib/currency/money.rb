@@ -71,7 +71,7 @@ module Currency
       @currency = currency;
       @rep = x.Money_rep(@currency)
       @time = time || Money.default_time
-      @time = money.now if @time == :now
+      @time = Money.now if @time == :now
 
       # Handle conversion of "USD 123.45".
       if @rep.kind_of?(Money)
@@ -82,7 +82,7 @@ module Currency
 
     # Returns a Time.new
     # Can be modifed for special purposes.
-    def now
+    def self.now
       Time.new
     end
 

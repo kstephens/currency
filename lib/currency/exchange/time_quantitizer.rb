@@ -66,14 +66,17 @@ class TimeQuantitizer
     time = Time.at(time)
     
     # Quant to day?
-    #if quant_size == 60 * 60 * 24 
-    #  if was_utc
-    #    time = time.getutc
-    #    time = Time.utc(time.year, time.month, time.day, 0, 0, 0, 0)
-    #  else
-    #    time = Time.local(time.year, time.month, time.day, 0, 0, 0, 0)
-    #  end
-    #end
+    # NOTE: is this due to a Ruby bug, or
+    # some wierd UTC time-flow issue, like leap-seconds.
+    if quant_size == 60 * 60 * 24 
+      time = time + 60 * 60
+      if was_utc
+        time = time.getutc
+        time = Time.utc(time.year, time.month, time.day, 0, 0, 0, 0)
+      else
+        time = Time.local(time.year, time.month, time.day, 0, 0, 0, 0)
+      end
+    end
     
     # Convert back to UTC?
     time = time.getutc if was_utc
