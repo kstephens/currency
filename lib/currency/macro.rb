@@ -28,6 +28,7 @@ module Currency
         end
       end
     end
+    
   end # class
 end # module
 
@@ -68,6 +69,11 @@ module Currency
       # If this column is different from the attribute name,
       # the money object will intercept column=(x) to flush
       # any cached Money object.
+      #
+      #    :readonly => false
+      #
+      # If true, the underlying attribute is readonly.  Thus the Money object
+      # cannot be cached.  This is useful for computed money values.
       #
       #    :rep => :rep
       #
@@ -140,7 +146,7 @@ module Currency
         write_value = opts[:write_value] ||= "self.#{value} = "
 
         # Intercept value setter?
-        if value.to_s != attr_name.to_s
+        if ! opts[:readonly] && value.to_s != attr_name.to_s
           alias_accessor = <<-"end_eval"
 alias :before_money_#{value}= :#{value}=
 
@@ -150,7 +156,7 @@ def #{value}=(__value)
 end
 
 end_eval
-        end
+        end 
 
         # How to convert between numeric representation and Money.
         rep = opts[:rep] ||= :float
@@ -224,7 +230,24 @@ end_eval
 
         validate ||= ''
 
-        eval_opts = [ (opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__ ]
+        if opts[:readonly]
+          eval_opts = [ (opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__ ]
+#{validate}
+
+def #{attr_name}
+  #{attr_name}_rep = #{value}
+  if #{attr_name}_rep != nil
+    #{attr_name} = #{from_rep}(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
+    #{read_preferred_currency}
+  else
+    #{attr_name} = nil
+  end
+  #{attr_name}
+end
+
+end_eval
+        else
+          eval_opts = [ (opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__ ]
 #{validate}
 
 #{alias_accessor}
@@ -264,10 +287,11 @@ def #{attr_name}=(value)
 end
 
 end_eval
-        # $stderr.puts "   CODE = #{x}"
-        module_eval *eval_opts
       end
-    end
-  end
-end
 
+      # $stderr.puts "   CODE = #{x}"
+      module_eval(*eval_opts)
+    end
+  end # module
+end # module
+end # ???

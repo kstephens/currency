@@ -1,7 +1,9 @@
 
 
 module Currency
-  class CurrencyFactory
+class Currency
+
+  class Factory
     @@default = nil
 
     # Returns the default CurrencyFactory.
@@ -121,6 +123,8 @@ module Currency
     end
 
   end # class
+
+end # class
 end # module
 
 

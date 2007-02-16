@@ -79,9 +79,10 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'currency/exception'
 require 'currency/money'
-require 'currency/currency_factory'
 require 'currency/currency'
+require 'currency/currency/factory'
 require 'currency/money'
+require 'currency/formatter'
 require 'currency/exchange'
 require 'currency/exchange/rate'
 require 'currency/exchange/rate/deriver'

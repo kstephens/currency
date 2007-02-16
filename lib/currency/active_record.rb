@@ -237,12 +237,12 @@ end
 def #{attr_name}_before_type_cast
   # FIXME: User cannot specify Currency
   x = #{attr_name}
-  x &&= x.format(:no_symbol, :no_currency, :no_thousands)
+  x &&= x.format(:symbol => false, :currency => false, :thousands => false)
   x
 end
 
 end_eval
-        $stderr.puts "   CODE = #{x}"
+        # $stderr.puts "   CODE = #{x}"
       end
     end
   end

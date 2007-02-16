@@ -64,7 +64,7 @@ class Writer
     end
 
 
-    $stderr.puts "currencies = #{currencies.inspect}"
+    #$stderr.puts "currencies = #{currencies.inspect}"
 
     deriver = ::Currency::Exchange::Rate::Deriver.new(:source => source)
 
@@ -72,7 +72,7 @@ class Writer
     if all_rates
       currencies.each do | c1 |
         currencies.each do | c2 |
-          next if c1 == c2
+          next if c1 == c2 && ! identity_rates
           c1 = ::Currency::Currency.get(c1)
           c2 = ::Currency::Currency.get(c2)
           rate = deriver.rate(c1, c2, nil)
@@ -82,7 +82,7 @@ class Writer
     elsif base_currencies
       base_currencies.each do | c1 |
         currencies.each do | c2 |
-          next if c1 == c2
+          next if c1 == c2 && ! identity_rates
           c1 = ::Currency::Currency.get(c1)
           c2 = ::Currency::Currency.get(c2)
           rate = deriver.rate(c1, c2, nil)
@@ -91,6 +91,7 @@ class Writer
       end
     else
       selected_rates = source.rates.select do | r |
+        next if r.c1 == r.c2 && ! identity_rates
         currencies.include?(r.c1.code) && currencies.include?(r.c2.code)
       end
     end
@@ -101,6 +102,10 @@ class Writer
         c2 = c1
         rate = deriver.rate(c1, c2, nil)
         selected_rates << rate unless selected_rates.include?(rate)
+      end
+    else
+      selected_rates = selected_rates.select do | r |
+        r.c1 != r.c2
       end
     end
 
@@ -113,7 +118,7 @@ class Writer
       end
     end
 
-    $stderr.puts "selected_rates = #{selected_rates.inspect}\n [#{selected_rates.size}]"
+    # $stderr.puts "selected_rates = #{selected_rates.inspect}\n [#{selected_rates.size}]"
 
     selected_rates
   end
@@ -157,8 +162,15 @@ class Writer
 
     # Save them all or none.
     h_rate_class.transaction do 
-      h_rates.each do | rr |
-        rr.save!
+      h_rates = h_rates.select do | rr |
+        next if rr.c1 == rr.c2 && ! identity_rates
+        existing_rate = rr.find_matching_this
+        if existing_rate.empty?
+          rr.save!
+          true # Written
+        else
+          false # False existed
+        end
       end
     end
 

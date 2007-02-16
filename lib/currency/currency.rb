@@ -14,34 +14,49 @@ module Currency
     # E.g. :USD, :CAD, etc.
     attr_reader :code
 
-    # Get the Currency's scale factor.  
+    # The Currency's scale factor.  
     # E.g: the :USD scale factor is 100.
     attr_reader :scale
 
-    # Get the Currency's scale factor.  
+    # The Currency's scale factor.  
     # E.g: the :USD scale factor is 2, where 10 ^ 2 == 100.
     attr_reader :scale_exp
 
-    # Get the Currency's symbol. 
+    attr_reader :format_right
+    attr_reader :format_left
+
+    # The Currency's symbol. 
     # E.g: USD symbol is '$'
-    attr_reader :symbol
+    attr_accessor :symbol
+
+    # The Currency's symbol as HTML.
+    # e.g: EUR symbol is 
+    attr_accessor :symbol_html
+
+    # The default formatter.
+    attr_accessor :formatter
+
+    # The default parser.
+    attr_accessor :parser
 
 
     # Create a new currency.
-    # This should only be called from Currency::CurrencyFactory.
+    # This should only be called from Currency::Currency::Factory.
     def initialize(code, symbol = nil, scale = 100)
       self.code = code
       self.symbol = symbol
       self.scale = scale
+      @formatter = nil
+      @parser = nil
     end
 
 
-    # Returns the Currency object from the default CurrencyFactory
+    # Returns the Currency object from the default Currency::Currency::Factory
     # by its 3-letter uppercase Symbol name, such as :USD, or :CAD.
     def self.get(code)
       # $stderr.puts "#{self}.get(#{code.inspect})"
       return code if code.kind_of?(::Currency::Currency)
-      CurrencyFactory.default.get_by_code(code)
+      Factory.default.get_by_code(code)
     end
 
 
@@ -92,12 +107,6 @@ module Currency
     end
 
 
-    # Clients should never call this directly.
-    def symbol=(x)
-      @symbol = x
-    end
-
-
     # Parse a Money string in this Currency.
     # Options:
     #   :currency => Currency object.
@@ -114,7 +123,7 @@ module Currency
       
       # Handle currency code at front of string.
       if (md = /^([A-Z][A-Z][A-Z])\s*(.*)$/.match(x)) != nil 
-        curr = CurrencyFactory.default.get_by_code(md[1])
+        curr = Factory.default.get_by_code(md[1])
         x = md[2]
         if curr != self
           if opt[:currency] && opt[:currency] != curr
@@ -124,7 +133,7 @@ module Currency
         end
         # Handle currency code at end of string.
       elsif (md = /^(.*)\s*([A-Z][A-Z][A-Z])$/.match(x)) != nil 
-        curr = CurrencyFactory.default.get_by_code(md[2])
+        curr = Factory.default.get_by_code(md[2])
         x = md[1]
         if curr != self
           if opt[:currency] && opt[:currency] != curr
@@ -181,93 +190,53 @@ module Currency
 
 
     # Format a Money object as a String.
+    @@default_formatter = nil
+    def self.default_formatter; @@default_formatter; end
+    def self.default_formatter=(x); @@default_formatter = x; end
+
     def format(m, *opt)
-      opt = opt.flatten
-
-      # Get scaled integer representation for this Currency.
-      x = m.Money_rep(self)
-
-      # Remove sign.
-      x = - x if ( neg = x < 0 )
-
-      # Convert to String.
-      x = x.to_s
-
-      # Keep prefixing "0" until filled to scale.
-      while ( x.length <= @scale_exp )
-        x = "0" + x
-      end
-
-      # Insert decimal place
-      whole = x[0..@format_left] 
-      decimal = x[@format_right..-1]
-
-      # Do commas
-      x = whole
-      unless opt.include?(:no_thousands)
-        x.reverse!
-        x.gsub!(/(\d\d\d)/) {|y| y + ','}
-        x.sub!(/,$/,'')
-        x.reverse!
-      end
-
-      x << '.' + decimal unless opt.include?(:no_cents) || opt.include?(:no_decimal)
-
-      # Put sign back.
-      x = "-" + x if neg
-
-      # Add symbol?
-      x = (@symbol || '') + x unless opt.include?(:no_symbol)
-
-      # Suffix currency code.
-      if opt.include?(:with_currency)
-        x << ' '
-        x << '<span class="currency">' if opt.include?(:html)
-        x << @code.to_s
-        x << '</span>' if opt.include?(:html)
-      end
-
-      x
+       (@formatter || (@@default_formatter ||= ::Currency::Formatter.new)).format(m, *opt)
     end
+
 
     #def to_s
     #  @code.to_s
     #end
 
 
-    # Returns the default CurrencyFactory's currency.
+    # Returns the default Factory's currency.
     def self.default
-      CurrencyFactory.default.currency
+      Factory.default.currency
     end
 
 
-    # Sets the default CurrencyFactory's currency.
+    # Sets the default Factory's currency.
     def self.default=(x)
-      CurrencyFactory.default.currency = x
+      Factory.default.currency = x
     end
 
 
     # Returns the USD Currency.
     def self.USD
-      CurrencyFactory.default.USD
+      Factory.default.USD
     end
 
 
     # Returns the CAD Currency.
     def self.CAD
-      CurrencyFactory.default.CAD
+      Factory.default.CAD
     end
 
 
     # Returns the EUR Currency.
     def self.EUR
-      CurrencyFactory.default.EUR
+      Factory.default.EUR
     end
 
 
     # Returns the GBP Currency.
     def self.GBP
-      CurrencyFactory.default.GBP
+      Factory.default.GBP
     end
 
   end # class

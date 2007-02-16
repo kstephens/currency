@@ -8,6 +8,9 @@
 * Working Historical::Writer.
 * Refactored rate deriviation into Rate::Deriver
 * Refactored time based rate caching in to TimedCache.
+* Refactored Currency#format into Currency::Format.  
+  NOTE: old formatting :no_* no longer supported.
+* Currency::CurrencyFactory is now Currency::Currency::Factory.
 
 == Release 0.4.0: 2007/01/18
 

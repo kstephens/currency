@@ -221,6 +221,7 @@ class MoneyTest < TestBase
     assert_equal_float Exchange::Rate::Source::Test.USD_CAD, m, 0.0001
   end
 
+
   def test_pivot_conversions
     # Using default get_rate
     assert_not_nil cad = Money.new(123.45, :CAD)
@@ -277,6 +278,7 @@ class MoneyTest < TestBase
 
     Money.default_time = nil
   end
+
 
   def test_time_fixed
     # Test for fixed time.

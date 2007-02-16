@@ -104,6 +104,57 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   def find_matching_this_conditions
+     sql = [ ]
+     values = [ ]
+
+     if self.c1
+       sql << 'c1 = ?'
+       values.push(self.c1.to_s)
+     end
+
+     if self.c2
+       sql << 'c2 = ?'
+       values.push(self.c2.to_s)
+     end
+
+     if self.source
+       if self.source.kind_of?(Array)
+         sql << 'source IN ?'
+       else
+         sql << 'source = ?'
+       end
+       values.push(self.source)
+     end
+
+     if self.date
+       sql << 'date_0 <= ? AND date_1 > ?'
+       values.push(self.date, self.date)
+     end
+
+     if self.date_0
+       sql << 'date_0 = ?'
+       values.push(self.date_0)
+     end
+
+     if self.date_1
+       sql << 'date_1 = ?'
+       values.push(self.date_1)
+     end
+
+     values.unshift(sql.collect{|x| "(#{x})"}.join(' AND '))
+     
+     # $stderr.puts "values = #{values.inspect}"
+
+     values
+   end
+
+
+   def find_matching_this(opt1 = :all, *opts)
+     self.class.find(opt1, :conditions => find_matching_this_conditions, *opts)
+   end
+
  end # class
+
 
  
