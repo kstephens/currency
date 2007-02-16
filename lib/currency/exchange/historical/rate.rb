@@ -69,22 +69,23 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
 
 
    def to_rate
-     ::Currency::Exchange::Rate.new(
+     Currency::Exchange::Rate.new(
                                   ::Currency::Currency.get(self.c1), 
                                   ::Currency::Currency.get(self.c2),
                                   self.rate,
                                   "historical #{self.source}",
                                   self.date,
-                                    {
-                                      :rate_avg => self.rate_avg,
-                                      :rate_samples => self.rate_samples,
-                                      :rate_lo => self.rate_lo,
-                                      :rate_hi => self.rate_hi,
-                                      :rate_date_0 => self.rate_date_0,
-                                      :rate_date_1 => self.rate_date_1,
-                                      :date_0 => self.date_0,
-                                      :date_1 => self.date_1
-                                    })
+                                  self.derived,
+                                  {
+                                    :rate_avg => self.rate_avg,
+                                    :rate_samples => self.rate_samples,
+                                    :rate_lo => self.rate_lo,
+                                    :rate_hi => self.rate_hi,
+                                    :rate_date_0 => self.rate_date_0,
+                                    :rate_date_1 => self.rate_date_1,
+                                    :date_0 => self.date_0,
+                                    :date_1 => self.date_1
+                                  })
    end
 
 
@@ -146,7 +147,7 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
 
      values.unshift(sql.collect{|x| "(#{x})"}.join(' AND '))
      
-     $stderr.puts "values = #{values.inspect}"
+     # $stderr.puts "values = #{values.inspect}"
 
      values
    end

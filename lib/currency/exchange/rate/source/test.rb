@@ -1,14 +1,9 @@
 # This class is a test Rate Source.
 # It can convert only between USD and CAD.
 
-require 'currency/exchange/rate/source/test'
+require 'currency/exchange/rate/source/provider'
 
-module Currency
-module Exchange
-class Rate
-module Source
-
-  class Test < Provider
+class Currency::Exchange::Rate::Source::Test < Currency::Exchange::Rate::Source::Provider
     @@instance = nil
 
     # Returns a singleton instance.
@@ -46,10 +41,6 @@ module Source
         new_rate(:USD, :GBP, self.class.USD_GBP) ]
     end
 
-  end # class
-
-end # module
 end # class
-end # module
-end # module
+
 

@@ -1,25 +1,25 @@
 # -*- ruby -*-
 #
-# = Currency::Exchange
-#
-# The Currency::Exchange package is responsible for
-# the buying and selling of currencies.
-#
-# This feature is currently unimplemented.
-#
 
-module Currency
-module Exchange
+require 'currency/exchange/rate'
+
+# = Currency::Exchange::Rate::Source
+#
+# The Currency::Exchange::Rate::Source package is responsible for
+# providing rates between currencies.
+#
+module Currency::Exchange::Rate::Source
+
     @@default = nil
     @@current = nil
 
-    # Returns the default Currency::Exchange object.
+    # Returns the default Currency::Exchange::Rate::Source::Base object.
     #
-    # If one is not specfied an instance of Currency::Exchange::Base is
-    # created.  Currency::Exchange::Base cannot service any
+    # If one is not specfied an instance of Currency::Exchange::Rate::Source::Base is
+    # created.  Currency::Exchange::Rate::Source::Base cannot service any
     # conversion rate requests.
     def self.default 
-      @@default ||= raise("UNIMPLEMENTED")
+      @@default ||= Base.new
     end
 
     # Sets the default Currency::Exchange object.
@@ -42,7 +42,5 @@ module Exchange
       @@current = x
     end
 end
-end
 
-require 'currency/exchange/rate'
-require 'currency/exchange/rate/source'
+require 'currency/exchange/rate/source/base'

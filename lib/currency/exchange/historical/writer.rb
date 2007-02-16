@@ -168,24 +168,25 @@ class Writer
     end
 
     # Save them all or none.
+    stored_h_rates = [ ] 
     h_rate_class.transaction do 
-      h_rates = h_rates.select do | rr |
+      h_rates.each do | rr |
         # Skip identity rates.
         next if rr.c1 == rr.c2 && ! identity_rates
 
         # Skip if already exists.
-        existing_rate = rr.find_matching_this
-        if existing_rate.empty?
-          rr.save!
-          true # Written.
+        existing_rate = rr.find_matching_this(:first)
+        if existing_rate
+          stored_h_rates << existing_rate # Already existed.
         else
-          false # False: already existed.
+          rr.save!
+          stored_h_rates << rr # Written.
         end
       end
     end
 
     # Return written Historical::Rates.
-    h_rates
+    stored_h_rates
   end
 
 end # class

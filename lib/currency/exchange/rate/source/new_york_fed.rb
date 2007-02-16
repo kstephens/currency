@@ -6,17 +6,12 @@ require 'open-uri'
 require 'rexml/document'
 
 
-module Currency
-module Exchange
-class Rate
-module Source
-
 # Connects to http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm
 # ?FEXdate=2007%2D02%2D14%2000%3A00%3A00%2E0&FEXtime=1200 and parses XML.
 #
 # This is for demonstration purposes.
 #
-class NewYorkFed < ::Currency::Exchange::Rate::Source::Provider
+class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate::Source::Provider
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
   
@@ -37,33 +32,6 @@ class NewYorkFed < ::Currency::Exchange::Rate::Source::Provider
     super
   end
   
-
-  def query_date
-    @query_date ||= Time.now - 24 * 60 * 60 # yesterday.
-  end
-
-
-  def date_YYYY
-    '%04d' % query_date.year
-  end
-
-
-  def date_MM
-    '%02d' % query_date.month
-  end
-
-
-  def date_DD
-    '%02d' % query_date.day
-  end
-
-
-  # Returns the URI content.
-  def get_uri
-    uri = self.uri
-    uri = "\"#{uri}\""
-    uri = instance_eval(uri)
-  end
 
   def get_content
     data = open(get_uri) { |data| data.read }
@@ -118,9 +86,5 @@ class NewYorkFed < ::Currency::Exchange::Rate::Source::Provider
  
 end # class
 
-end # class
-end # class
-end # module
-end # module
 
 

@@ -3,7 +3,7 @@
 require 'currency/exchange/rate/source/base'
 
 # A timed cache for rate sources.
-class Currency::Exchange::Rate::Source::TimedCache << ::Currency::Exchange::Rate::Source::Base
+class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate::Source::Base
   # The rate source.
   attr_accessor :source
   

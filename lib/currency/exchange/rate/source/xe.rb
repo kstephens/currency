@@ -1,21 +1,15 @@
-# Connects to http://xe.com and parses "XE.com Quick Cross Rates"
-# from home page HTML.
-#
-# This is for demonstration purposes.
-#
 
 require 'currency/exchange/rate/source/base'
 
 require 'net/http'
 require 'open-uri'
 
-
-module Currency
-module Exchange
-class Rate
-module Source
-
-class Xe < ::Currency::Exchange::Rate::Source::Provider
+# Connects to http://xe.com and parses "XE.com Quick Cross Rates"
+# from home page HTML.
+#
+# This is for demonstration purposes.
+#
+class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source::Provider
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
   
@@ -192,9 +186,4 @@ class Xe < ::Currency::Exchange::Rate::Source::Provider
  
 end # class
 
-
-end # module
-end # class
-end # module
-end # module
 

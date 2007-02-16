@@ -87,6 +87,7 @@ require 'currency/exchange'
 require 'currency/exchange/rate'
 require 'currency/exchange/rate/deriver'
 require 'currency/exchange/rate/source'
+require 'currency/exchange/rate/source/test'
 require 'currency/exchange/time_quantitizer'
 require 'currency/core_extensions'
 

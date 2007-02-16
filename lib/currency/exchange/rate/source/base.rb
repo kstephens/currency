@@ -1,21 +1,18 @@
 # -*- ruby -*-
 
 
-module Currency
-module Exchange
-class  Rate
-module Source
+require 'currency/exchange/rate/source'
 
-  # = Currency::Exchange::Rate::Source::Base
-  #
-  # The Currency::Exchange::Rate::Source::Base class is the base class for
-  # currency exchange rate providers.
-  #
-  # Currency::Exchange::Rate::Source::Base subclasses are Currency::Exchange::Rate
-  # factories.
-  #
-  # Represents a method of converting between two currencies
-  class Base
+# = Currency::Exchange::Rate::Source::Base
+#
+# The Currency::Exchange::Rate::Source::Base class is the base class for
+# currency exchange rate providers.
+#
+# Currency::Exchange::Rate::Source::Base subclasses are Currency::Exchange::Rate
+# factories.
+#
+# Represents a method of converting between two currencies.
+class Currency::Exchange::Rate::Source::Base
 
     # The name of this Exchange.
     attr_accessor :name
@@ -26,6 +23,9 @@ module Source
 
     # If true, this Exchange will log information.
     attr_accessor :verbose
+
+    attr_accessor :time_quantitizer
+
 
     def initialize(opt = { })
       @name = nil
@@ -64,7 +64,7 @@ module Source
 
     # Flush any cached Rate between Currency c1 and c2.
     def clear_rate(c1, c2, time, recip = true)
-      time = normalize_time(time)
+      time = time && normalize_time(time)
       @rate["#{c1}:#{c2}:#{time}"] = nil
       @rate["#{c2}:#{c1}:#{time}"] = nil if recip
       time
@@ -79,7 +79,7 @@ module Source
     # rate expiration rules.
     #
     def rate(c1, c2, time)
-      time = time && time_normalize(time)
+      time = time && normalize_time(time)
       @rate["#{c1}:#{c2}:#{time}"] ||= get_rate(c1, c2, time)
     end
 
@@ -128,7 +128,7 @@ module Source
     def new_rate(c1, c2, c1_to_c2_rate, time = nil, derived = nil)
       c1 = ::Currency::Currency.get(c1)
       c2 = ::Currency::Currency.get(c2)
-      rate = Rate.new(c1, c2, c1_to_c2_rate, name, time, derived)
+      rate = ::Currency::Exchange::Rate.new(c1, c2, c1_to_c2_rate, name, time, derived)
       # $stderr.puts "new_rate = #{rate}"
       rate
     end
@@ -138,7 +138,7 @@ module Source
     #
     # Subclasses can override this method.
     def normalize_time(time)
-      time && Currency::Exchange::TimeQuantitizer.current.quantitize_time(time)
+      time && (time_quantitizer || ::Currency::Exchange::TimeQuantitizer.current).quantitize_time(time)
     end
   
    
@@ -148,11 +148,6 @@ module Source
     end
     alias :inspect :to_s
 
-  end # class
+end # class
 
   
-end # module
-end # class
-end # module
-end # module
-

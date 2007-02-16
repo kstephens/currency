@@ -3,15 +3,14 @@
 # = Currency::Exchange::Rate::Deriver
 #
 
-module Currency
-module Exchange
-class Rate
+require 'currency/exchange/rate'
+require 'currency/exchange/rate/source/base'
 
 # The Currency::Exchange::Rate::Deriver class calculates derived rates
 # from base Rates from a rate Source by pivoting against a pivot currency or by
 # generating reciprocals.
 #
-class Deriver < Base
+class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
 
   # The source for base rates.
   attr_accessor :source
@@ -59,7 +58,7 @@ class Deriver < Base
     # Attempt to use pivot_currency to bridge
     # between Rates.
     unless rate
-      pc = Currency.get(pivot_currency)
+      pc = ::Currency::Currency.get(pivot_currency)
       
       if pc &&
           (rate_1 = get_rate_reciprocal(c1, pc, time)) && 
@@ -111,8 +110,4 @@ class Deriver < Base
 end # class
 
   
-end # class
-end # module
-end # module
-
 

@@ -8,15 +8,19 @@ module Currency
 class NewYorkFedTest < TestBase
   def setup
     super
-    # Force XE Exchange.
-    source = Exchange::Rate::Source::NewYorkFed.new
-    deriver = Exchange::Rate::Deriver.new(:source => source)
-    Exchange.default = deriver
   end
 
 
+  def get_rate_source
+    # Force XE Exchange.
+    source = Exchange::Rate::Source::NewYorkFed.new
+    deriver = Exchange::Rate::Deriver.new(:source => source)
+  end
+
+
+
   def test_usd_cad
-    assert_not_nil rates = Exchange.default.source.raw_rates
+    assert_not_nil rates = Exchange::Rate::Source.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
 
@@ -30,7 +34,7 @@ class NewYorkFedTest < TestBase
 
 
   def test_cad_eur
-    assert_not_nil rates = Exchange.default.source.raw_rates
+    assert_not_nil rates = Exchange::Rate::Source.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
     assert_not_nil usd_eur = rates[:USD][:EUR]

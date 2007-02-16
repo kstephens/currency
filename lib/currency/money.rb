@@ -15,7 +15,7 @@ module Currency
   #
   #    Currency::Money("12.34", :CAD)
   #
-  # not
+  # Do not do this:
   #
   #    Currency::Money.new("12.34", :CAD)
   #
@@ -43,7 +43,7 @@ module Currency
     # from a pre-scaled external representation:
     # where x is a Float, Integer, String, etc.
     #
-    # If a currency is not specified, Currency#default is used.
+    # If a currency is not specified, Currency.default is used.
     #
     #    x.Money_rep(currency) 
     #
@@ -61,17 +61,17 @@ module Currency
     def initialize(x, currency = nil, time = nil)
       opts ||= @@empty_hash
 
-      # Xform currency
+      # Xform currency.
       currency = Currency.default if currency.nil?
       currency = Currency.get(currency) unless currency.kind_of?(Currency)
 
-      # Set ivars
+      # Set ivars.
       @currency = currency;
       @rep = x.Money_rep(@currency)
       @time = time || Money.default_time
       @time = Time.new if @time == :now
 
-      # Handle conversion of "USD 123.45"
+      # Handle conversion of "USD 123.45".
       if @rep.kind_of?(Money)
         @currency = @rep.currency
         @rep = @rep.rep
@@ -149,16 +149,18 @@ module Currency
       if @currency == currency
         self
       else
-        time = self.time if time = :money
-        Exchange.current.convert(self, currency, time)
+        time = self.time if time == :money
+        Exchange::Rate::Source.current.convert(self, currency, time)
       end
     end
+
 
     # Hash for hash table: both value and currency.
     # See #eql? below.
     def hash
       @rep.hash ^ @currency.hash
     end
+
 
     # True if money values have the same value and currency.
     def eql?(x)
@@ -213,7 +215,7 @@ module Currency
        new_rep(@rep * x)
     end
 
-    #    Money / Money => Number (ratio)
+    #    Money / Money => Float (ratio)
     #    Money / Number => Money
     #
     # Right side must be Money or Number.
@@ -227,7 +229,7 @@ module Currency
       end
     end
 
-    # Formats the Money value as a String.
+    # Formats the Money value as a String using the Currency's Formatter.
     def format(*opt)
       @currency.format(self, *opt)
     end

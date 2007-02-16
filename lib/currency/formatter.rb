@@ -1,5 +1,7 @@
 module Currency
 
+# This class formats a Money value as a String.
+# Each Currency has a default Formatter.
 class Formatter
   # Defaults to ','
   attr_accessor :thousands_separator
@@ -23,6 +25,7 @@ class Formatter
   attr_accessor :html
 
 
+  # If passed true, formats for an input field (i.e.: as a number).
   def as_input_value=(x)
     if x
       self.thousands_separator = ''

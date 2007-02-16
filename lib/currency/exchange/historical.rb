@@ -1,13 +1,13 @@
 
-module Currency
-module Exchange
-  # Gets historical rates from database using Active::Record.
-  # Rates are retrieved using Currency::Exchange::Historical::Rate as
-  # a database proxy.
-  #
-  # See Currency::Exchange::Historical::Writer for a rate archiver.
-  #
-  class Historical < ::Currency::Exchange::Base
+require 'currency/exchange/rate/source/base'
+
+# Gets historical rates from database using Active::Record.
+# Rates are retrieved using Currency::Exchange::Historical::Rate as
+# a database proxy.
+#
+# See Currency::Exchange::Historical::Writer for a rate archiver.
+#
+class Currency::Exchange::Historical < ::Currency::Exchange::Rate::Source::Base
 
     # Select specific rate source.
     # Defaults to nil
@@ -26,7 +26,7 @@ module Exchange
 
     # This Exchange's name is the same as its #uri.
     def name
-      "historical #{source.inspect}"
+      "historical #{source_key}"
     end
 
 
@@ -46,7 +46,9 @@ module Exchange
 
     # Returns a Rate.
     def get_rate(c1, c2, time)
-      get_rates(time).select{ | r | r.c1 == c1 && r.c2 == c2 }[0]
+      rate = get_rates(time).select{ | r | r.c1 == c1 && r.c2 == c2 }[0]
+      $stderr.puts "#{self}.get_rate(#{c1}, #{c2}, #{time.inspect}) => #{rate.inspect}"
+      rate
     end
 
 
@@ -66,14 +68,9 @@ module Exchange
           find_matching_this(:all)
     end
 
-  end # class
-
-end # module
-end # module
+end # class
 
 
 require 'currency/exchange/historical/rate'
 
-# Install as default.
-# Currency::Exchange.default = Currency::Exchange::Xe.instance
 
