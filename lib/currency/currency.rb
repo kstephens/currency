@@ -199,9 +199,9 @@ module Currency
     end
 
 
-    #def to_s
-    #  @code.to_s
-    #end
+    def to_s
+      @code.to_s
+    end
 
 
     # Returns the default Factory's currency.

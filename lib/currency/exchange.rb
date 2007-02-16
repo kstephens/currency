@@ -42,5 +42,5 @@ module Exchange
 end
 end
 
-require 'currency/exchange/base'
 require 'currency/exchange/rate'
+require 'currency/exchange/rate/source/base'

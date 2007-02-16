@@ -6,9 +6,9 @@ require 'currency/exchange/rate/source/test'
 module Currency
 module Exchange
 class Rate
-class Source
+module Source
 
-  class Test < Source
+  class Test < Provider
     @@instance = nil
 
     # Returns a singleton instance.
@@ -48,7 +48,7 @@ class Source
 
   end # class
 
-end # class
+end # module
 end # class
 end # module
 end # module

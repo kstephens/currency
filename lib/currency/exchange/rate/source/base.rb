@@ -1,17 +1,19 @@
 # -*- ruby -*-
-#
-# = Currency::Exchange::Base
-#
-# The Currency::Exchange::Base class is the base class for
-# currency exchange rate providers.
-#
-# Currency::Exchange::Base subclasses are Currency::Exchange::Rate
-# factories.
-#
+
 
 module Currency
 module Exchange
+class  Rate
+module Source
 
+  # = Currency::Exchange::Rate::Source::Base
+  #
+  # The Currency::Exchange::Rate::Source::Base class is the base class for
+  # currency exchange rate providers.
+  #
+  # Currency::Exchange::Rate::Source::Base subclasses are Currency::Exchange::Rate
+  # factories.
+  #
   # Represents a method of converting between two currencies
   class Base
 
@@ -31,6 +33,7 @@ module Exchange
       @pivot_currency ||= :USD
 
       @rate = { }
+      @currencies = nil
       opt.each_pair{|k,v| self.send("#{k}=", v)}
     end 
 
@@ -43,7 +46,7 @@ module Exchange
       time = normalize_time(time)
       if c1 == c2 && normalize_time(m.time) == time
         m
-      elser
+      else
         rate = rate(c1, c2, time)
         # raise ::Currency::Exception::UnknownRate, "#{c1} #{c2} #{time}" unless rate
           
@@ -55,6 +58,7 @@ module Exchange
     # Flush all cached Rate.
     def clear_rates
       @rate.clear
+      @currencies = nil
     end
 
 
@@ -77,6 +81,21 @@ module Exchange
     def rate(c1, c2, time)
       time = time && time_normalize(time)
       @rate["#{c1}:#{c2}:#{time}"] ||= get_rate(c1, c2, time)
+    end
+
+
+    # Gets all rates available by this source.
+    #
+    def rates(time = nil)
+      raise Exception::SubclassResponsibility, "#{self.class}#rate"
+    end
+
+
+    # Returns a list of Currency that the rate source provides.
+    #
+    # Subclasses can override this method.
+    def currencies
+      @currencies ||= rates.collect{| r | [ r.c1.code, r.c2.code ]}.flatten.uniq
     end
 
 
@@ -107,6 +126,8 @@ module Exchange
 
     # Called by implementors to construct new Rate objects.
     def new_rate(c1, c2, c1_to_c2_rate, time = nil, derived = nil)
+      c1 = ::Currency::Currency.get(c1)
+      c2 = ::Currency::Currency.get(c2)
       rate = Rate.new(c1, c2, c1_to_c2_rate, name, time, derived)
       # $stderr.puts "new_rate = #{rate}"
       rate
@@ -120,16 +141,18 @@ module Exchange
       time && Currency::Exchange::TimeQuantitizer.current.quantitize_time(time)
     end
   
-
-    
-    # Returns a simple string rep of an Exchange object.
+   
+    # Returns a simple string rep.
     def to_s
       "#<#{self.class.name} #{self.name && self.name.inspect}>"
     end
+    alias :inspect :to_s
 
   end # class
 
   
+end # module
+end # class
 end # module
 end # module
 

@@ -149,6 +149,7 @@ module Currency
       if @currency == currency
         self
       else
+        time = self.time if time = :money
         Exchange.current.convert(self, currency, time)
       end
     end

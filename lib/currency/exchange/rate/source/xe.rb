@@ -4,7 +4,7 @@
 # This is for demonstration purposes.
 #
 
-require 'currency/exchange/rate/source'
+require 'currency/exchange/rate/source/base'
 
 require 'net/http'
 require 'open-uri'
@@ -13,9 +13,9 @@ require 'open-uri'
 module Currency
 module Exchange
 class Rate
-class Source
+module Source
 
-class Xe < ::Currency::Exchange::Rate::Source
+class Xe < ::Currency::Exchange::Rate::Source::Provider
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
   
@@ -193,7 +193,7 @@ class Xe < ::Currency::Exchange::Rate::Source
 end # class
 
 
-end # class
+end # module
 end # class
 end # module
 end # module

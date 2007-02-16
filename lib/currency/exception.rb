@@ -33,13 +33,17 @@ module Currency
     class UnknownCurrency < Base
     end
 
-    # Error if an Exchange cannot provide an Exchange::Rate.
+    # Error if an Exchange Rate Source cannot provide an Exchange::Rate.
     class UnknownRate < Base
     end
 
     # Error if an Exchange::Rate is not valid.
     class InvalidRate < Base
     end
-
+    
+    # Error if a subclass is responsible for implementing a method.
+    class SubclassResponsibility < Base
+    end
   end
+  
 end

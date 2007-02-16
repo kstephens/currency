@@ -2,26 +2,19 @@
 #
 # = Currency::Exchange::Rate::Deriver
 #
-# The Currency::Exchange::Rate::Deriver class calculates derived rates
-# from base Rates from a rate Source by pivoting against a pivot currency or by
-# generating reciprocals.
-#
-#
 
 module Currency
 module Exchange
 class Rate
 
-# Represents a method of calculating derived rates between any two currency pairs,
-# using any available base rates from a Source.
-class Deriver < ::Currency::Exchange::Base
+# The Currency::Exchange::Rate::Deriver class calculates derived rates
+# from base Rates from a rate Source by pivoting against a pivot currency or by
+# generating reciprocals.
+#
+class Deriver < Base
 
   # The source for base rates.
   attr_accessor :source
-  
-  # Currency to use as pivot for deriving rate pairs.
-  # Defaults to the source.pivot_currency.
-  attr_accessor :pivot_currency
   
 
   def name
@@ -51,7 +44,7 @@ class Deriver < ::Currency::Exchange::Base
   # Return list of known Rates.
   # Source may have more Rates underneath this object.
   def rates
-    @rate.values
+    @derived_rate.values
   end
 
 
@@ -110,15 +103,10 @@ class Deriver < ::Currency::Exchange::Base
       # Identity rates are timeless.
       new_rate(c1, c2, 1.0, nil, "identity")
     else
-      source.get_rate(c1, c2, time)
+      source.rate(c1, c2, time)
     end
   end
 
-
-  # Returns a simple string rep of an Exchange object.
-  def to_s
-    "#<#{self.class.name} #{self.source.inspect}>"
-  end
 
 end # class
 
