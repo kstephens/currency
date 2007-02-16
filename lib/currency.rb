@@ -75,7 +75,10 @@
 #
 
 $:.unshift(File.dirname(__FILE__)) unless
-  $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
+
+$:.unshift(File.expand_path(File.dirname(__FILE__))) unless $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'currency/exception'
 require 'currency/money'

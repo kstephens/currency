@@ -1,14 +1,13 @@
-# -*- ruby -*-
-#
-# = Currency::Currency
-#
-# Represents a currency.
-#
-#
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 module Currency
   #include Currency::Exceptions
 
+  # = Currency::Currency
+  #
+  # Represents a currency.
+  #
   class Currency
     # Returns the ISO 3-letter currency code as a symbol.
     # E.g. :USD, :CAD, etc.

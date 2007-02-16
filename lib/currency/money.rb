@@ -1,13 +1,5 @@
-# -*- ruby -*-
-#
-# = Currency::Money
-#
-# Represents an amount of money in a particular currency.
-#
-# A Money object stores its value using a scaled Integer representation
-# and a Currency object.
-#
-#
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 module Currency
 
@@ -24,6 +16,16 @@ module Currency
     Money.new(*opts)
   end
 
+  # = Currency::Money
+  #
+  # Represents an amount of money in a particular currency.
+  #
+  # A Money object stores its value using a scaled Integer representation
+  # and a Currency object.
+  #
+  # A Money object also has a time, which is used in conversions
+  # against historical exchange rates.
+  #
   class Money
     include Comparable
 
@@ -69,7 +71,7 @@ module Currency
       @currency = currency;
       @rep = x.Money_rep(@currency)
       @time = time || Money.default_time
-      @time = Time.new if @time == :now
+      @time = money.now if @time == :now
 
       # Handle conversion of "USD 123.45".
       if @rep.kind_of?(Money)
@@ -78,6 +80,11 @@ module Currency
       end
     end
 
+    # Returns a Time.new
+    # Can be modifed for special purposes.
+    def now
+      Time.new
+    end
 
     # Compatibility with Money package.
     def self.us_dollar(x)

@@ -1,8 +1,12 @@
-# This class is a test Rate Source.
-# It can convert only between USD and CAD.
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 require 'currency/exchange/rate/source/provider'
 
+# This class is a test Rate Source.
+# It can provide only fixed rates between USD, CAD and EUR.
+# Used only for test purposes.
+# DO NOT USE THESE RATES FOR A REAL APPLICATION.
 class Currency::Exchange::Rate::Source::Test < Currency::Exchange::Rate::Source::Provider
     @@instance = nil
 

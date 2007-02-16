@@ -35,6 +35,14 @@ Currency was developed by:
 
 * Kurt Stephens -- ruby-currency(at)umleta.com, sponsored by umleta.com
 
+== License
+
+* See LICENSE.txt
+
+== Copyright
+
+* Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+
 == Contributors
 
 Maybe you?

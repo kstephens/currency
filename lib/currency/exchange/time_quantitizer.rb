@@ -1,17 +1,16 @@
-# -*- ruby -*-
-#
-# = Currency::Exchange::TimeQuantitizer
-#
-# The Currency::Exchange::TimeQuantitizer quantitizes time values
-# such that money values and rates at a given time
-# can be turned in to a hashable key, depending
-# on the rate source's temporal accuracy.
-#
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 module Currency
 module Exchange
 
-# Represents a method of quantitzing time.
+# = Currency::Exchange::TimeQuantitizer
+#
+# The Currency::Exchange::TimeQuantitizer quantitizes time values
+# such that money values and rates at a given time
+# can be turned into a hash key, depending
+# on the rate source's temporal accuracy.
+#
 class TimeQuantitizer
 
   def self.current; @current ||= self.new; end

@@ -1,5 +1,5 @@
-
-#require File.dirname(__FILE__) + '/../test_helper'
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
 
 require 'test/test_base'
 require 'currency'

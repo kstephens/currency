@@ -1,14 +1,14 @@
-# -*- ruby -*-
-#
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
+
+module Currency
+
 # = Currency::Exchange
 #
 # The Currency::Exchange package is responsible for
 # the buying and selling of currencies.
 #
 # This feature is currently unimplemented.
-#
-
-module Currency
 module Exchange
     @@default = nil
     @@current = nil
