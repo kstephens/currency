@@ -30,52 +30,28 @@ class Deriver < ::Currency::Exchange::Base
 
 
   def initialize(opt = { })
-    @verbose = nil unless defined? @verbose
+    @source = nil
     @pivot_currency = nil
-    
-    @rate = { }
-    opt.each_pair{|k,v| self.send("#{k}=", v)}
+    super
   end 
+
+
+  def pivot_currency
+    @pivot_currency || @source.pivot_currency || :USD
+  end
 
 
   # Flush all cached Rates.
   def clear_rates
-    @rate.clear
+    @derived_rate.clear
+    super
   end
-
-
-  def pivot_currency
-    @source.pivot_currency || :USD
-  end
-
+ 
 
   # Return list of known Rates.
-  # source may have more Rates underneath this object.
+  # Source may have more Rates underneath this object.
   def rates
     @rate.values
-  end
-
-
-  # Flush any cached Rate between Currency c1 and c2.
-  def clear_rate(c1, c2, time, recip = true)
-    time = normalize_time(time)
-    @rate[c1.code.to_s + c2.code.to_s + (time || '')] = nil
-  end
-
-
-  # Returns the cached Rate between Currency c1 and c2 at a given time.
-  #
-  # Time is normalized using #normalize_time(time)
-  #
-  # This will call #get_rate(c1, c2, time) if the
-  # Rate has not already been cached.
-  #
-  # Subclasses can override this method to implement
-  # rate expiration rules.
-  #
-  def rate(c1, c2, time)
-    time = normalize_time(time)
-    (@rate[c1.code.to_s + c2.code.to_s + (time || '')] ||= get_rate(c1, c2, time))
   end
 
 
@@ -99,7 +75,7 @@ class Deriver < ::Currency::Exchange::Base
         rate = new_rate(c1, c2, 
                         c1_to_c2_rate, 
                         rate_1.date || rate_2.date || time, 
-                        "pivot(#{pc.code},#{rate_1.derived || "#{rate_1.c1.code}#{rate_1.c2.code}"},#{rate_2.derived || "#{rate_2.c1.code}#{rate_2.c2.code}"})")
+                        "pivot(#{pc.code},#{rate_1.derived || "#{rate_1.c1.code}#{rate_1.c2.code}"},#{rate_2.derived || "#{rate_2.c1}#{rate_2.c2}"})")
       end
     end
     
@@ -112,7 +88,7 @@ class Deriver < ::Currency::Exchange::Base
     rate = get_rate_base_cached(c1, c2, time)
     unless rate
       if rate = get_rate_base_cached(c2, c1, time)
-        rate = (@rate[c1.code.to_s + c2.code.to_s + (time || '')] ||= rate.reciprocal)
+        rate = (@rate["#{c1}:#{c2}:#{time}"] ||= rate.reciprocal)
       end
     end
     
@@ -123,7 +99,7 @@ class Deriver < ::Currency::Exchange::Base
   # Returns a cached base Rate.
   #
   def get_rate_base_cached(c1, c2, time)
-    rate = (@rate[c1.code.to_s + c2.code.to_s + (time || '')] ||= get_rate_base(c1, c2, time))
+    rate = (@rate["#{c1}:#{c2}:#{time}"] ||= get_rate_base(c1, c2, time))
     rate
   end
 
@@ -131,9 +107,10 @@ class Deriver < ::Currency::Exchange::Base
   # Returns a base Rate from the Source.
   def get_rate_base(c1, c2, time)
     if c1 == c2
+      # Identity rates are timeless.
       new_rate(c1, c2, 1.0, nil, "identity")
     else
-      source.get_rate_base(c1, c2, time)
+      source.get_rate(c1, c2, time)
     end
   end
 

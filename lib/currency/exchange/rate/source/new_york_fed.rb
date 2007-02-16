@@ -1,8 +1,3 @@
-# Connects to http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm
-# ?FEXdate=2007%2D02%2D14%2000%3A00%3A00%2E0&FEXtime=1200 and parses XML.
-#
-# This is for demonstration purposes.
-#
 
 require 'currency/exchange/rate/source'
 
@@ -16,6 +11,11 @@ module Exchange
 class Rate
 class Source
 
+# Connects to http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm
+# ?FEXdate=2007%2D02%2D14%2000%3A00%3A00%2E0&FEXtime=1200 and parses XML.
+#
+# This is for demonstration purposes.
+#
 class NewYorkFed < ::Currency::Exchange::Rate::Source
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD

@@ -22,7 +22,7 @@ class Source
   def initialize(opt = { })
     @processing_rates = false
     @rates = nil
-    @pivot_currency    ||= :USD
+    @pivot_currency ||= :USD
     
     # super(opt)
   end
@@ -55,7 +55,7 @@ class Source
 
 
   # Return a matching base rate?
-  def get_rate_base(c1, c2, time)
+  def get_rate(c1, c2, time)
     matching_rates = rates.select do | rate |
       rate.c1 == c1 &&
       rate.c2 == c2 &&
@@ -63,6 +63,8 @@ class Source
     end
     matching_rates[0]
   end
+
+  alias :get_rate_base :get_rate
 
 
   # Called by implementors to construct new Rate objects.

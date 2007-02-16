@@ -1,16 +1,27 @@
-# Gets historical rates.
-#
-
-
-require 'currency/exchange/historical/rate'
 
 module Currency
 module Exchange
- class Historical < Base
+  # Gets historical rates from database using Active::Record.
+  # Rates are retrieved using Currency::Exchange::Historical::Rate as
+  # a database proxy.
+  #
+  # See Currency::Exchange::Historical::Writer for a rate archiver.
+  #
+  class Historical < ::Currency::Exchange::Base
 
     # Select specific rate source.
     # Defaults to nil
     attr_accessor :source
+
+    def initialize
+      @source = nil # any
+      super
+    end
+
+
+    def source_key
+      @source ? @source.join(',') : ''
+    end
 
 
     # This Exchange's name is the same as its #uri.
@@ -20,41 +31,39 @@ module Exchange
 
 
     def initialize(*opt)
-      @rate_cache = nil
-      super(*opt)
+      super
+      @rates_cache = { }
+      @raw_rates_cache = { }
     end
 
 
     def clear_rates
-      @rate_cache && @rate_cache.clear
+      @rates_cache.clear
+      @raw_rates_cache.clear
       super
     end
 
 
-    # Loads 
+    # Returns a Rate.
     def get_rate(c1, c2, time)
-      rates = get_rates(time)
- 
-      rate > 0 ? new_rate(c1, c2, rate, @rate_timestamp) : nil
+      get_rates(time).select{ | r | r.c1 == c1 && r.c2 == c2 }[0]
     end
 
 
-    # Return a list of base rates.
-    def get_rates(time)
-      raw_rates = get_raw_rates(time)
-
-      rates = raw_rates.each do | raw_rate |
-        rate = new_rate(raw_rate.c1, rate_rate.c2, raw_rate.rate, raw_rate.date)
-      end
-
-      rates
+    # Return a list of base Rates.
+    def get_rates(time = nil)
+      @rates_cache["#{source_key}:#{time}"] ||= 
+        get_raw_rates(time).collect do | rr |
+          rr.to_rate
+        end
     end
 
 
-    def get_raw_rates(time, source)
-      rate = Rate.new(:date => time, :source => source)
-      raw_rates = rate.find_matching_this(:all)
-      raw_rates
+    # Return a list of raw rates.
+    def get_raw_rates(time = nil)
+      @raw_rates_cache["#{source_key}:#{time}"] ||= 
+        ::Currency::Exchange::Historical::Rate.new(:c1 => nil, :c2 => nil, :date => time, :source => source).
+          find_matching_this(:all)
     end
 
   end # class
@@ -62,6 +71,8 @@ module Exchange
 end # module
 end # module
 
+
+require 'currency/exchange/historical/rate'
 
 # Install as default.
 # Currency::Exchange.default = Currency::Exchange::Xe.instance

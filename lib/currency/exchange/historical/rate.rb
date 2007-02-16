@@ -142,9 +142,11 @@ class Currency::Exchange::Historical::Rate < ::ActiveRecord::Base
        values.push(self.date_1)
      end
 
+     sql << '1 = 1' if sql.empty?
+
      values.unshift(sql.collect{|x| "(#{x})"}.join(' AND '))
      
-     # $stderr.puts "values = #{values.inspect}"
+     $stderr.puts "values = #{values.inspect}"
 
      values
    end

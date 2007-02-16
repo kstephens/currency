@@ -3,7 +3,7 @@ module Currency
 module Exchange
 class Historical
 
-# Responsible for writing
+# Responsible for writing historical rates from a rate source.
 class Writer
   # The source of rates.
   attr_accessor :source
@@ -17,6 +17,9 @@ class Writer
   # This can be used to aid complex join reports.
   attr_accessor :identity_rates
 
+  # If true, compute and store all reciprocal rates.
+  attr_accessor :reciprocal_rates
+
   # If set, a set of preferred currencies.
   attr_accessor :preferred_currencies
 
@@ -27,23 +30,25 @@ class Writer
   # base currencies must have rates as c1.
   attr_accessor :base_currencies
 
-  # If true, compute and store all reciprocal rates.
-  attr_accessor :reciprocal_rates
-
   # If set, use this time quantitizer to
   # manipulate the Rate date_0 date_1 time ranges.
+  # If :default, use the TimeQuantitizer.default.
   attr_accessor :time_quantitizer
 
 
   def initialize(opt = { })
+    @all_rates = true
     @identity_rates = false
+    @reciprocal_rates = true
     @preferred_currencies = nil
+    @required_currencies = nil
     @base_currencies = nil
     @time_quantitizer = nil
     opt.each_pair{| k, v | self.send("#{k}=", v) }
   end
 
 
+  # Returns a list of selected rates from source.
   def selected_rates
     # Produce a list of all currencies.
     currencies = source.currencies
@@ -124,6 +129,8 @@ class Writer
   end
 
 
+  # Returns an Array of Historical::Rate objects that were written.
+  # Avoids writing Rates that already have been written.
   def write_rates(rates = selected_rates)
  
     # Create Historical::Rate objects.
@@ -163,18 +170,22 @@ class Writer
     # Save them all or none.
     h_rate_class.transaction do 
       h_rates = h_rates.select do | rr |
+        # Skip identity rates.
         next if rr.c1 == rr.c2 && ! identity_rates
+
+        # Skip if already exists.
         existing_rate = rr.find_matching_this
         if existing_rate.empty?
           rr.save!
-          true # Written
+          true # Written.
         else
-          false # False existed
+          false # False: already existed.
         end
       end
     end
 
-   h_rates
+    # Return written Historical::Rates.
+    h_rates
   end
 
 end # class

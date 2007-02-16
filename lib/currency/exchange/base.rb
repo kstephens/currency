@@ -18,12 +18,17 @@ module Exchange
     # The name of this Exchange.
     attr_accessor :name
 
+    # Currency to use as pivot for deriving rate pairs.
+    # Defaults to :USD.
+    attr_accessor :pivot_currency
+
     # If true, this Exchange will log information.
     attr_accessor :verbose
 
     def initialize(opt = { })
       @name = nil
       @verbose = nil unless defined? @verbose
+      @pivot_currency ||= :USD
 
       @rate = { }
       opt.each_pair{|k,v| self.send("#{k}=", v)}
@@ -38,20 +43,27 @@ module Exchange
       time = normalize_time(time)
       if c1 == c2 && normalize_time(m.time) == time
         m
-      else
-        ::Currency::Money(rate(c1, c2, time).convert(m, c1), c2, time)
+      elser
+        rate = rate(c1, c2, time)
+        # raise ::Currency::Exception::UnknownRate, "#{c1} #{c2} #{time}" unless rate
+          
+        rate && ::Currency::Money(rate.convert(m, c1), c2, time)
       end
     end
 
 
     # Flush all cached Rate.
     def clear_rates
+      @rate.clear
     end
 
 
     # Flush any cached Rate between Currency c1 and c2.
     def clear_rate(c1, c2, time, recip = true)
       time = normalize_time(time)
+      @rate["#{c1}:#{c2}:#{time}"] = nil
+      @rate["#{c2}:#{c1}:#{time}"] = nil if recip
+      time
     end
 
 
@@ -63,7 +75,8 @@ module Exchange
     # rate expiration rules.
     #
     def rate(c1, c2, time)
-      raise("Subclass responsibility: #{self.class}#rate")
+      time = time && time_normalize(time)
+      @rate["#{c1}:#{c2}:#{time}"] ||= get_rate(c1, c2, time)
     end
 
 
@@ -73,20 +86,22 @@ module Exchange
     # rates.
     #
     def get_rate(c1, c2, time)
-      raise("Subclass responsibility: #{self.class}#get_rate")
+      raise Exception::SubclassResponsibility, "#{self.class}#get_rate"
     end
 
     # Returns a base Rate.
     #
     # Subclasses are required to implement this method.
     def get_rate_base(c1, c2, time)
-      raise Exception::UnknownRate.new("Subclass responsibility: #{self.class}#get_rate_base")
+      raise Exception::SubclassResponsibility, "#{self.class}#get_rate_base"
     end
 
 
-    # Returns an array of all base Rates.
-    def get_all_rate_bases(time)
-      raise Exception::UnknownRate.new("Subclass responsibility: #{self.class}#get_all_rate_bases")
+    # Returns a list of all available rates.
+    #
+    # Subclasses must override this method.
+    def get_rates(time = nil)
+      raise Exception::SubclassResponsibility, "#{self.class}#get_rate"
     end
 
 
@@ -99,8 +114,6 @@ module Exchange
 
 
     # Normalizes rate time to a quantitized value.
-    # For example: a time_quant_size of 60 * 60 * 24 will
-    # truncate a rate time to a particular day.
     #
     # Subclasses can override this method.
     def normalize_time(time)
@@ -108,6 +121,7 @@ module Exchange
     end
   
 
+    
     # Returns a simple string rep of an Exchange object.
     def to_s
       "#<#{self.class.name} #{self.name && self.name.inspect}>"
