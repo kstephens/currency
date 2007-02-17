@@ -21,12 +21,6 @@ class Currency
       @currency_by_code = { }
       @currency_by_symbol = { }
       @currency = nil
-
-      # Standards
-      @USD = nil    
-      @CAD = nil
-      @EUR = nil
-      @GBP = nil
     end
 
 
@@ -96,34 +90,10 @@ class Currency
     end
 
 
-    # Standard Currency: US Dollars, :USD.
-    def USD
-      @USD ||= self.get_by_code(:USD)
-    end
-
-
-    # Standard Currency: Canadian Dollars, :CAD.
-    def CAD
-      @CAD ||= self.get_by_code(:CAD)
-    end
-
-
-    # Standard Currency: Euro, :EUR.
-    def EUR
-      @EUR ||= self.get_by_code(:EUR)
-    end
-
-
-    # Standard Currency: Great Britain Pound, :GBP.
-    def GBP
-      @GBP ||= self.get_by_code(:GBP)
-    end
-
-
     # Returns the default Currency.
-    # Defaults to self.USD.
+    # Defaults to self.get_by_code(:USD).
     def currency
-      @currency ||= self.USD
+      @currency ||= self.get_by_code(:USD)
     end
 
 
@@ -132,6 +102,19 @@ class Currency
       @currency = x
     end
 
+
+    # If selector is [A-Z][A-Z][A-Z], load the currency.
+    #
+    #   factory.USD
+    #   => #<Currency::Currency:0xb7d0917c @formatter=nil, @scale_exp=2, @scale=100, @symbol="$", @format_left=-3, @code=:USD, @parser=nil, @format_right=-2>
+    #
+    def method_missing(sel, *args, &blk)
+      if args.size == 0 && (! block_given?) && /^[A-Z][A-Z][A-Z]$/.match(sel.to_s)
+        self.get_by_code(sel)
+      else
+        super
+      end
+    end
   end # class
 
 end # class

@@ -34,6 +34,7 @@ lib/currency/formatter.rb
 lib/currency/macro.rb
 lib/currency/money.rb
 lib/currency/money_helper.rb
+lib/currency/parser.rb
 test/ar_column_test.rb
 test/ar_simple_test.rb
 test/ar_test_base.rb
@@ -43,6 +44,7 @@ test/historical_writer_test.rb
 test/macro_test.rb
 test/money_test.rb
 test/new_york_fed_test.rb
+test/parser_test.rb
 test/test_base.rb
 test/time_quantitizer_test.rb
 test/xe_test.rb

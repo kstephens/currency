@@ -135,13 +135,16 @@ class Formatter
   end
 
 
+  @@empty_hash = { }
+  @@empty_hash.freeze
+
   # Format a Money object as a String.
   # 
   #   m = Money.new("1234567.89")
   #   m.to_s(:code => true, :symbol => false)
   #     => "1,234,567.89 USD"
   #
-  def format(m, opt = { })
+  def format(m, opt = @@empty_hash)
     fmt = self
 
     unless opt.empty? 

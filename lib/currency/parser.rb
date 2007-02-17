@@ -107,14 +107,23 @@ class Parser
   end
 
 
-  # Parse a Money string in this Currency.
-  # Options:
-  #   :currency => Currency object.
-  # Look for a matching currency code at the beginning or end of the string.
-  # If the currency does not match IncompatibleCurrency is raised.
-  #
   @@empty_hash = { }
   @@empty_hash.freeze
+
+  # Parse a Money string in this Currency.
+  #
+  #   "123.45".money       # Using default Currency.
+  #   => $123.45 USD
+  #
+  #   "123.45 USD".money   # Explicit Currency.
+  #   => $123.45 USD
+  #
+  #   "123.45 CAD".money
+  #   => $123.45 CAD
+  #  
+  #   "123.45 CAD".money(:USD)  # Incompatible explicit Currency.
+  #     !!! "123.45 CAD" USD (Currency::Exception::IncompatibleCurrency)
+  #
   def parse(str, opt = @@empty_hash)
     prs = self
 

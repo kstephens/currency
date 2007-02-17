@@ -46,13 +46,11 @@ module Currency
       self.code = code
       self.symbol = symbol
       self.scale = scale
-      @formatter = nil
-      @parser = nil
     end
 
 
     # Returns the Currency object from the default Currency::Currency::Factory
-    # by its 3-letter uppercase Symbol name, such as :USD, or :CAD.
+    # by its three-letter uppercase Symbol, such as :USD, or :CAD.
     def self.get(code)
       # $stderr.puts "#{self}.get(#{code.inspect})"
       return nil unless code
@@ -64,10 +62,10 @@ module Currency
     # Internal method for converting currency codes to internal
     # Symbol format.
     def self.cast_code(x)
-     x = x.upcase.intern if x.kind_of?(String)
-     raise Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
-     raise Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
-     x
+      x = x.upcase.intern if x.kind_of?(String)
+      raise Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
+      raise Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
+      x
     end
 
 
@@ -153,29 +151,18 @@ module Currency
     end
 
 
-    # Returns the USD Currency.
-    def self.USD
-      Factory.default.USD
+    # If selector is [A-Z][A-Z][A-Z], load the currency via Factory.default.
+    #
+    #   Currency::Currency.USD
+    #   => #<Currency::Currency:0xb7d0917c @formatter=nil, @scale_exp=2, @scale=100, @symbol="$", @format_left=-3, @code=:USD, @parser=nil, @format_right=-2>
+    #
+    def self.method_missing(sel, *args, &blk)
+      if args.size == 0 && (! block_given?) && /^[A-Z][A-Z][A-Z]$/.match(sel.to_s)
+        Factory.default.get_by_code(sel)
+      else
+        super
+      end
     end
-
-
-    # Returns the CAD Currency.
-    def self.CAD
-      Factory.default.CAD
-    end
-
-
-    # Returns the EUR Currency.
-    def self.EUR
-      Factory.default.EUR
-    end
-
-
-    # Returns the GBP Currency.
-    def self.GBP
-      Factory.default.GBP
-    end
-
   end # class
   
 end # module
