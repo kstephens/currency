@@ -8,9 +8,13 @@ module Currency
 class Parser
 
   # The default Currency to use if no Currency is specified.
-  # If not nil and a parsed string contains a ISO currency code
-  # #parse() will raise IncompatibleCurrency.
   attr_accessor :currency
+
+  # If true and a parsed string contains a ISO currency code
+  # that is not the same as currency,
+  # #parse() will raise IncompatibleCurrency.
+  # Defaults to false.
+  attr_accessor :enforce_currency
 
   # The default Time to use if no Time is specified in the string.
   attr_accessor :time
@@ -44,12 +48,16 @@ class Parser
     # $stderr.puts "'#{x}'.Money_rep(#{self})"
     
     # $stderr.puts "x = #{x}"
+    convert_currency = nil
     # Handle currency code at front of string.
     if (md = /([A-Z][A-Z][A-Z])/.match(x)) 
       curr = ::Currency::Currency.get(md[1])
       x = md.pre_match + md.post_match
       if @currency && @currency != curr
-        raise Exception::IncompatibleCurrency.new("#{str.inspect} #{@currency.code}")
+        if @enforce_currency
+          raise Exception::IncompatibleCurrency.new("#{str.inspect} #{@currency.code}")
+        end
+        convert_currency = @currency
       end
       currency = curr
     else
@@ -102,6 +110,12 @@ class Parser
       #x.to_f.Money_rep(self)
       raise Exception::InvalidMoneyString.new("#{str.inspect} #{currency} #{x.inspect}")
     end
+
+    # Do conversion.
+    if convert_currency
+      x = x.convert(convert_currency)
+    end
+
 
     x
   end

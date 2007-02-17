@@ -36,6 +36,11 @@ class ParserTest < TestBase
   end
 
 
+  def test_misc
+    assert_not_nil m = "123.45 USD".money + "100 CAD"
+    assert ! (m.rep == 200.45)
+  end
+
 
   def test_round_trip
     ::Currency::Currency.default = :USD

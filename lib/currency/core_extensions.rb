@@ -34,6 +34,7 @@ class String
   # Exact conversion to Money representation value.
   def Money_rep(currency, time = nil)
     x = currency.parse(self, :currency => currency, :time => time)
+    x = x.rep if x.respond_to?(:rep)
     x
   end
 end
