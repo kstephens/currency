@@ -8,6 +8,8 @@ module Currency
 class Parser
 
   # The default Currency to use if no Currency is specified.
+  # If not nil and a parsed string contains a ISO currency code
+  # #parse() will raise IncompatibleCurrency.
   attr_accessor :currency
 
   # The default Time to use if no Time is specified in the string.
