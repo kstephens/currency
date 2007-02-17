@@ -24,6 +24,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
   end
   
 
+  # Returns 'newyorkfed.org'.
   def name
     'newyorkfed.org'
   end

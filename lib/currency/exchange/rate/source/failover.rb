@@ -4,24 +4,15 @@
 require 'currency/exchange/rate/source'
 
 
-module Currency
-module Exchange
-class Rate
-class Source
-
 # Gets Rates from primary source, if primary fails, attempts secondary source.
 #
-class Failover < ::Currency::Exchange::Base
-  # Gets Rates from primary Source.
-  # Use secondary if primary fails.
+class Currency::Exchange::Rate::Source::Failover < ::Currency::Exchange::Base
+  # Primary rate source.
   attr_accessor :primary
 
+  # Secondary rate source if primary fails.
   attr_accessor :secondary
 
-  def initialize(*opt)
-    super(*opt)
-  end
-  
   def name
     "failover(#{primary.name}, #{secondary.name})"
   end
@@ -35,11 +26,23 @@ class Failover < ::Currency::Exchange::Base
   
 
   def get_rate(c1, c2, time)
-    rate = @primary.get_rate(c1, c2, time)
-    unless rate
-      $stderr.put "Failover: primary failed for get_rate(#{c1}, #{c2}, #{time})"
+    rate = nil
+
+    # Try primary.
+    err = nil
+    begin
+      rate = @primary.get_rate(c1, c2, time)
+    rescue Object => e
+      err = e
+    end
+
+
+    if rate == nil || err
+      $stderr.put "Failover: primary failed for get_rate(#{c1}, #{c2}, #{time}) : #{err.inspect}"
       rate = @secondary.get_rate(c1, c2, time)
     end
+
+
     unless rate
       raise("Failover: secondary failed for get_rate(#{c1}, #{c2}, #{time})")
     end
@@ -50,9 +53,5 @@ class Failover < ::Currency::Exchange::Base
  
 end # class
 
-end # class
-end # class
-end # module
-end # module
 
 

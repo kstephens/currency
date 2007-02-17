@@ -4,32 +4,33 @@
 module Currency
   #include Currency::Exceptions
 
-  # = Currency::Currency
-  #
   # Represents a currency.
   #
   class Currency
-    # Returns the ISO 3-letter currency code as a symbol.
-    # E.g. :USD, :CAD, etc.
+    # Returns the ISO three-letter currency code as a symbol.
+    # e.g. :USD, :CAD, etc.
     attr_reader :code
 
     # The Currency's scale factor.  
-    # E.g: the :USD scale factor is 100.
+    # e.g: the :USD scale factor is 100.
     attr_reader :scale
 
     # The Currency's scale factor.  
-    # E.g: the :USD scale factor is 2, where 10 ^ 2 == 100.
+    # e.g: the :USD scale factor is 2, where 10 ^ 2 == 100.
     attr_reader :scale_exp
 
+    # Used by Formatter.
     attr_reader :format_right
+
+    # Used by Formatter.
     attr_reader :format_left
 
     # The Currency's symbol. 
-    # E.g: USD symbol is '$'
+    # e.g: USD symbol is '$'
     attr_accessor :symbol
 
     # The Currency's symbol as HTML.
-    # e.g: EUR symbol is 
+    # e.g: EUR symbol is '&#8364;' (:html &#8364; :) or '&euro;' (:html &euro; :)
     attr_accessor :symbol_html
 
     # The default formatter.
@@ -188,11 +189,13 @@ module Currency
     end
 
 
-    # Format a Money object as a String.
     @@default_formatter = nil
+    # Get the default Formatter.
     def self.default_formatter; @@default_formatter; end
+    # Set the default Formatter.
     def self.default_formatter=(x); @@default_formatter = x; end
 
+    # Formats the Money value as a string using the current Formatter.
     def format(m, *opt)
        (@formatter || (@@default_formatter ||= ::Currency::Formatter.new)).format(m, *opt)
     end

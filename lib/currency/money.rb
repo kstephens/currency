@@ -41,6 +41,10 @@ module Currency
     @@empty_hash.freeze
 
     #
+    # DO NOT CALL THIS DIRECTLY:
+    #
+    # See Currency.Money() function.
+    #
     # Construct a Money value object 
     # from a pre-scaled external representation:
     # where x is a Float, Integer, String, etc.
@@ -58,7 +62,6 @@ module Currency
     # Because the USD Currency object has a #scale of 100
     #
     # See #Money_rep(currency) mixin.
-    # See Currency#Money() function.
     #
     def initialize(x, currency = nil, time = nil)
       opts ||= @@empty_hash
@@ -98,15 +101,16 @@ module Currency
     end
 
 
-    # Construct from post-scaled internal representation
+    # Construct from post-scaled internal representation.
     def self.new_rep(r, currency = nil, time = nil)
       x = self.new(0, currency, time)
       x.set_rep(r)
       x
     end
 
-    # Construct from post-scaled internal representation
-    # using the same currency.
+    # Construct from post-scaled internal representation.
+    # using the same currency:
+    #
     #    x = Currency::Money.new("1.98", :USD)
     #    x.new_rep(100) => "$1.00 USD"
     #
@@ -120,7 +124,7 @@ module Currency
     # Do not call this method directly.
     # CLIENTS SHOULD NEVER CALL set_rep DIRECTLY.
     # You have been warned in ALL CAPS.
-    def set_rep(r)
+    def set_rep(r) # :nodoc:
       r = r.to_i unless r.kind_of?(Integer)
       @rep = r
     end
@@ -128,7 +132,7 @@ module Currency
     # Do not call this method directly.
     # CLIENTS SHOULD NEVER CALL set_time DIRECTLY.
     # You have been warned in ALL CAPS.
-    def set_time(time)
+    def set_time(time) # :nodoc:
       @time = time
     end
 
@@ -287,7 +291,7 @@ module Currency
     # Basic inspection, with symbol and currency code.
     # The standard #inspect method is available as #inspect_deep.
     def inspect(*opts)
-      self.format(:with_symbol, :with_currency).inspect
+      self.format(:symbol => true, :code => true).inspect
     end
 
     # How to alias a method defined in an object superclass in a different class:

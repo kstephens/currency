@@ -7,11 +7,11 @@ class Currency
   class Factory
     @@default = nil
 
-    # Returns the default CurrencyFactory.
+    # Returns the default Currency::Factory.
     def self.default
       @@default ||= self.new
     end
-    # Sets the default CurrencyFactory.
+    # Sets the default Currency::Factory.
     def self.default=(x)
       @@default = x
     end
@@ -50,8 +50,12 @@ class Currency
     # This method must initialize:
     #
     #    currency.code
-    #    currency.symbol
     #    currency.scale
+    # 
+    # Optionally:
+    #
+    #    currency.symbol
+    #    currency.symbol_html
     #
     # Subclasses that provide Currency metadata should override this method.
     # For example, loading Currency metadata from a database or YAML file.
@@ -67,6 +71,11 @@ class Currency
       elsif currency.code == :CAD
         # $stderr.puts "load('CAD')"
         currency.symbol = '$'
+        currency.scale = 100
+      elsif currency.code == :EUR
+        # $stderr.puts "load('CAD')"
+        currency.symbol = nil
+        currency.symbol_html = '&#8364;'
         currency.scale = 100
       else
         currency.symbol = nil

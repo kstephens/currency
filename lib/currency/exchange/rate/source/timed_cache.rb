@@ -22,7 +22,7 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   attr_accessor :time_to_live_fudge
 
 
-  # This Exchange's name is the same as its source's name.
+  # Returns source's name.
   def name
     source.name
   end
@@ -106,7 +106,7 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   end
   
 
-  def _load_rates_from_source
+  def _load_rates_from_source # :nodoc:
     # Do not allow re-entrancy
     raise "Reentry!" if @processing_rates
 

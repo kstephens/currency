@@ -3,7 +3,7 @@
 
 module Currency
 module Exchange
-  # Represents a convertion rate between two currencies
+  # Represents a convertion rate between two currencies at a given period of time.
   class Rate
     # The first Currency.
     attr_reader :c1
@@ -11,9 +11,11 @@ module Exchange
     # The second Currency.
     attr_reader :c2
 
-    # The rate between _c1_ and _c2_.
-    # to convert between m1 in _c1_ and m2 in _c2_,
-    # m2 = m1 * _rate_.
+    # The rate between c1 and c2.
+    #
+    # To convert between m1 in c1 and m2 in c2:
+    #
+    #   m2 = m1 * rate.
     attr_reader :rate
 
     # The source of the rate.
@@ -25,13 +27,30 @@ module Exchange
     # If the rate is derived from other rates, this describes from where it was derived.
     attr_reader :derived
 
-    # Extended Attributes
+    # Average rate over rate samples in a time range.
     attr_reader :rate_avg
+    
+    # Number of rate samples used to calcuate _rate_avg_.
+    attr_reader :rate_samples
+
+    # The rate low between date_0 and date_1.
     attr_reader :rate_lo
+
+    # The rate high between date_0 and date_1.
     attr_reader :rate_hi
+
+    # The rate at date_0.
     attr_reader :rate_date_0
+ 
+    # The rate at date_1.
     attr_reader :rate_date_1
+    
+    # The lowest date of sampled rates.
     attr_reader :date_0
+    
+    # The highest date of sampled rates.
+    # This is non-inclusive during searches to allow seamless tileings of 
+    # time with rate buckets.
     attr_reader :date_1
 
     def initialize(c1, c2, c1_to_c2_rate, source = "UNKNOWN", date = nil, derived = nil, reciprocal = nil, opts = nil)
@@ -96,7 +115,7 @@ module Exchange
       self
     end
 
-
+    # Collect rates samples in to this Rate.
     def collect_rate(rate)
       # Initial.
       @rate_samples ||= 0

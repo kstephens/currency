@@ -1,3 +1,6 @@
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# See LICENSE.txt for details.
+
 module Currency
 
 # This class formats a Money value as a String.
@@ -22,6 +25,10 @@ class Formatter
   attr_accessor :code
 
   # If true, use html formatting.
+  #
+  #   Currency::Money(12.45, :EUR).to_s(:html => true; :code => true)
+  #   => "&#8364;12.45 <span class=\"currency_code\">EUR</span>"
+
   attr_accessor :html
 
 
@@ -52,16 +59,17 @@ class Formatter
   end
 
 
-  def currency=(x)
+  def currency=(x) # :nodoc:
     # DO NOTHING!
   end
 
 
-  def _format(m, currency = nil)
+  def _format(m, currency = nil) # :nodoc:
     # Get currency.
     currency ||= m.currency
 
     # Get scaled integer representation for this Currency.
+    # $stderr.puts "m.currency = #{m.currency}, currency => #{currency}"
     x = m.Money_rep(currency)
 
     # Remove sign.
@@ -108,12 +116,19 @@ class Formatter
   end
 
 
+
   # Format a Money object as a String.
+  # 
+  #   m = Money.new("1234567.89")
+  #   m.to_s(:code => true, :symbol => false)
+  #     => "1,234,567.89 USD"
+  #
   def format(m, opt = { })
     fmt = self.clone
 
     opt.each_pair{ | k, v | fmt.send("#{k}=", v) }
 
+    # $stderr.puts "format(opt = #{opt.inspect})"
     fmt._format(m, opt[:currency]) # Allow override of current currency.
   end
 

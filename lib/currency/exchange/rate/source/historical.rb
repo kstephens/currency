@@ -1,13 +1,13 @@
-# Copyright (C) 2007 Kurt Stephens <ruby-currency(at)umleta.com>
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
 require 'currency/exchange/rate/source/base'
 
 # Gets historical rates from database using Active::Record.
-# Rates are retrieved using Currency::Exchange::Historical::Rate as
+# Rates are retrieved using Currency::Exchange::Rate::Source::Historical::Rate as
 # a database proxy.
 #
-# See Currency::Exchange::Historical::Writer for a rate archiver.
+# See Currency::Exchange::Rate::Source::Historical::Writer for a rate archiver.
 #
 class Currency::Exchange::Rate::Source::Historical < Currency::Exchange::Rate::Source::Base
 

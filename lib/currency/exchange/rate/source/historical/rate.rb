@@ -2,10 +2,15 @@ require 'active_record/base'
 
 require 'currency/exchange/rate/source/historical'
 
+# This class represents a historical Rate in a database.
+# It requires ActiveRecord.
+#
 class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    TABLE_NAME = 'currency_historical_rates'
    set_table_name TABLE_NAME
 
+   # Can create a table and indices for this class
+   # when passed a Migration.
    def self.__create_table(m, table_name = TABLE_NAME)
      table_name = table_name.intern 
      m.instance_eval do 
@@ -45,6 +50,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Initializes this object from a Currency::Exchange::Rate object.
    def from_rate(rate)
      self.c1 = rate.c1.code.to_s
      self.c2 = rate.c2.code.to_s
@@ -63,6 +69,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Convert all dates to localtime.
    def dates_to_localtime!
      self.date   = self.date   && self.date.clone.localtime
      self.date_0 = self.date_0 && self.date_0.clone.localtime
@@ -70,6 +77,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Creates a new Currency::Exchange::Rate object.
    def to_rate
      Currency::Exchange::Rate.new(
                                   ::Currency::Currency.get(self.c1), 
@@ -91,6 +99,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Various defaults.
    def before_validation
      self.rate_avg = self.rate unless self.rate_avg
      self.rate_samples = 1 unless self.rate_samples
@@ -107,6 +116,12 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Returns a ActiveRecord::Base#find :conditions value
+   # to locate any rates that will match this one.
+   #
+   # source may be a list of sources.
+   # date will match inside date_0 ... date_1 or exactly.
+   #
    def find_matching_this_conditions
      sql = [ ]
      values = [ ]
@@ -131,8 +146,8 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
      end
 
      if self.date
-       sql << 'date_0 <= ? AND date_1 > ?'
-       values.push(self.date, self.date)
+       sql << '(date_0 <= ? AND date_1 > ?) OR date = ?'
+       values.push(self.date, self.date, self.date)
      end
 
      if self.date_0
@@ -155,6 +170,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
    end
 
 
+   # Shorthand.
    def find_matching_this(opt1 = :all, *opts)
      self.class.find(opt1, :conditions => find_matching_this_conditions, *opts)
    end

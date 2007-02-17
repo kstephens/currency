@@ -17,27 +17,32 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   alias :name :uri 
   
 
+  # Returns the date to query for rates.
+  # Defaults to yesterday.
   def date
     @date ||= Time.now - 24 * 60 * 60 # yesterday.
   end
 
 
+  # Returns year of query date.
   def date_YYYY
     '%04d' % date.year
   end
 
 
+  # Return month of query date.
   def date_MM
     '%02d' % date.month
   end
 
 
+  # Returns day of query date.
   def date_DD
     '%02d' % date.day
   end
 
 
-  # Returns the URI string with as evaluated with this object.
+  # Returns the URI string as evaluated with this object.
   def get_uri
     uri = self.uri
     uri = "\"#{uri}\""

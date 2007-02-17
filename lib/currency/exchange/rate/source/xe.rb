@@ -23,6 +23,7 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
   end
   
 
+  # Returns 'xe.com'.
   def name
     'xe.com'
   end
