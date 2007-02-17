@@ -16,7 +16,7 @@ class FormatterTest < TestBase
   #
 
   def test_default
-    assert_kind_of Money, m = ::Currency::Money("1234567.89")
+    assert_kind_of Money, m = ::Currency::Money.new_rep(123456789)
     assert_equal m.currency, Currency.default
     assert_equal m.currency.code, :USD
     assert_equal "$1,234,567.89", m.to_s
@@ -74,15 +74,6 @@ class FormatterTest < TestBase
     m.to_s(:html => true, :code => true, :thousands_separator => '_')
   end
 
-
-  def test_round_trip
-    assert_not_nil m = ::Currency::Money("1234567.89", :USD)
-    assert_not_nil m2 = ::Currency::Money(m.inspect)
-    assert_equal m.rep, m2.rep
-    assert_equal m.currency, m2.currency
-    assert_nil   m2.time
-    assert_equal m.inspect, m2.inspect
-  end
 
 end
 

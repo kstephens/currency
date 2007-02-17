@@ -30,9 +30,11 @@ class ParserTest < TestBase
   def test_cents
     assert_equal  123456789, @parser.parse("1234567.89").rep
     assert_equal  123456700, @parser.parse("1234567").rep
+    assert_equal  123456700, @parser.parse("1234567.").rep
+    assert_equal  123456780, @parser.parse("1234567.8").rep
+    assert_equal  123456789, @parser.parse("1234567.891").rep
     assert_equal -123456700, @parser.parse("-1234567").rep
     assert_equal  123456700, @parser.parse("+1234567").rep
-
   end
 
 
