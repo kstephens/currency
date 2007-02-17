@@ -102,7 +102,7 @@ class Formatter
     x = '-' + x if neg
     
     # Add symbol?
-    x = ((@html ? currency.symbol_html : currency.symbol) || '') + x if @symbol
+    x = ((@html && currency.symbol_html) || currency.symbol || '') + x if @symbol
     
     # Suffix with currency code.
     if @code

@@ -61,6 +61,10 @@ class FormatterTest < TestBase
   end
 
   def test_misc
+    m = ::Currency::Money(12.45, :USD)
+    assert_equal "$12.45 <span class=\"currency_code\">EUR</span>", 
+    m.to_s(:html => true, :code => true)
+
     m = ::Currency::Money(12.45, :EUR)
     assert_equal "&#8364;12.45 <span class=\"currency_code\">EUR</span>", 
     m.to_s(:html => true, :code => true)
