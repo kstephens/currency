@@ -66,21 +66,25 @@ module Currency
     def initialize(x, currency = nil, time = nil)
       opts ||= @@empty_hash
 
-      # Xform currency.
-      currency = Currency.default if currency.nil?
-      currency = Currency.get(currency) unless currency.kind_of?(Currency)
-
       # Set ivars.
-      @currency = currency;
-      @rep = x.Money_rep(@currency)
+      currency = Currency.get(currency)
+      @currency = currency
       @time = time || Money.default_time
       @time = Money.now if @time == :now
-
-      # Handle conversion of "USD 123.45".
-      if @rep.kind_of?(Money)
-        @currency = @rep.currency
-        @rep = @rep.rep
+      if x.kind_of?(String)
+        if currency
+          m = currency.parser_or_default.parse(x, :currency => currency)
+        else
+          m = ::Currency::Parser.default.parse(x)
+        end
+        @currency = m.currency unless @currency
+        @time = m.time if m.time
+        @rep = m.rep
+      else
+        @currency = Currency.default unless @currency
+        @rep = x.Money_rep(@currency)
       end
+
     end
 
     # Returns a Time.new
@@ -107,6 +111,7 @@ module Currency
       x.set_rep(r)
       x
     end
+
 
     # Construct from post-scaled internal representation.
     # using the same currency:
@@ -291,7 +296,7 @@ module Currency
     # Basic inspection, with symbol and currency code.
     # The standard #inspect method is available as #inspect_deep.
     def inspect(*opts)
-      self.format(:symbol => true, :code => true).inspect
+      self.format(:symbol => true, :code => true)
     end
 
     # How to alias a method defined in an object superclass in a different class:

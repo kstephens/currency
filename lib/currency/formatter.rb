@@ -46,6 +46,19 @@ class Formatter
   end
 
 
+  @@default = nil
+  # Get the default Formatter.
+  def self.default
+    @@default || self.new
+  end
+
+
+  # Set the default Formatter.
+  def self.default=(x)
+    @@default = x
+  end
+  
+
   def initialize(opt = { })
     @thousands_separator = ','
     @decimal_separator = '.'
@@ -106,15 +119,20 @@ class Formatter
     
     # Suffix with currency code.
     if @code
-      x << ' '
-      x << '<span class="currency_code">' if @html
-      x << currency.code.to_s
-      x << '</span>' if @html
+      x << (' ' + _format_Currency(currency))
     end
     
     x
   end
 
+
+  def _format_Currency(c) # :nodoc:
+    x = ''
+    x << '<span class="currency_code">' if @html
+    x << c.code.to_s
+    x << '</span>' if @html
+    x
+  end
 
 
   # Format a Money object as a String.

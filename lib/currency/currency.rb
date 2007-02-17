@@ -33,7 +33,7 @@ module Currency
     # e.g: EUR symbol is '&#8364;' (:html &#8364; :) or '&euro;' (:html &euro; :)
     attr_accessor :symbol_html
 
-    # The default formatter.
+    # The default Formatter.
     attr_accessor :formatter
 
     # The default parser.
@@ -55,6 +55,7 @@ module Currency
     # by its 3-letter uppercase Symbol name, such as :USD, or :CAD.
     def self.get(code)
       # $stderr.puts "#{self}.get(#{code.inspect})"
+      return nil unless code
       return code if code.kind_of?(::Currency::Currency)
       Factory.default.get_by_code(code)
     end
@@ -108,99 +109,32 @@ module Currency
 
 
     # Parse a Money string in this Currency.
-    # Options:
-    #   :currency => Currency object.
-    # Look for a matching currency code at the beginning or end of the string.
-    # If the currency does not match IncompatibleCurrency is raised.
+    #
+    # See Currency::Parser#parse.
     #
     def parse(str, *opt)
-      x = str
-      opt = Hash[*opt]
-
-      md = nil # match data
-
-      # $stderr.puts "'#{x}'.Money_rep(#{self})"
-      
-      # Handle currency code at front of string.
-      if (md = /^([A-Z][A-Z][A-Z])\s*(.*)$/.match(x)) != nil 
-        curr = Factory.default.get_by_code(md[1])
-        x = md[2]
-        if curr != self
-          if opt[:currency] && opt[:currency] != curr
-            raise Exception::IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
-          end
-          return Money.new(x, curr);
-        end
-        # Handle currency code at end of string.
-      elsif (md = /^(.*)\s*([A-Z][A-Z][A-Z])$/.match(x)) != nil 
-        curr = Factory.default.get_by_code(md[2])
-        x = md[1]
-        if curr != self
-          if opt[:currency] && opt[:currency] != curr
-            raise Exception::IncompatibleCurrency.new("#{str} #{opt[:currency].code}")
-          end
-          return Money.new(x, curr);
-        end
-      end
-
-      # Remove placeholders and symbol.
-      x = x.gsub(/[, ]/, '')
-      x = x.sub(@symbol, '') if @symbol
-
-      # Match: whole Currency value.
-      if x =~ /^[-+]?(\d+)\.?$/
-        # $stderr.puts "'#{self}'.parse(#{str}) => EXACT"
-        x.to_i.Money_rep(self)
-        
-        # Match: fractional Currency value.
-      elsif (md = /^([-+]?)(\d*)\.(\d+)$/.match(x)) != nil
-        sign = md[1]
-        whole = md[2]
-        part = md[3]
-        
-        # $stderr.puts "'#{self}'.parse(#{str}) => DECIMAL (#{sign} #{whole} . #{part})"
-        
-        if part.length != self.scale
-          
-          # Pad decimal places with additional '0'
-          while part.length < self.scale_exp
-            part << '0'
-          end
-          
-          # Truncate to Currency's decimal size. 
-          part = part[0..(self.scale_exp - 1)]
-          
-          # $stderr.puts "  => INEXACT DECIMAL '#{whole}'"
-        end
-        
-        # Put the string back together:
-        #   #{sign}#{whole}#{part}
-        whole = sign + whole + part
-        # $stderr.puts "  => REP = #{whole}"
-        
-        x = whole.to_i
-
-        x = Money.new_rep(x, opt[:currency], opt[:time])
-      else
-        # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
-        #x.to_f.Money_rep(self)
-        raise Exception::InvalidMoneyString.new("#{str} #{self}")
-      end
+      parser_or_default.parse(str, *opt)
     end
 
 
-    @@default_formatter = nil
-    # Get the default Formatter.
-    def self.default_formatter; @@default_formatter; end
-    # Set the default Formatter.
-    def self.default_formatter=(x); @@default_formatter = x; end
+    def parser_or_default
+      (@parser || ::Currency::Parser.default)
+    end
+
 
     # Formats the Money value as a string using the current Formatter.
+    # See Currency::Formatter#format.
     def format(m, *opt)
-       (@formatter || (@@default_formatter ||= ::Currency::Formatter.new)).format(m, *opt)
+       formatter_or_default.format(m, *opt)
     end
 
 
+    def formatter_or_default
+      (@formatter || ::Currency::Formatter.default)
+    end
+
+
+    # Returns the Currency code as a String.
     def to_s
       @code.to_s
     end
@@ -214,6 +148,7 @@ module Currency
 
     # Sets the default Factory's currency.
     def self.default=(x)
+      x = self.get(x) unless x.kind_of?(self)
       Factory.default.currency = x
     end
 
