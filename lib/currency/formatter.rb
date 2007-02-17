@@ -124,9 +124,12 @@ class Formatter
   #     => "1,234,567.89 USD"
   #
   def format(m, opt = { })
-    fmt = self.clone
+    fmt = self
 
-    opt.each_pair{ | k, v | fmt.send("#{k}=", v) }
+    unless opt.empty? 
+      fmt = fmt.clone
+      opt.each_pair{ | k, v | fmt.send("#{k}=", v) }
+    end
 
     # $stderr.puts "format(opt = #{opt.inspect})"
     fmt._format(m, opt[:currency]) # Allow override of current currency.
