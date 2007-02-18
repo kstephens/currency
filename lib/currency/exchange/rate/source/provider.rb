@@ -50,6 +50,14 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   end
 
 
+  # Returns the URI content.
+  def get_page_content
+    data = open(get_uri) { |data| data.read }
+    
+    data
+  end
+
+
   # Clear cached rates from this source.
   def clear_rates
     @rates = nil

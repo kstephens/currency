@@ -108,8 +108,8 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
      self.rate_date_0 = self.rate unless self.rate_date_0
      self.rate_date_1 = self.rate unless self.rate_date_1
 
-     self.date_0 = self.date unless self.date_0
-     self.date_1 = self.date unless self.date_1
+     #self.date_0 = self.date unless self.date_0
+     #self.date_1 = self.date unless self.date_1
      self.date = self.date_0 + (self.date_1 - self.date_0) * 0.5 if ! self.date && self.date_0 && self.date_1
      self.date = self.date_0 unless self.date
      self.date = self.date_1 unless self.date

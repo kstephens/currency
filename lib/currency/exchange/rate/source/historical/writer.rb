@@ -51,27 +51,36 @@ class Currency::Exchange::Rate::Source::Historical::Writer
     # Produce a list of all currencies.
     currencies = source.currencies
 
+    # $stderr.puts "currencies = #{currencies.join(', ')}"
+
     selected_rates = [ ]
 
     # Get list of preferred_currencies.
-    if preferred_currencies
+    if self.preferred_currencies
+      self.preferred_currencies = self.preferred_currencies.collect do | c | 
+        ::Currency::Currency.get(c) 
+      end
       currencies = currencies.select do | c | 
-        c = ::Currency::Currency.get(c)
-        preferred_currencies.include?(c.code) || preferred_currencies.include?(c)
+        self.preferred_currencies.include?(c)
       end.uniq
     end
 
 
     # Check for required currencies.
-    if required_currencies
-      required_currencies.each do | c |
-        c = ::Currency::Currency.get(c)
-        currencies.include?(c) || raise("Required currency #{c.inspect} not in #{currencies.inspect}")
+    if self.required_currencies
+      self.required_currencies = self.required_currencies.collect do | c |
+        ::Currency::Currency.get(c) 
+      end
+
+      self.required_currencies.each do | c |
+        unless currencies.include?(c)
+          raise("Required currency #{c.inspect} not in #{currencies.inspect}")
+        end
       end
     end
 
 
-    #$stderr.puts "currencies = #{currencies.inspect}"
+    # $stderr.puts "currencies = #{currencies.inspect}"
 
     deriver = ::Currency::Exchange::Rate::Deriver.new(:source => source)
 

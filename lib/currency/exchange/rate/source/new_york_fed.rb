@@ -19,7 +19,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
   
   def initialize(*opt)
     self.uri = 'http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm?FEXdate=#{date_YYYY}%2D#{date_MM}%2D#{date_DD}%2000%3A00%3A00%2E0&FEXtime=1200'
-    @xe_rates = nil
+    @fed_rates = nil
     super(*opt)
   end
   
@@ -36,13 +36,6 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
   end
   
 
-  def get_content
-    data = open(get_uri) { |data| data.read }
-    
-    data
-  end
-
-
   def raw_rates
     rates
     @raw_rates
@@ -51,11 +44,13 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
 
   # Parses XML for rates.
   def parse_rates(data = nil)
-    data = get_content unless data
+    data = get_page_content unless data
     
     rates = [ ]
 
     @raw_rates = { }
+
+    $stderr.puts "parse_rates: data = #{data}"
 
     doc = REXML::Document.new(data).root
     doc.elements.to_a('//frbny:Series').each do | series |

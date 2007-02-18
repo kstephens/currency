@@ -40,17 +40,27 @@ class ArTestBase < TestBase
 
   def database_spec
     # TODO: Get from ../config/database.yml:test
+    # Create test database on:
+
+    # MYSQL:
+    #
     # sudo mysqladmin create test;
     # sudo mysql
     # grant all on test.* to test@localhost identified by 'test';
     # flush privileges;
 
+    # POSTGRES:
+    #
+    # CREATE USER test PASSWORD 'test';
+    # CREATE DATABASE test WITH OWNER = test;
+    #
+
     @database_spec = {
-      :adapter  => "mysql",
-      :host     => "localhost",
-      :username => "test",
-      :password => "test",
-      :database => "test"
+      :adapter  => ENV['TEST_DB_ADAPTER'] || 'mysql',
+      :host     => ENV['TEST_DB_HOST']    || 'localhost',
+      :username => ENV['TEST_DB_USER']    || 'test',
+      :password => ENV['TEST_DB_PASS']    || 'test',
+      :database => ENV['TEST_DB_TEST']    || 'test'
     }
   end
 

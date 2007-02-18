@@ -45,20 +45,13 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
   end
   
   
-  # Returns the URI content.
-  def get_page
-    data = open(get_uri) { |data| data.read }
-    
-    data = data.split(/[\r\n]/)
-    
-    data
-  end
-
 
   # Parses http://xe.com homepage HTML for
   # quick rates of 10 currencies.
   def parse_page_rates(data = nil)
-    data = get_page unless data
+    data = get_page_content unless data
+
+    data = data.split(/[\r\n]/)
     
     @rate_timestamp = nil
 

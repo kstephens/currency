@@ -69,6 +69,7 @@ class HistoricalWriterTest < ArTestBase
     rates = writer.write_rates
     assert_not_nil rates
     assert rates.size > 0
+    assert 12, rates.size
     assert_h_rates(rates, writer)
   end
 
@@ -79,6 +80,7 @@ class HistoricalWriterTest < ArTestBase
     rates = writer.write_rates
     assert_not_nil rates
     assert rates.size > 0
+    assert_equal 12, rates.size
     assert_h_rates(rates, writer)
   end
 
