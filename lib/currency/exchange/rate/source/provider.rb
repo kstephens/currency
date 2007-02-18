@@ -50,8 +50,15 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   end
 
 
+  # Clear cached rates from this source.
+  def clear_rates
+    @rates = nil
+    super
+  end
+
+
   # Returns current base Rates or calls load_rates to load them from the source.
-  def rates
+  def rates(time = nil)
     @rates ||= load_rates
   end
   

@@ -55,13 +55,17 @@ class Currency::Exchange::Rate::Source::Historical::Writer
 
     # Get list of preferred_currencies.
     if preferred_currencies
-      currencies = currencies.select{ | c | preferred_currencies.include?(c)}.uniq
+      currencies = currencies.select do | c | 
+        c = ::Currency::Currency.get(c)
+        preferred_currencies.include?(c.code) || preferred_currencies.include?(c)
+      end.uniq
     end
 
 
     # Check for required currencies.
     if required_currencies
       required_currencies.each do | c |
+        c = ::Currency::Currency.get(c)
         currencies.include?(c) || raise("Required currency #{c.inspect} not in #{currencies.inspect}")
       end
     end
@@ -76,18 +80,15 @@ class Currency::Exchange::Rate::Source::Historical::Writer
       currencies.each do | c1 |
         currencies.each do | c2 |
           next if c1 == c2 && ! identity_rates
-          c1 = ::Currency::Currency.get(c1)
-          c2 = ::Currency::Currency.get(c2)
-          rate = deriver.rate(c1, c2, nil)
+           rate = deriver.rate(c1, c2, nil)
           selected_rates << rate unless selected_rates.include?(rate)
         end
       end
     elsif base_currencies
       base_currencies.each do | c1 |
+        c1 = ::Currency::Currency.get(c1)
         currencies.each do | c2 |
           next if c1 == c2 && ! identity_rates
-          c1 = ::Currency::Currency.get(c1)
-          c2 = ::Currency::Currency.get(c2)
           rate = deriver.rate(c1, c2, nil)
           selected_rates << rate unless selected_rates.include?(rate)
         end
@@ -95,7 +96,7 @@ class Currency::Exchange::Rate::Source::Historical::Writer
     else
       selected_rates = source.rates.select do | r |
         next if r.c1 == r.c2 && ! identity_rates
-        currencies.include?(r.c1.code) && currencies.include?(r.c2.code)
+        currencies.include?(r.c1) && currencies.include?(r.c2)
       end
     end
 

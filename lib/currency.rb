@@ -47,11 +47,17 @@
 #
 # === Storage and retrival of historical exchange rates
 #
-# See Currency::Exchange::Historical
+# * See Currency::Exchange::Rate::Source::Historical
+# * See Currency::Exchange::Rate::Source::Historical::Writer
 #
-# === Exchange rate polling for population of historical rates
+# === Automatic derivation of rates from base rates.
 #
-# See Currency::Exchange::Historical::Writer
+# * See Currency::Exhcnage::Rate::Deriver
+#
+# === Customizable Formatter and Parser objects.
+#
+# * See Currency::Formatter
+# * See Currency::Parser
 #
 # == Future Enhancements
 #

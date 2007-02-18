@@ -41,38 +41,13 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
   #
   def raw_rates
     # Force load of rates
-    @raw_rates ||= xe_rates_load
-  end
-  
-  
-  def xe_rates_load
-    # Do not allow re-entrancy
-    raise "Reentrant!" if @loading_rates
-    
-    # Begin processing new rate request.
-    @loading_rates = true
-    
-    # Parse rates from HTML page.
-    rates = parse_page_rates
-    
-    unless rates 
-      # FIXME: raise Exception::???
-      return rates 
-    end
-    
-    # Compute new rate timeps
-    @rate_timestamp ||= Time.now # TODO: Extract this from HTML page!
-    
-    # End processsing new rate request.
-    @processing_rates = false
-    
-    rates
+    @raw_rates ||= parse_page_rates
   end
   
   
   # Returns the URI content.
   def get_page
-    data = open(uri) { |data| data.read }
+    data = open(get_uri) { |data| data.read }
     
     data = data.split(/[\r\n]/)
     

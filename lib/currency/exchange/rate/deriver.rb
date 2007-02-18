@@ -22,6 +22,8 @@ class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
   def initialize(opt = { })
     @source = nil
     @pivot_currency = nil
+    @derived_rates = { }
+    @all_rates = { }
     super
   end 
 
@@ -31,17 +33,50 @@ class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
   end
 
 
+  # Return all currencies.
+  def currencies
+    @source.currencies
+  end
+
+
   # Flush all cached Rates.
   def clear_rates
     @derived_rate.clear
+    @all_rates.clear
+    @source.clear
     super
   end
  
 
-  # Return list of known Rates.
-  # Source may have more Rates underneath this object.
-  def rates
-    @derived_rate.values
+  # Returns all combinations of rates except identity rates.
+  def rates(time = nil)
+    time = time && normalize_time(time)
+    all_rates(time)
+  end
+
+
+  # Computes all rates.
+  # time is assumed to be normalized.
+  def all_rates(time = nil)
+    if x = @all_rates["#{time}"]
+      return x 
+    end
+
+    x = @all_rates["#{time}"] = [ ]
+    
+    currencies = self.currencies
+
+    currencies.each do | c1 |
+      currencies.each do | c2 |
+        next if c1 == c2 
+        c1 = ::Currency::Currency.get(c1)
+        c2 = ::Currency::Currency.get(c2)
+        rate = rate(c1, c2, time)
+        x << rate
+      end
+    end
+
+    x
   end
 
 

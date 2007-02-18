@@ -1,29 +1,25 @@
 = Currency Release History
 
-== Release 0.5.0: 2007/02/16
+== Release 0.4.0: 2007/02/18
 
-* >>>> MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA <<<<
-* Added copyright notices, LICENSE.txt, COPYING.txt
+>>>> MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA <<<<
+
+* Support for historical money values and rates using ActiveRecord.
+* Added Rate::Source::Historical::Writer.
+* Added Money attribute macros for classes not using ActiveRecord.
+* Currency::Exchange is now Currency::Exchange::Rate::Source
+  NOTE: Currency::Exchange::* is reserved for future use.
 * Refactored rate sources into Currency::Exchange::Rate::Source.
 * Refactored xe.com rate source as a Currency::Exchange::Rate::Source.
 * Added nyfed.org rate source.
-* Working Historical::Writer.
-* Refactored rate deriviation into Rate::Deriver
-* Refactored time based rate caching in to TimedCache.
+* Refactored rate deriviation into Rate::Deriver.
+* Refactored time-based rate caching into TimedCache.
 * Refactored Currency#format into Currency::Format.  
   NOTE: old formatting :no_* no longer supported.
+* Refactored Currency#parse into Currency::Parser.
 * Currency::CurrencyFactory is now Currency::Currency::Factory.
-* Currency::Exchange is now Currency::Exchange::Rate::Source
-  NOTE: Currency::Exchange::* is reserved for future use.
 * Preliminary Source::Failover.
-
-== Release 0.4.0: 2007/01/18
-
-* Refactor derived rates using pivot currencies and reciprocals.
-* Money attribute macros for classes not using ActiveRecord.
-* Initial support for historical money values and rates.
-* Added EUR, GBP short-cuts.
-* Initial Currency::Exchange::Historical using ActiveRecord.
+* Added copyright notices: LICENSE.txt, COPYING.txt.
 
 == Release 0.3.3: 2006/10/31
 

@@ -95,7 +95,7 @@ class Currency::Exchange::Rate::Source::Base
     #
     # Subclasses can override this method.
     def currencies
-      @currencies ||= rates.collect{| r | [ r.c1.code, r.c2.code ]}.flatten.uniq
+      @currencies ||= rates.collect{| r | [ r.c1, r.c2 ]}.flatten.uniq
     end
 
 
