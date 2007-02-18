@@ -91,7 +91,7 @@ class Currency::Exchange::Rate::Source::Base
     end
 
 
-    # Returns a list of Currency that the rate source provides.
+    # Returns a list of Currencies that the rate source provides.
     #
     # Subclasses can override this method.
     def currencies

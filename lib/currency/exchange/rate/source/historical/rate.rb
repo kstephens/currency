@@ -33,8 +33,8 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
          t.column :rate_date_1,   :float
          
          t.column :date,     :datetime, :null => false
-         t.column :date_0,   :datetime, :null => false
-         t.column :date_1,   :datetime, :null => false
+         t.column :date_0,   :datetime
+         t.column :date_1,   :datetime
 
          t.column :derived,  :string,   :limit => 64
        end
@@ -146,7 +146,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
      end
 
      if self.date
-       sql << '(date_0 <= ? AND date_1 > ?) OR date = ?'
+       sql << '(((date_0 IS NULL) OR (date_0 <= ?)) AND ((date_1 IS NULL) OR (date_1 > ?))) OR date = ?'
        values.push(self.date, self.date, self.date)
      end
 
