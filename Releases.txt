@@ -10,8 +10,9 @@
 * Currency::Exchange is now Currency::Exchange::Rate::Source
   NOTE: Currency::Exchange::* is reserved for future use.
 * Refactored rate sources into Currency::Exchange::Rate::Source.
-* Refactored xe.com rate source as a Currency::Exchange::Rate::Source.
-* Added nyfed.org rate source.
+* Refactored xe.com homepage rate source as a Currency::Exchange::Rate::Source.
+* Added newyorkfed.org XML rate source.
+* Added thefinancials.com XML rate source.
 * Refactored rate deriviation into Rate::Deriver.
 * Refactored time-based rate caching into TimedCache.
 * Refactored Currency#format into Currency::Format.  

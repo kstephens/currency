@@ -27,6 +27,7 @@ lib/currency/exchange/rate/source/historical/writer.rb
 lib/currency/exchange/rate/source/new_york_fed.rb
 lib/currency/exchange/rate/source/provider.rb
 lib/currency/exchange/rate/source/test.rb
+lib/currency/exchange/rate/source/the_financials.rb
 lib/currency/exchange/rate/source/timed_cache.rb
 lib/currency/exchange/rate/source/xe.rb
 lib/currency/exchange/time_quantitizer.rb

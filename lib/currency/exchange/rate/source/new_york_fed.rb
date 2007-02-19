@@ -19,7 +19,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
   
   def initialize(*opt)
     self.uri = 'http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm?FEXdate=#{date_YYYY}%2D#{date_MM}%2D#{date_DD}%2000%3A00%3A00%2E0&FEXtime=1200'
-    @fed_rates = nil
+    @raw_rates = nil
     super(*opt)
   end
   
@@ -31,7 +31,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
 
 
   def clear_rates
-    @fed_rates = nil
+    @raw_rates = nil
     super
   end
   
@@ -68,7 +68,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
       rates << new_rate(c1, c2, rate, date)
 
       (@raw_rates[c1] ||= { })[c2] ||= rate
-      (@raw_rates[c2] ||= { })[c1] ||= 1.0 / rate
+      # (@raw_rates[c2] ||= { })[c1] ||= 1.0 / rate
 
     end
 
