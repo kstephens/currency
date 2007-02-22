@@ -16,8 +16,9 @@ class NewYorkFedTest < TestBase
 
   def get_rate_source
     # Force XE Exchange.
-    source = Exchange::Rate::Source::NewYorkFed.new
-    deriver = Exchange::Rate::Deriver.new(:source => source)
+    verbose = false
+    source = Exchange::Rate::Source::NewYorkFed.new(:verbose => verbose)
+    deriver = Exchange::Rate::Deriver.new(:source => source, :verbose => source.verbose)
   end
 
 

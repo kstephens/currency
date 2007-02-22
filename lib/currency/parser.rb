@@ -1,11 +1,10 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
 
 # This class parses a Money value from a String.
 # Each Currency has a default Parser.
-class Parser
+class Currency::Parser
 
   # The default Currency to use if no Currency is specified.
   attr_accessor :currency
@@ -55,7 +54,7 @@ class Parser
       x = md.pre_match + md.post_match
       if @currency && @currency != curr
         if @enforce_currency
-          raise Exception::IncompatibleCurrency.new("#{str.inspect} #{@currency.code}")
+          raise ::Currency::Exception::IncompatibleCurrency.new("#{str.inspect} #{@currency.code}")
         end
         convert_currency = @currency
       end
@@ -108,7 +107,7 @@ class Parser
     else
       # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
       #x.to_f.Money_rep(self)
-      raise Exception::InvalidMoneyString.new("#{str.inspect} #{currency} #{x.inspect}")
+      raise ::Currency::Exception::InvalidMoneyString.new("#{str.inspect} #{currency} #{x.inspect}")
     end
 
     # Do conversion.
@@ -151,5 +150,4 @@ class Parser
 
 end # class
 
-end # module
 

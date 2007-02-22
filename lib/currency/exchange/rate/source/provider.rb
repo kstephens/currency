@@ -11,16 +11,21 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   attr_accessor :uri
   
   # The Time used to query the rate source.
-
+  # Typically set by #load_rates.
   attr_accessor :date
+
   # The name is the same as its #uri.
   alias :name :uri 
   
+  def initialize(*args)
+    super
+    @rates = { }
+  end
 
   # Returns the date to query for rates.
   # Defaults to yesterday.
   def date
-    @date ||= Time.now - 24 * 60 * 60 # yesterday.
+    @date || (Time.now - 24 * 60 * 60) # yesterday.
   end
 
 
@@ -47,6 +52,8 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
     uri = self.uri
     uri = "\"#{uri}\""
     uri = instance_eval(uri)
+    $stderr.puts "#{self}: uri = #{uri.inspect}" if @verbose
+    uri
   end
 
 
@@ -60,21 +67,22 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
 
   # Clear cached rates from this source.
   def clear_rates
-    @rates = nil
+    @rates.clear
     super
   end
 
 
   # Returns current base Rates or calls load_rates to load them from the source.
   def rates(time = nil)
-    @rates ||= load_rates
+    time = time && normalize_time(time)
+    @rates["#{time}"] ||= load_rates(time)
   end
   
 
   # Returns an array of base Rates from the rate source.
   #
   # Subclasses must define this method.
-  def load_rates
+  def load_rates(time = nil)
     raise('Subclass responsiblity')
   end
 

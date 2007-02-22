@@ -80,7 +80,8 @@ class Currency::Exchange::Rate::Source::TheFinancials < ::Currency::Exchange::Ra
   
   
   # Return a list of known base rates.
-  def load_rates   
+  def load_rates(time = nil)
+    self.date = time
     parse_rates
   end
   

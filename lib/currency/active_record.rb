@@ -39,8 +39,7 @@ module ActiveRecord
 end
 
 
-module Currency
-  module ActiveRecord
+module Currency::ActiveRecord
     def self.append_features(base) # :nodoc:
       # $stderr.puts "  Currency::ActiveRecord#append_features(#{base})"
       super
@@ -208,7 +207,7 @@ def #{attr_name}
   unless @#{attr_name}
     #{attr_name}_rep = read_attribute(:#{column})
     unless #{attr_name}_rep.nil?
-      @#{attr_name} = Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
+      @#{attr_name} = ::Currency::Money.new_rep(#{attr_name}_rep, #{read_currency} || #{currency}, #{read_time} || #{time})
       #{read_preferred_currency}
     end
   end
@@ -248,7 +247,6 @@ end_eval
         # $stderr.puts "   CODE = #{x}"
       end
     end
-  end
 end
 
 

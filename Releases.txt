@@ -1,25 +1,27 @@
 = Currency Release History
 
-== Release 0.4.0: 2007/02/18
+== Release 0.4.0: 2007/02/21
 
->>>> MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA <<<<
+=== MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA
 
+* Some changes are not-backwards compatible.
+* Currency::Exchange is now Currency::Exchange::Rate::Source
+  NOTE: Currency::Exchange::* is reserved for buying/selling currencies, not for providing rate data.
+* Refactored xe.com homepage rate source as a Currency::Exchange::Rate::Source::Xe.
+* Refactored Currency::Exchange::Test as Currency::Exchange::Rate::Source::Test.
 * Support for historical money values and rates using ActiveRecord.
 * Added Rate::Source::Historical::Writer.
-* Added Money attribute macros for classes not using ActiveRecord.
-* Currency::Exchange is now Currency::Exchange::Rate::Source
-  NOTE: Currency::Exchange::* is reserved for future use.
-* Refactored rate sources into Currency::Exchange::Rate::Source.
-* Refactored xe.com homepage rate source as a Currency::Exchange::Rate::Source.
 * Added newyorkfed.org XML rate source.
 * Added thefinancials.com XML rate source.
-* Refactored rate deriviation into Rate::Deriver.
-* Refactored time-based rate caching into TimedCache.
-* Refactored Currency#format into Currency::Format.  
-  NOTE: old formatting :no_* no longer supported.
-* Refactored Currency#parse into Currency::Parser.
+* Refactored rate deriviation into Currency::Exchange::Rate::Deriver.
+* Refactored rate caching into Currency::Exchange::Rate::Source::TimedCache.
+* Added Money attribute macros for classes not using ActiveRecord.
+* Refactored time-based rate caching into Currency::Exchange::Rate::Source::TimedCache.
+* Refactored Currency::Currency#format into Currency::Formatter.  
+  NOTE: old formatting options as :no_* no longer supported.
+* Refactored Currency::Currency#parse into Currency::Parser.
 * Currency::CurrencyFactory is now Currency::Currency::Factory.
-* Preliminary Source::Failover.
+* Preliminary Currency::Exchange::Rate::Source::Failover.
 * Added copyright notices: LICENSE.txt, COPYING.txt.
 
 == Release 0.3.3: 2006/10/31

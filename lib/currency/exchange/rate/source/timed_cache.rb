@@ -4,6 +4,10 @@
 require 'currency/exchange/rate/source/base'
 
 # A timed cache for rate sources.
+#
+# This class should be used at the top-level of a rate source change,
+# to correctly check rate dates.
+#
 class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate::Source::Base
   # The rate source.
   attr_accessor :source
@@ -77,13 +81,13 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
 
   
   # Returns an array of all the cached Rates.
-  def rates
-    load_rates
+  def rates(time = nil)
+    load_rates(time)
   end
 
 
   # Returns an array of all the cached Rates.
-  def load_rates
+  def load_rates(time = nil)
     # Check expiration.
     expired?
     
@@ -91,7 +95,7 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
     return @cached_rates if @cashed_rates
     
     # Force load of rates
-    @cached_rates = _load_rates_from_source
+    @cached_rates = _load_rates_from_source(time)
     
     # Flush old rates.
     @cached_rates_old = nil
@@ -106,7 +110,7 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   end
   
 
-  def _load_rates_from_source # :nodoc:
+  def _load_rates_from_source(time = nil) # :nodoc:
     # Do not allow re-entrancy
     raise "Reentry!" if @processing_rates
 
@@ -116,8 +120,8 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
     # Clear cached Rates.
     clear_rates
 
-    # Parse rates from HTML page.
-    rates = source.load_rates
+    # Load rates from the source.
+    rates = source.load_rates(time)
       
     unless rates 
       # FIXME: raise Exception::???

@@ -1,10 +1,9 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-class Currency
 
-  class Factory
+# Responsible for creating Currency::Currency objects on-demand.
+class Currency::Currency::Factory
     @@default = nil
 
     # Returns the default Currency::Factory.
@@ -28,7 +27,7 @@ class Currency
     def get_by_code(x)
       x = ::Currency::Currency.cast_code(x)
       # $stderr.puts "get_by_code(#{x})"
-      @currency_by_code[x] ||= install(load(Currency.new(x)))
+      @currency_by_code[x] ||= install(load(::Currency::Currency.new(x)))
     end
 
 
@@ -84,7 +83,7 @@ class Currency
 
     # Installs a new Currency for #get_by_symbol and #get_by_code.
     def install(currency)
-      raise Exception::UnknownCurrency.new() unless currency
+      raise ::Currency::Exception::UnknownCurrency.new() unless currency
       @currency_by_symbol[currency.symbol] ||= currency unless currency.symbol.nil?
       @currency_by_code[currency.code] = currency
     end
@@ -115,10 +114,8 @@ class Currency
         super
       end
     end
-  end # class
 
 end # class
-end # module
 
 
 

@@ -1,8 +1,7 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-  class Money
+class Currency::Money
     @@money_attributes = { }
 
     # Called by money macro when a money attribute
@@ -32,12 +31,10 @@ module Currency
       end
     end
     
-  end # class
-end # module
+end # class
 
 
-module Currency
-  module Macro
+module Currency::Macro
     def self.append_features(base) # :nodoc:
       # $stderr.puts "  Currency::ActiveRecord#append_features(#{base})"
       super
@@ -297,4 +294,4 @@ end_eval
     end
   end # module
 end # module
-end # ???
+

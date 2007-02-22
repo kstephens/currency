@@ -133,6 +133,7 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
         next unless cur
         next if cur.to_s == PIVOT_CURRENCY.to_s
         (rate[PIVOT_CURRENCY] ||= {})[cur] = usd_to_cur
+        (rate[cur] ||= { })[PIVOT_CURRENCY] ||= 1.0 / usd_to_cur
         $stderr.puts "#{cur.inspect} => #{usd_to_cur}" if @verbose
       end
     end
@@ -142,10 +143,15 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
   
   
   # Return a list of known base rates.
-  def load_rates
+  def load_rates(time = nil)
+    if time
+      $stderr.puts "#{self}: WARNING CANNOT SUPPLY HISTORICAL RATES" unless @time_warning
+      @time_warning = true
+    end
+
     rates = raw_rates # Load rates
     rates_pivot = rates[PIVOT_CURRENCY]
-    raise Exception::UnknownRate.new("#{self}: cannot get base rate #{PIVOT_CURRENCY.inspect}") unless rates_pivot
+    raise ::Currency::Exception::UnknownRate.new("#{self}: cannot get base rate #{PIVOT_CURRENCY.inspect}") unless rates_pivot
     
     result = rates_pivot.keys.collect do | c2 | 
       new_rate(PIVOT_CURRENCY, c2, rates_pivot[c2], @rate_timestamp)

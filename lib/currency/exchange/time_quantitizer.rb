@@ -1,9 +1,6 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-module Exchange
-
 # = Currency::Exchange::TimeQuantitizer
 #
 # The Currency::Exchange::TimeQuantitizer quantitizes time values
@@ -11,7 +8,7 @@ module Exchange
 # can be turned into a hash key, depending
 # on the rate source's temporal accuracy.
 #
-class TimeQuantitizer
+class Currency::Exchange::TimeQuantitizer
 
   def self.current; @current ||= self.new; end
   def self.current=(x); @current = x; end
@@ -112,6 +109,3 @@ class TimeQuantitizer
 end # class
 
   
-end # module
-end # module
-

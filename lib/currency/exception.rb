@@ -1,17 +1,11 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-  module Exception
-  end
-end
-  
-# Base class for all Currency::Exception.
-class Currency::Exception::Base < Exception
-end
+module Currency::Exception
+    # Base class for all Currency::Exception objects.
+    class Base < ::Exception
+    end
 
-module Currency
-  module Exception
     # Error during string parsing.
     class InvalidMoneyString < Base
     end
@@ -47,6 +41,5 @@ module Currency
     # Error if a subclass is responsible for implementing a method.
     class SubclassResponsibility < Base
     end
-  end
   
-end
+end # module

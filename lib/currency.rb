@@ -1,4 +1,6 @@
-# -*- ruby -*-
+# Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+#
+# See LICENSE.txt for details.
 #
 # = Currency
 #
@@ -7,6 +9,7 @@
 # * currencies 
 # * exchanges
 # * exchange rates
+# * exchange rate sources
 # * monetary values
 #
 # The core classes are:
@@ -14,7 +17,8 @@
 # * Currency::Money - uses a scaled integer representation of a monetary value and performs accurate conversions to and from string values.
 # * Currency::Currency - provides an object-oriented representation of a currency.
 # * Currency::Exchange::Base - the base class for a currency exchange rate provider.
-# * Currency::Exchange::Rate::Source - the base class for a currency exchange rate data provider.
+# * Currency::Exchange::Rate::Source::Base - the base class for an on-demand currency exchange rate data provider.
+# * Currency::Exchange::Rate::Source::Provider - the base class for a bulk exchange rate data provider.
 # * Currency::Exchange::Rate - represents a exchange rate between two currencies.
 #
 # 
@@ -22,8 +26,14 @@
 # exchange rates from http://xe.com/ :
 #
 #    require 'currency'
-#    require 'currency/exchange/xe'
+#    require 'currency/exchange/rate/source/xe'
 #    
+#    # Rate source initialization
+#    provider = Currency::Exchange::Rate::Source::Xe.new
+#    deriver  = Currency::Exchange::Rate::Deriver.new(:source => provider)
+#    cache = Currency::Exchange::Rate::Source::TimedCache.new(:source => deriver)
+#    Currency::Exchange::Rate::Source.default = cache
+#
 #    usd = Currency::Money('6.78', :USD)
 #    puts "usd = #{usd.format}"
 #    cad = usd.convert(:CAD)
@@ -52,9 +62,19 @@
 #
 # === Automatic derivation of rates from base rates.
 #
-# * See Currency::Exhcnage::Rate::Deriver
+# * See Currency::Exchange::Rate::Deriver
 #
-# === Customizable Formatter and Parser objects.
+# === Rate caching
+#
+# * See Currency::Exchange::Rate::Source::TimedCache
+#
+# === Rate Providers
+#
+# * See Currency::Exchange::Rate::Source::Xe
+# * See Currency::Exchange::Rate::Source::NewYorkFed
+# * See Currency::Exchange::Rate::Source::TheFinancials
+#
+# === Customizable formatting and parsing
 #
 # * See Currency::Formatter
 # * See Currency::Parser
@@ -77,15 +97,32 @@
 #
 # == Support
 #
-# ruby-currency(at)umleta.com
+# http://rubyforge.org/forum/forum.php?forum_id=7643
 #
-
-$:.unshift(File.dirname(__FILE__)) unless
+# == Copyright
+#
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+#
 # See LICENSE.txt for details.
+#
+module Currency
+  # Use this function instead of Money#new:
+  #
+  #    Currency::Money("12.34", :CAD)
+  #
+  # Do not do this:
+  #
+  #    Currency::Money.new("12.34", :CAD)
+  #
+  # See Money#new.
+  def self.Money(*opts)
+    Money.new(*opts)
+  end
+end
 
 $:.unshift(File.expand_path(File.dirname(__FILE__))) unless $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
+require 'currency/currency_version'
 require 'currency/exception'
 require 'currency/money'
 require 'currency/currency'

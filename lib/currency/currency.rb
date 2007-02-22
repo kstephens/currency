@@ -1,12 +1,14 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-  #include Currency::Exceptions
 
-  # Represents a currency.
-  #
-  class Currency
+# Represents a currency.
+#
+# Currency objects are created on-demand by Currency::Currency::Factory.
+#
+# See Currency.get method.
+#
+class Currency::Currency
     # Returns the ISO three-letter currency code as a symbol.
     # e.g. :USD, :CAD, etc.
     attr_reader :code
@@ -63,8 +65,8 @@ module Currency
     # Symbol format.
     def self.cast_code(x)
       x = x.upcase.intern if x.kind_of?(String)
-      raise Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
-      raise Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
+      raise ::Currency::Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
+      raise ::Currency::Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
       x
     end
 
@@ -163,7 +165,7 @@ module Currency
         super
       end
     end
-  end # class
+
+end # class
   
-end # module
 

@@ -50,7 +50,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
 
     @raw_rates = { }
 
-    $stderr.puts "parse_rates: data = #{data}"
+    $stderr.puts "#{self}: parse_rates: data =\n#{data}" if @verbose
 
     doc = REXML::Document.new(data).root
     doc.elements.to_a('//frbny:Series').each do | series |
@@ -68,16 +68,19 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
       rates << new_rate(c1, c2, rate, date)
 
       (@raw_rates[c1] ||= { })[c2] ||= rate
-      # (@raw_rates[c2] ||= { })[c1] ||= 1.0 / rate
-
+      (@raw_rates[c2] ||= { })[c1] ||= 1.0 / rate
     end
+
+    # $stderr.puts "rates = #{rates.inspect}"
 
     rates
   end
   
   
   # Return a list of known base rates.
-  def load_rates   
+  def load_rates(time = nil)
+    # $stderr.puts "#{self}: load_rates(#{time})" if @verbose
+    self.date = time
     parse_rates
   end
   

@@ -1,11 +1,10 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
 
 # This class formats a Money value as a String.
 # Each Currency has a default Formatter.
-class Formatter
+class Currency::Formatter
   # Defaults to ','
   attr_accessor :thousands_separator
 
@@ -158,4 +157,3 @@ class Formatter
 
 end # class
 
-end # module

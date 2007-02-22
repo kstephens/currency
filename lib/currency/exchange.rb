@@ -1,15 +1,14 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-
-# = Currency::Exchange
-#
 # The Currency::Exchange package is responsible for
 # the buying and selling of currencies.
 #
 # This feature is currently unimplemented.
-module Exchange
+#
+# Exchange rate sources are configured via Currency::Exchange::Rate::Source.
+#
+module Currency::Exchange
     @@default = nil
     @@current = nil
 
@@ -33,7 +32,7 @@ module Exchange
     # If #current= has not been called and #default= has not been called,
     # then UndefinedExchange is raised.
     def self.current
-      @@current || self.default || (raise Exception::UndefinedExchange.new("Currency::Exchange.current not defined"))
+      @@current || self.default || (raise ::Currency::Exception::UndefinedExchange.new("Currency::Exchange.current not defined"))
     end
 
     # Sets the current Currency::Exchange object used during
@@ -41,8 +40,9 @@ module Exchange
     def self.current=(x)
       @@current = x
     end
-end
-end
+
+end # module
 
 require 'currency/exchange/rate'
 require 'currency/exchange/rate/source'
+

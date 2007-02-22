@@ -1,32 +1,16 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-
-  # Use this function instead of Money#new:
-  #
-  #    Currency::Money("12.34", :CAD)
-  #
-  # Do not do this:
-  #
-  #    Currency::Money.new("12.34", :CAD)
-  #
-  # See Money#new.
-  def self.Money(*opts)
-    Money.new(*opts)
-  end
-
-  # = Currency::Money
-  #
-  # Represents an amount of money in a particular currency.
-  #
-  # A Money object stores its value using a scaled Integer representation
-  # and a Currency object.
-  #
-  # A Money object also has a time, which is used in conversions
-  # against historical exchange rates.
-  #
-  class Money
+#
+# Represents an amount of money in a particular currency.
+#
+# A Money object stores its value using a scaled Integer representation
+# and a Currency object.
+#
+# A Money object also has a time, which is used in conversions
+# against historical exchange rates.
+#
+class Currency::Money
     include Comparable
 
     @@default_time = nil
@@ -67,7 +51,7 @@ module Currency
       opts ||= @@empty_hash
 
       # Set ivars.
-      currency = Currency.get(currency)
+      currency = ::Currency::Currency.get(currency)
       @currency = currency
       @time = time || Money.default_time
       @time = Money.now if @time == :now
@@ -81,7 +65,7 @@ module Currency
         @time = m.time if m.time
         @rep = m.rep
       else
-        @currency = Currency.default unless @currency
+        @currency = ::Currency::Currency.default unless @currency
         @rep = x.Money_rep(@currency)
       end
 
@@ -160,8 +144,8 @@ module Currency
     # currency can be a Symbol or a Currency object.
     # If currency is nil, the Currency.default is used.
     def convert(currency, time = nil)
-      currency = Currency.default if currency.nil?
-      currency = Currency.get(currency) unless currency.kind_of?(Currency)
+      currency = ::Currency::Currency.default if currency.nil?
+      currency = ::Currency::Currency.get(currency) unless currency.kind_of?(Currency)
       if @currency == currency
         self
       else
@@ -306,6 +290,5 @@ module Currency
     #      self.class.superclass.instance_method(:inspect).bind(self).call 
     #    end
 
-  end # class
+end # class
 
-end # module

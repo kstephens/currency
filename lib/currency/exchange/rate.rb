@@ -1,10 +1,8 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
-module Currency
-module Exchange
-  # Represents a convertion rate between two currencies at a given period of time.
-  class Rate
+# Represents a convertion rate between two currencies at a given period of time.
+class Currency::Exchange::Rate
     # The first Currency.
     attr_reader :c1
 
@@ -57,7 +55,7 @@ module Exchange
       @c1 = c1
       @c2 = c2
       @rate = c1_to_c2_rate
-      raise Exception::InvalidRate.new(@rate) unless @rate && @rate >= 0.0
+      raise ::Currency::Exception::InvalidRate.new(@rate) unless @rate && @rate >= 0.0
       @source = source
       @date = date
       @derived = derived
@@ -178,10 +176,7 @@ module Exchange
     end
 
     def inspect; to_s; end
-  end
 
-  
-end # module
-end # module
+end # class
 
 

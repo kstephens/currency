@@ -12,6 +12,9 @@ require 'currency/exchange/rate/source'
 # factories.
 #
 # Represents a method of converting between two currencies.
+#
+# See Currency;:Exchange::Rate::source for more details.
+#
 class Currency::Exchange::Rate::Source::Base
 
     # The name of this Exchange.
@@ -87,7 +90,7 @@ class Currency::Exchange::Rate::Source::Base
     # Gets all rates available by this source.
     #
     def rates(time = nil)
-      raise Exception::SubclassResponsibility, "#{self.class}#rate"
+      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#rate"
     end
 
 
@@ -105,14 +108,14 @@ class Currency::Exchange::Rate::Source::Base
     # rates.
     #
     def get_rate(c1, c2, time)
-      raise Exception::SubclassResponsibility, "#{self.class}#get_rate"
+      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate"
     end
 
     # Returns a base Rate.
     #
     # Subclasses are required to implement this method.
     def get_rate_base(c1, c2, time)
-      raise Exception::SubclassResponsibility, "#{self.class}#get_rate_base"
+      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate_base"
     end
 
 
@@ -120,7 +123,7 @@ class Currency::Exchange::Rate::Source::Base
     #
     # Subclasses must override this method.
     def get_rates(time = nil)
-      raise Exception::SubclassResponsibility, "#{self.class}#get_rate"
+      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate"
     end
 
 
