@@ -73,7 +73,7 @@ class Currency::Parser
     # Match: whole Currency value.
     if md = /^([-+]?\d+)\.?$/.match(x)
       # $stderr.puts "'#{self}'.parse(#{str}) => EXACT"
-      x = Money.new_rep(md[1].to_i * currency.scale, currency, @time)
+      x = ::Currency::Money.new_rep(md[1].to_i * currency.scale, currency, @time)
       
       # Match: fractional Currency value.
     elsif md = /^([-+]?)(\d*)\.(\d+)$/.match(x)
@@ -103,7 +103,7 @@ class Currency::Parser
       
       x = whole.to_i
       
-      x = Money.new_rep(x, currency, @time)
+      x = ::Currency::Money.new_rep(x, currency, @time)
     else
       # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
       #x.to_f.Money_rep(self)

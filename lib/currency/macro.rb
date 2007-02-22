@@ -50,10 +50,22 @@ module Currency::Macro
 #    require 'currency'
 #    require 'currency/macro'
 #    
-#    class Entry < ActiveRecord::Base
-#       money :amount_money, :value => :amount, :currency_fixed => :USD
+#    class SomeClass
+#      include ::Currency::Macro
+#      attr_accessor :amount
+#      attr_money :amount_money, :value => :amount, :currency_fixed => :USD, :rep => :float
 #    end
 # 
+#    x = SomeClass.new
+#    x.amount = 123.45
+#    x.amount
+#    # => 123.45
+#    x.amount_money.inspect
+#    # => "$123.45 USD'
+#    x.amount_money = x.amount_money + "12.45"
+#    # => "$135.90 USD"
+#    x.amount
+#    # => 135.9
     module ClassMethods
 
       # Defines a Money object attribute that is bound
@@ -133,7 +145,7 @@ module Currency::Macro
       # If true, the Money time value is updated upon setting the
       # money attribute.  
       #
-      def money(attr_name, *opts)
+      def attr_money(attr_name, *opts)
         opts = Hash[*opts]
 
         attr_name = attr_name.to_s
@@ -268,7 +280,7 @@ def #{attr_name}=(value)
   if value == nil
     #{attr_name}_money = nil
   elsif value.kind_of?(Integer) || value.kind_of?(Float) || value.kind_of?(String)
-    #{attr_name}_money = ::Currency::Money(value, #{read_currency}, #{read_time})
+    #{attr_name}_money = ::Currency.Money(value, #{read_currency}, #{read_time})
     #{write_preferred_currency}
   elsif value.kind_of?(::Currency::Money)
     #{attr_name}_money = value
@@ -294,4 +306,10 @@ end_eval
     end
   end # module
 end # module
+
+
+# Use include ::Currency::Macro
+#::Object.class_eval do
+#  include Currency::Macro
+#end
 

@@ -17,9 +17,9 @@ class MacroTest < TestBase
     attr_accessor :net
     attr_accessor :currency
 
-    money :gross_money, :value => :gross, :time => :date, :currency => :currency
-    money :tax_money,   :value => :tax,   :time => :date, :currency => :currency
-    money :net_money,   :value => :net,   :time => :date, :currency => :currency
+    attr_money :gross_money, :value => :gross, :time => :date, :currency => :currency
+    attr_money :tax_money,   :value => :tax,   :time => :date, :currency => :currency
+    attr_money :net_money,   :value => :net,   :time => :date, :currency => :currency
 
     def initialize
       self.date = Time.now
@@ -65,6 +65,7 @@ class MacroTest < TestBase
     r
   end
 
+
   def test_money_cache
     r = test_read_money
 
@@ -77,6 +78,7 @@ class MacroTest < TestBase
     assert         r_gross.object_id != r.gross.object_id
   end
 
+
   def test_currency
     r = test_read_money
 
@@ -84,6 +86,7 @@ class MacroTest < TestBase
     assert_equal    r.gross_money.currency.code, r.currency
     
   end
+
 
   def test_compute
     assert_kind_of  Record, r = Record.new

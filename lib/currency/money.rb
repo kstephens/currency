@@ -53,8 +53,8 @@ class Currency::Money
       # Set ivars.
       currency = ::Currency::Currency.get(currency)
       @currency = currency
-      @time = time || Money.default_time
-      @time = Money.now if @time == :now
+      @time = time || ::Currency::Money.default_time
+      @time = ::Currency::Money.now if @time == :now
       if x.kind_of?(String)
         if currency
           m = currency.parser_or_default.parse(x, :currency => currency)
@@ -100,7 +100,7 @@ class Currency::Money
     # Construct from post-scaled internal representation.
     # using the same currency:
     #
-    #    x = Currency::Money.new("1.98", :USD)
+    #    x = Currency.Money("1.98", :USD)
     #    x.new_rep(100) => "$1.00 USD"
     #
     def new_rep(r, time = nil)
