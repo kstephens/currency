@@ -29,7 +29,7 @@ class ArTestCore < ArTestBase
 
   class CurrencyTest < AR_B
     set_table_name TABLE_NAME
-    money :amount
+    attr_money :amount
   end 
 
 

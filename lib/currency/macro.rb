@@ -60,12 +60,18 @@ module Currency::Macro
 #    x.amount = 123.45
 #    x.amount
 #    # => 123.45
-#    x.amount_money.inspect
-#    # => "$123.45 USD'
+#    x.amount_money
+#    # => $123.45 USD
 #    x.amount_money = x.amount_money + "12.45"
-#    # => "$135.90 USD"
+#    # => $135.90 USD
 #    x.amount
 #    # => 135.9
+#    x.amount = 45.951
+#    x.amount_money
+#    # => $45.95 USD
+#    x.amount
+#    # => 45.951
+#
     module ClassMethods
 
       # Defines a Money object attribute that is bound
@@ -78,8 +84,8 @@ module Currency::Macro
       # Defines the value attribute to use for storing the money value.
       # Defaults to the attribute name.
       #
-      # If this column is different from the attribute name,
-      # the money object will intercept column=(x) to flush
+      # If this attribute is different from the attribute name,
+      # the money object will intercept #{value}=(x) to flush
       # any cached Money object.
       #
       #    :readonly => false
@@ -135,7 +141,7 @@ module Currency::Macro
       # conversions.
       #
       # Money values can share a time value with other attributes
-      # (e.g. a created_on column).
+      # (e.g. a created_on column in ActiveRecord::Base).
       #
       # If this option is true, the money time attribute will be named
       # "#{attr_name}_time" and :time_update will be true.

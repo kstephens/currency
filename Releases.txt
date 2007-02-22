@@ -4,7 +4,9 @@
 
 === MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA
 
-* Some changes are not-backwards compatible.
+Some changes are not backwards-compatible
+
+* ActiveRecord::Base.money macro is deprecated, use ActiveRecord::Base.attr_money macro.
 * Currency::Exchange is now Currency::Exchange::Rate::Source
   NOTE: Currency::Exchange::* is reserved for buying/selling currencies, not for providing rate data.
 * Refactored xe.com homepage rate source as a Currency::Exchange::Rate::Source::Xe.

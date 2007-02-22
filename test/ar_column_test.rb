@@ -35,7 +35,7 @@ class ArFieldTest < ArTestCore
 
   class CurrencyColumnTest < AR_B
     set_table_name TABLE_NAME
-    money :amount, :currency_column => true
+    attr_money :amount, :currency_column => true
   end 
 
   ##################################################

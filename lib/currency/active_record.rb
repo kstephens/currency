@@ -4,8 +4,8 @@
 require 'active_record/base'
 require File.join(File.dirname(__FILE__), '..', 'currency')
 
-module ActiveRecord
-  class Base
+# See Currency::ActiveRecord::ClassMethods
+class ActiveRecord::Base
     @@money_attributes = { }
 
     # Called by money macro when a money attribute
@@ -22,6 +22,7 @@ module ActiveRecord
       (@@money_atttributes[cls] || { }).values
     end
 
+
     # Iterates through all known money attributes in all classes.
     #
     # each_money_attribute { | money_opts |
@@ -35,11 +36,12 @@ module ActiveRecord
       end
     end
 
-  end
-end
+end # class
 
 
+# See Currency::ActiveRecord::ClassMethods
 module Currency::ActiveRecord
+    
     def self.append_features(base) # :nodoc:
       # $stderr.puts "  Currency::ActiveRecord#append_features(#{base})"
       super
@@ -56,10 +58,17 @@ module Currency::ActiveRecord
 #    require 'currency/active_record'
 #    
 #    class Entry < ActiveRecord::Base
-#       money :amount
+#       attr_money :amount
 #    end
 # 
     module ClassMethods
+
+      # Deprecated: use attr_money.
+      def money(*args)
+        $stderr.puts "WARNING: money(#{args.inspect}) deprecated, use attr_money: in #{caller(1)[0]}"
+        attr_money(*args)
+      end
+
 
       # Defines a Money object attribute that is bound
       # to a database column.  The database column to store the
@@ -124,7 +133,7 @@ module Currency::ActiveRecord
       # If true, the Money time value is updated upon setting the
       # money attribute.  
       #
-      def money(attr_name, *opts)
+      def attr_money(attr_name, *opts)
         opts = Hash[*opts]
 
         attr_name = attr_name.to_s
