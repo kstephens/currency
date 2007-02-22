@@ -93,7 +93,7 @@ module Currency::Macro
       # If true, the underlying attribute is readonly.  Thus the Money object
       # cannot be cached.  This is useful for computed money values.
       #
-      #    :rep => :rep
+      #    :rep => :float
       #
       # This option specifies how the value attribute stores Money values.
       # if :rep is :rep, then the value is stored as a scaled integer as
