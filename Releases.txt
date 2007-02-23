@@ -1,5 +1,12 @@
 = Currency Release History
 
+== Releate 0.4.1: 2007/02/23
+
+Some changes are not backwards-compatible
+
+* Added support for Formatter#template string
+* Money format template default changed to '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'.  THIS MAY BREAK EXISTING CLIENTS.  See http://www.jhall.demon.co.uk/currency/ for rationale.
+
 == Release 0.4.0: 2007/02/21
 
 === MAJOR CHANGES IN THIS RELEASE FOR HISTORICAL RATE DATA

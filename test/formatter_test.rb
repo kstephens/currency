@@ -55,22 +55,22 @@ class FormatterTest < TestBase
   def test_code
     m = test_default
     assert_equal "$1,234,567.89", m.to_s(:code => false)
-    assert_equal "$1,234,567.89 USD", m.to_s(:code => true)
+    assert_equal "USD $1,234,567.89", m.to_s(:code => true)
 
     m
   end
 
   def test_misc
     m = ::Currency::Money(12.45, :USD)
-    assert_equal "$12.45 <span class=\"currency_code\">USD</span>", 
+    assert_equal "<span class=\"currency_code\">USD</span> $12.45", 
     m.to_s(:html => true, :code => true)
 
     m = ::Currency::Money(12.45, :EUR)
-    assert_equal "&#8364;12.45 <span class=\"currency_code\">EUR</span>", 
+    assert_equal "<span class=\"currency_code\">EUR</span> &#8364;12.45", 
     m.to_s(:html => true, :code => true)
 
-    m = ::Currency::Money(12.45, :EUR)
-    assert_equal "&#8364;12.45 <span class=\"currency_code\">EUR</span>", 
+    m = ::Currency::Money(12345.45, :EUR)
+    assert_equal "<span class=\"currency_code\">EUR</span> &#8364;12_345.45", 
     m.to_s(:html => true, :code => true, :thousands_separator => '_')
   end
 

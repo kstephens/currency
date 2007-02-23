@@ -5,6 +5,68 @@
 # This class formats a Money value as a String.
 # Each Currency has a default Formatter.
 class Currency::Formatter
+  # The underlying object for Currency::Formatter#format.
+  # This object is cloned and initialized with strings created
+  # from Formatter#format.
+  # It handles the Formatter#format string interpolation.
+  class Template
+    @@empty_hash = { }
+    @@empty_hash.freeze
+
+    # The template string.
+    attr_accessor :template
+
+    # The Currency::Money object being formatted.
+    attr_accessor :money
+    # The Currency::Currency object being formatted.
+    attr_accessor :currency
+
+    # The sign: '-' or nil.
+    attr_accessor :sign
+    # The whole part of the value, with thousands_separator or nil.
+    attr_accessor :whole
+    # The fraction part of the value, with decimal_separator or nil.
+    attr_accessor :fraction
+    # The currency symbol or nil.
+    attr_accessor :symbol
+    # The currency code or nil.
+    attr_accessor :code
+
+    
+    def initialize(opts = @@empty_hash)
+      opts.each_pair{ | k, v | self.send("#{k}=", v) }
+    end
+
+
+    # Sets the template string and uncaches the template_proc.
+    def template=(x)
+      if @template != x
+        @template_proc = nil
+      end
+      @template = x
+    end
+
+
+    # Defines a the self._format template procedure using
+    # the template as a string to be interpolated.
+    def template_proc(template = @template)
+      return @template_proc if @template_proc
+      @template_proc = template || ''
+      # @template_proc = @template_proc.gsub(/[\\"']/) { | x | "\\" + x }
+      @template_proc = "def self._format; \"#{@template_proc}\"; end"
+      self.instance_eval @template_proc
+      @template_proc
+    end
+
+
+    # Formats the current state using the template.
+    def format
+      template_proc
+      _format
+    end
+  end
+
+
   # Defaults to ','
   attr_accessor :thousands_separator
 
@@ -27,8 +89,13 @@ class Currency::Formatter
   #
   #   Currency::Money(12.45, :EUR).to_s(:html => true; :code => true)
   #   => "&#8364;12.45 <span class=\"currency_code\">EUR</span>"
-
   attr_accessor :html
+
+  # A template string used to format a money value.
+  # Defaults to:
+  # 
+  #   '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'
+  attr_accessor :template
 
 
   # If passed true, formats for an input field (i.e.: as a number).
@@ -42,6 +109,7 @@ class Currency::Formatter
       self.code = false
       self.html = false
     end
+    x
   end
 
 
@@ -66,6 +134,7 @@ class Currency::Formatter
     @symbol = true
     @code = false
     @html = false
+    @template = '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'
 
     opt.each_pair{ | k, v | self.send("#{k}=", v) }
   end
@@ -76,9 +145,37 @@ class Currency::Formatter
   end
 
 
+  # Sets the template and the Template#template.
+  def template=(x)
+    if @template_object
+      @template_object.template = x
+    end
+    @template = x
+  end
+
+
+  # Returns the Template object.
+  def template_object
+    return @template_object if @template_object
+
+    @template_object = Template.new
+    @template_object.template = @template if @template
+    # $stderr.puts "template.template = #{@template_object.template.inspect}"
+    @template_object.template_proc # pre-cache before clone.
+
+    @template_object
+  end
+
+
   def _format(m, currency = nil) # :nodoc:
     # Get currency.
     currency ||= m.currency
+
+    # Setup template
+    tmpl = self.template_object.clone
+    # $stderr.puts "template.template = #{tmpl.template.inspect}"
+    tmpl.money = m
+    tmpl.currency = currency
 
     # Get scaled integer representation for this Currency.
     # $stderr.puts "m.currency = #{m.currency}, currency => #{currency}"
@@ -86,6 +183,7 @@ class Currency::Formatter
 
     # Remove sign.
     x = - x if ( neg = x < 0 )
+    tmpl.sign = neg ? '-' : nil
     
     # Convert to String.
     x = x.to_s
@@ -97,9 +195,9 @@ class Currency::Formatter
     
     # Insert decimal place.
     whole = x[0 .. currency.format_left] 
-    decimal = x[currency.format_right .. -1]
+    fraction = x[currency.format_right .. -1]
  
-    # Do commas
+    # Do thousands.
     x = whole
     if @thousands && (@thousands_separator && ! @thousands_separator.empty?)
       x.reverse!
@@ -108,20 +206,20 @@ class Currency::Formatter
       x.reverse!
     end
     
-    x << @decimal_separator + decimal if @cents && @decimal_separator
-    
-    # Put sign back.
-    x = '-' + x if neg
-    
+    # Put whole and fractional parts.
+    tmpl.whole = x
+    tmpl.fraction = @cents && @decimal_separator ? @decimal_separator + fraction : nil
+
+ 
     # Add symbol?
-    x = ((@html && currency.symbol_html) || currency.symbol || '') + x if @symbol
+    tmpl.symbol = @symbol ? ((@html && currency.symbol_html) || currency.symbol) : nil
+
     
     # Suffix with currency code.
-    if @code
-      x << (' ' + _format_Currency(currency))
-    end
+    tmpl.code = @code ? _format_Currency(currency) : nil
     
-    x
+    # Ask template to format the components.
+    tmpl.format
   end
 
 

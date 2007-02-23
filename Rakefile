@@ -19,15 +19,15 @@ require 'rubygems'
 require 'hoe'
 
 PKG_Name = 'Currency'
-PKG_DESCRIPTION = %{Currency models currencies, monetary values, foreign exchanges and rates.  
-Pulls live rates from http://xe.com/.
-Supports ActiveRecord.
+PKG_DESCRIPTION = %{Currency models currencies, monetary values, foreign exchanges rates.  
+Pulls live and historical rates from http://xe.com/, http://newyorkfed.org/, http://thefinancials.com/.
+Can store/retrieve historical rate data from database using ActiveRecord.
+Can store/retrieve Money values using ActiveRecord.
 
 For more details, see:
 
-http://currency.rubyforge.org/files/lib/currency_rb.html 
-http://currency.rubyforge.org/files/README.txt
 http://currency.rubyforge.org/
+http://currency.rubyforge.org/files/README.txt
 
 }
 
