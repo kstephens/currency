@@ -199,9 +199,10 @@ end_eval
 
         money_rep ||= "#{attr_name}_money.rep"
 
+        validate_allow_nil = opts[:allow_nil] ? ', :allow_nil => true' : ''
         validate = "# Validation\n"
-        validate << "\nvalidates_numericality_of :#{attr_name}\n" unless opts[:allow_nil]
-        validate << "\nvalidates_format_of :#{currency_column}, :with => /^[A-Z][A-Z][A-Z]$/\n" if currency_column && ! opts[:allow_nil]
+        validate << "\nvalidates_numericality_of :#{attr_name}#{validate_allow_nil}\n"
+        validate << "\nvalidates_format_of :#{currency_column}, :with => /^[A-Z][A-Z][A-Z]$/#{validate_allow_nil}\n" if currency_column
 
  
         alias_accessor ||= ''
