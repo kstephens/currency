@@ -6,10 +6,12 @@ README.txt
 Rakefile
 Releases.txt
 TODO.txt
+email.txt
 examples/ex1.rb
 examples/xe1.rb
 lib/currency.rb
 lib/currency/active_record.rb
+lib/currency/config.rb
 lib/currency/core_extensions.rb
 lib/currency/currency.rb
 lib/currency/currency/factory.rb
@@ -40,6 +42,7 @@ test/ar_column_test.rb
 test/ar_simple_test.rb
 test/ar_test_base.rb
 test/ar_test_core.rb
+test/config_test.rb
 test/formatter_test.rb
 test/historical_writer_test.rb
 test/macro_test.rb

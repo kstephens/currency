@@ -45,6 +45,7 @@ Currency was developed by:
 
 == Contributors
 
-Maybe you?
+* Steffen Rusitschka
+
 
 

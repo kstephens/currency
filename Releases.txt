@@ -1,5 +1,10 @@
 = Currency Release History
 
+== Release 0.4.2: 2007/03/11
+
+* Missing Manifest changes
+* Missing Contributors
+
 == Release 0.4.1: 2007/03/10
 
 Some changes are not backwards-compatible
