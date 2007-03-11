@@ -150,7 +150,7 @@ class Currency::Money
         self
       else
         time = self.time if time == :money
-        Exchange::Rate::Source.current.convert(self, currency, time)
+        ::Currency::Exchange::Rate::Source.current.convert(self, currency, time)
       end
     end
 
