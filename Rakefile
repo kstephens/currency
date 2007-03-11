@@ -3,9 +3,9 @@
 
 # For release
 "
-svn status
 rake make_manifest
 rake update_version
+svn status
 rake package
 rake release VERSION=x.x.x
 rake svn_release
