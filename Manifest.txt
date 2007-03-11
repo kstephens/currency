@@ -6,7 +6,6 @@ README.txt
 Rakefile
 Releases.txt
 TODO.txt
-email.txt
 examples/ex1.rb
 examples/xe1.rb
 lib/currency.rb
