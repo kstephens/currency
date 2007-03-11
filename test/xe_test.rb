@@ -16,7 +16,9 @@ class XeTest < TestBase
 
   def get_rate_source
     source = Exchange::Rate::Source::Xe.new
+    # source.verbose = true
     deriver = Exchange::Rate::Deriver.new(:source => source)
+    deriver
   end
 
 
@@ -45,7 +47,7 @@ class XeTest < TestBase
 
     assert_kind_of Numeric, m = (eur.to_f / cad.to_f)
     # $stderr.puts "m = #{m}"
-    assert_equal_float (1.0 / usd_cad) * usd_eur, m, 0.001
+    assert_equal_float((1.0 / usd_cad) * usd_eur, m, 0.001)
   end
 
 end

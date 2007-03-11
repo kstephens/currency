@@ -295,7 +295,7 @@ class MoneyTest < TestBase
     assert usd.time == usd2.time
   end
 
-end
+end # class
 
 end # module
 

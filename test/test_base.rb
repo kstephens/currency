@@ -14,6 +14,9 @@ class TestBase < Test::Unit::TestCase
     super
     @rate_source ||= get_rate_source
     Exchange::Rate::Source.default = @rate_source
+
+    # Force non-historical money values.
+    Money.default_time = nil
   end
 
 
@@ -31,8 +34,8 @@ class TestBase < Test::Unit::TestCase
   # Helpers.
   def assert_equal_float(x, y, eps = 1.0e-8)
     d = (x * eps).abs
-    assert (x - d) <= y
-    assert y <= (x + d)
+    assert((x - d) <= y)
+    assert(y <= (x + d))
   end
 
 end # class

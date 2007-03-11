@@ -4,6 +4,7 @@
 
 Some changes are not backwards-compatible
 
+* Fixed Rate::Source::Xe; site format changed, more robust parser.
 * Added Currency::Config.
 * Support for filtering Float values before casting to Money, based on suggestions for rounding by Steffen Rusitschka.
 * Fixed :allow_nil in ActiveRecord money macro based on fix by Steffen Rusitschka.
