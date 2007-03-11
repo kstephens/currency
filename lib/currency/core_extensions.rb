@@ -24,7 +24,7 @@ end
 class Float 
   # Inexact conversion to Money representation value.
   def Money_rep(currency, time = nil)  
-    Integer(self * currency.scale) 
+    Integer(Currency::Config.current.float_ref_filter.call(self * currency.scale))
   end
 end
 
