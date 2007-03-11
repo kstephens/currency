@@ -1,9 +1,13 @@
 = Currency Release History
 
-== Releate 0.4.1: 2007/02/23
+== Release 0.4.1: 2007/03/10
 
 Some changes are not backwards-compatible
 
+* Added Currency::Config.
+* Support for filtering Float values before casting to Money, based on suggestions for rounding by Steffen Rusitschka.
+* Fixed :allow_nil in ActiveRecord money macro based on fix by Steffen Rusitschka.
+* Fixed package scoping issue in Money.
 * Added support for Formatter#template string
 * Money format template default changed to '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'.  THIS MAY BREAK EXISTING CLIENTS.  See http://www.jhall.demon.co.uk/currency/ for rationale.
 
