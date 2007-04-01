@@ -11,10 +11,7 @@ require 'open-uri'
 # Connects to http://xe.com and parses "XE.com Quick Cross Rates"
 # from home page HTML.
 #
-# This is for demonstration purposes.
-#
 class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source::Provider
-  class ParserError < ::Currency::Exception::Base; end
 
   # Defines the pivot currency for http://xe.com/.
   PIVOT_CURRENCY = :USD
@@ -57,7 +54,10 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
 
     @lines = data = data.split(/\n/);
 
-    @rate_timestamp = nil
+    # xe.com no longer gives date/time.
+    # Remove usecs.
+    time = Time.at(Time.new.to_i).getutc
+    @rate_timestamp = time
 
     eat_lines_until /More currencies\.\.\.<\/a>/i
     eat_lines_until /^\s*<tr>/i
@@ -73,7 +73,7 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
         $stderr.puts "Found currency header: #{cur.inspect} at #{cur_i}" if @verbose
       end
     end
-    raise ParseError, "Currencies header not found" if currency.empty?
+    raise ParserError, "Currencies header not found" if currency.empty?
     
 
     # Skip until "1 USD ="
@@ -87,17 +87,20 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
         usd_to_cur = md[1].to_f
         cur_i = cur_i + 1
         cur = currency[cur_i]
-        raise ParseError, "Currency not found at column #{cur_i}" unless cur
+        raise ParserError, "Currency not found at column #{cur_i}" unless cur
         next if cur.to_s == PIVOT_CURRENCY.to_s
         (rate[PIVOT_CURRENCY] ||= {})[cur] = usd_to_cur
         (rate[cur] ||= { })[PIVOT_CURRENCY] ||= 1.0 / usd_to_cur
         $stderr.puts "#{cur.inspect} => #{usd_to_cur}" if @verbose
       end
     end
-    raise ParseError, "Currency rates not found" if rate.keys.empty?
-    raise ParseError, "Not all rates found" if rate.keys.size != currency.size
+
+    raise ::Currency::Exception::UnavailableRates, "No rates found in #{get_uri.inspect}" if rate.keys.empty?
+    raise ParserError, "Not all rates found" if rate.keys.size != currency.size
     
     @lines = @line = nil
+
+    raise ParserError, "Rate date not found" unless @rate_timestamp
 
     rate
   end
@@ -112,7 +115,7 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
       end
       yield @line if block_given?
     end
-    raise ParseError, rx.inspect
+    raise ParserError, rx.inspect
     false
   end
 
