@@ -48,6 +48,10 @@ class Currency::Currency
       self.code = code
       self.symbol = symbol
       self.scale = scale
+
+      @formatter =
+        @parser = 
+        nil
     end
 
 

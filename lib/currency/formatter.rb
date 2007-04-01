@@ -34,6 +34,10 @@ class Currency::Formatter
 
     
     def initialize(opts = @@empty_hash)
+      @template =
+        @template_proc =
+        nil
+
       opts.each_pair{ | k, v | self.send("#{k}=", v) }
     end
 

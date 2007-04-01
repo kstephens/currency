@@ -98,11 +98,12 @@ class Currency::Money
 
 
     # Construct from post-scaled internal representation.
-    # using the same currency:
+    # using the same currency.
     #
     #    x = Currency.Money("1.98", :USD)
-    #    x.new_rep(100) => "$1.00 USD"
+    #    x.new_rep(123) => USD $1.23
     #
+    # time defaults to self.time.
     def new_rep(r, time = nil)
       time ||= @time
       x = self.class.new(0, @currency, time)
@@ -177,7 +178,7 @@ class Currency::Money
     end
 
     # Compares Money values.
-    # Will convert x currency before comparision.
+    # Will convert x to self.currency before comparision.
     def <=>(x)
       if @currency == x.currency
         @rep <=> x.rep

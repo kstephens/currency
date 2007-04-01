@@ -60,6 +60,17 @@ class Currency::Exchange::Rate
       @date = date
       @derived = derived
       @reciprocal = reciprocal
+      
+      #
+      @rate_avg =
+        @rate_samples =
+        @rate_lo =
+        @rate_hi =
+        @rate_date_0 =
+        @rate_date_1 =
+        @date_0 =
+        @date_1 =
+        nil
 
       if opts
         opts.each_pair do | k, v |

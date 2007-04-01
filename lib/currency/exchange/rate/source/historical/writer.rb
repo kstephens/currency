@@ -3,6 +3,10 @@ require 'currency/exchange/rate/source/historical'
 
 # Responsible for writing historical rates from a rate source.
 class Currency::Exchange::Rate::Source::Historical::Writer
+
+  # Error during handling of historical rates.
+  class Error < ::Currency::Exception::Base; end
+
   # The source of rates.
   attr_accessor :source
 
@@ -187,7 +191,11 @@ class Currency::Exchange::Rate::Source::Historical::Writer
         if existing_rate
           stored_h_rates << existing_rate # Already existed.
         else
-          rr.save!
+          begin
+            rr.save!
+          rescue Object => err
+            raise Error, "During save of #{rr.inspect} : #{err.inspect}"
+          end
           stored_h_rates << rr # Written.
         end
       end

@@ -1,1 +1,5 @@
 
+= Currency To Do List
+
+* Refactor all configuration class variables into Currency::Config
+* Refactor all cached values into objects that can be reinstantiated on a per-thread basis

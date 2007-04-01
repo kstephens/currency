@@ -77,6 +77,7 @@ class HistoricalWriterTest < ArTestBase
   def writer_src2
     writer = test_writer
     writer.source = @src2
+    return unless writer.source.available?
     rates = writer.write_rates
     assert_not_nil rates
     assert rates.size > 0
@@ -105,18 +106,20 @@ class HistoricalWriterTest < ArTestBase
     deriver = Exchange::Rate::Deriver.new(:source => source)
     Exchange::Rate::Source.default = deriver
 
-    rates = source.get_raw_rates
-    #$stderr.puts "historical rates = #{rates.inspect}"
+    assert_not_nil rates = source.get_raw_rates
+    assert ! rates.empty?
+    # $stderr.puts "historical rates = #{rates.inspect}"
 
-    rates = source.get_rates
-    #$stderr.puts "historical rates = #{rates.inspect}"
+    assert_not_nil rates = source.get_rates
+    assert ! rates.empty?
+    # $stderr.puts "historical rates = #{rates.inspect}"
     
-    assert_not_nil m_usd = ::Currency::Money('1234.56', :USD, :now)
-    #$stderr.puts "m_usd = #{m_usd.to_s(:code => true)}"
+    assert_not_nil m_usd = ::Currency.Money('1234.56', :USD, :now)
+    # $stderr.puts "m_usd = #{m_usd.to_s(:code => true)}"
     assert_not_nil m_eur = m_usd.convert(:EUR)
-    #$stderr.puts "m_eur = #{m_eur.to_s(:code => true)}"
+    # $stderr.puts "m_eur = #{m_eur.to_s(:code => true)}"
 
-   end
+  end
 
 
   def assert_h_rates(rates, writer = nil)

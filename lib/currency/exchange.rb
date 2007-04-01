@@ -27,7 +27,7 @@ module Currency::Exchange
     end
 
     # Returns the current Currency::Exchange object used during
-    # explicit and implicit Money conversions.
+    # explicit and implicit Money trading.
     # 
     # If #current= has not been called and #default= has not been called,
     # then UndefinedExchange is raised.

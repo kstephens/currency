@@ -6,7 +6,7 @@ module Currency::Exception
     class Base < ::Exception
     end
 
-    # Error during string parsing.
+    # Error during parsing of Money values from String.
     class InvalidMoneyString < Base
     end
 
@@ -32,6 +32,14 @@ module Currency::Exception
 
     # Error if an Exchange Rate Source cannot provide an Exchange::Rate.
     class UnknownRate < Base
+    end
+
+    # Error if an Exchange Rate Source.
+    class RateSourceError < Base
+    end
+
+    # Error if an Exchange Rate Source cannot supply any rates.
+    class UnavailableRates < Base
     end
 
     # Error if an Exchange::Rate is not valid.

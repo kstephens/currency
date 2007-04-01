@@ -21,7 +21,8 @@ class Currency::Parser
   @@default = nil
   # Get the default Formatter.
   def self.default
-    @@default || self.new
+    @@default ||=
+      self.new
   end
 
 
@@ -32,6 +33,9 @@ class Currency::Parser
   
 
   def initialize(opt = { })
+    @time =
+      @currency =
+      nil
     opt.each_pair{ | k, v | self.send("#{k}=", v) }
   end
 

@@ -2,7 +2,7 @@
 # See LICENSE.txt for details.
 
 
-# External representation mixin
+
 class Object 
   # Exact conversion to Money representation value.
   def money(*opts)
@@ -11,7 +11,7 @@ class Object
 end
 
 
-# External representation mixin
+
 class Integer 
   # Exact conversion to Money representation value.
   def Money_rep(currency, time = nil)
@@ -20,7 +20,7 @@ class Integer
 end
 
 
-# External representation mixin
+
 class Float 
   # Inexact conversion to Money representation value.
   def Money_rep(currency, time = nil)  
@@ -29,7 +29,7 @@ class Float
 end
 
 
-# External representation mixin
+
 class String
   # Exact conversion to Money representation value.
   def Money_rep(currency, time = nil)

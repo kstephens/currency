@@ -1,5 +1,13 @@
 = Currency Release History
 
+== Release 0.4.3: 2007/04/01
+
+* Added available? checks for NewYorkFed.
+* Created new UnavailableRates exception for rate providers that return no rates (New York Fed on weekends).
+* Fixed xe.com rate dates.
+* Refactored exceptions.
+* Fixed comments.
+
 == Release 0.4.2: 2007/03/11
 
 * Missing Manifest changes
