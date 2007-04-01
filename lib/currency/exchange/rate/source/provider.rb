@@ -7,6 +7,10 @@ require 'currency/exchange/rate/source'
 # Base class for rate data providers.
 # Assumes that rate sources provide more than one rate per query.
 class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Source::Base
+
+  # Error during parsing of rates.
+  class ParserError < ::Currency::Exception::RateSourceError; end
+
   # The URI used to access the rate source.
   attr_accessor :uri
   
@@ -98,6 +102,12 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   end
 
   alias :get_rate_base :get_rate
+
+
+  # Returns true if a rate provider is available.
+  def available?(time = nil)
+    true
+  end
 
 end # class
 

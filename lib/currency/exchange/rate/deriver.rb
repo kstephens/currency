@@ -140,6 +140,12 @@ class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
   end
 
 
+  # Returns true if the underlying rate provider is available.
+  def available?(time = nil)
+    source.available?(time)
+  end
+
+
 end # class
 
   

@@ -14,16 +14,30 @@ class NewYorkFedTest < TestBase
   end
 
 
+  @@available = nil
+
+  # New York Fed rates are not available on Saturday and Sunday.
+  def available?
+    if @@available == nil
+      @@available = @source.available?
+      STDERR.puts "Warning: NewYorkFed unavailable on Saturday and Sunday, skipping tests."
+    end
+    @@available
+  end
+
+
   def get_rate_source
-    # Force XE Exchange.
+    # Force NewYorkFed Exchange.
     verbose = false
-    source = Exchange::Rate::Source::NewYorkFed.new(:verbose => verbose)
+    source = @source = Exchange::Rate::Source::NewYorkFed.new(:verbose => verbose)
     deriver = Exchange::Rate::Deriver.new(:source => source, :verbose => source.verbose)
   end
 
 
 
   def test_usd_cad
+    return unless available?
+
     assert_not_nil rates = Exchange::Rate::Source.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]
@@ -38,6 +52,8 @@ class NewYorkFedTest < TestBase
 
 
   def test_cad_eur
+    return unless available?
+
     assert_not_nil rates = Exchange::Rate::Source.default.source.raw_rates
     assert_not_nil rates[:USD]
     assert_not_nil usd_cad = rates[:USD][:CAD]

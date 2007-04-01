@@ -11,7 +11,7 @@ require 'rexml/document'
 # Connects to http://www.newyorkfed.org/markets/fxrates/FXtoXML.cfm
 # ?FEXdate=2007%2D02%2D14%2000%3A00%3A00%2E0&FEXtime=1200 and parses XML.
 #
-# This is for demonstration purposes.
+# No rates are available on Saturday and Sunday.
 #
 class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate::Source::Provider
   # Defines the pivot currency for http://xe.com/.
@@ -27,6 +27,13 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
   # Returns 'newyorkfed.org'.
   def name
     'newyorkfed.org'
+  end
+
+
+  # New York Fed rates are not available on Saturday and Sunday.
+  def available?(time = nil)
+    time ||= Time.now
+    ! [0, 6].include?(time.wday) ? true : false
   end
 
 
@@ -53,16 +60,24 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
     $stderr.puts "#{self}: parse_rates: data =\n#{data}" if @verbose
 
     doc = REXML::Document.new(data).root
-    doc.elements.to_a('//frbny:Series').each do | series |
+    x_series = doc.elements.to_a('//frbny:Series')
+    raise ParserError, "no UNIT attribute" unless x_series
+    x_series.each do | series |
       c1 = series.attributes['UNIT'] # WHAT TO DO WITH @UNIT_MULT?
+      raise ParserError, "no UNIT attribute" unless c1
       c1 = c1.upcase.intern
 
       c2 = series.elements.to_a('frbny:Key/frbny:CURR')[0].text
+      raise ParserError, "no frbny:CURR element" unless c2
       c2 = c2.upcase.intern
       
-      rate = series.elements.to_a('frbny:Obs/frbny:OBS_VALUE')[0].text.to_f
+      rate = series.elements.to_a('frbny:Obs/frbny:OBS_VALUE')[0]
+      raise ParserError, 'no frbny:OBS_VALUE' unless rate
+      rate = rate.text.to_f
 
-      date = series.elements.to_a('frbny:Obs/frbny:TIME_PERIOD')[0].text
+      date = series.elements.to_a('frbny:Obs/frbny:TIME_PERIOD')[0]
+      raise ParserError, 'no frbny:TIME_PERIOD' unless date
+      date = date.text
       date = Time.parse("#{date} 12:00:00 -05:00") # USA NY => EST
 
       rates << new_rate(c1, c2, rate, date)
@@ -72,6 +87,7 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
     end
 
     # $stderr.puts "rates = #{rates.inspect}"
+    raise ::Currency::Exception::UnavailableRates, "No rates found in #{get_uri.inspect}" if rates.empty?
 
     rates
   end
