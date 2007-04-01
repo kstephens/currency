@@ -278,10 +278,10 @@ class Currency::Money
       end
     end
 
-    # Basic inspection, with symbol and currency code.
+    # Basic inspection, with symbol, currency code and time.
     # The standard #inspect method is available as #inspect_deep.
     def inspect(*opts)
-      self.format(:symbol => true, :code => true)
+      self.format(:symbol => true, :code => true, :time => true)
     end
 
     # How to alias a method defined in an object superclass in a different class:

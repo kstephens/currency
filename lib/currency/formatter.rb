@@ -1,6 +1,8 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
+require 'rss/rss' # Time#xmlschema
+
 
 # This class formats a Money value as a String.
 # Each Currency has a default Formatter.
@@ -32,7 +34,9 @@ class Currency::Formatter
     # The currency code or nil.
     attr_accessor :code
 
-    
+    # The time or nil.
+    attr_accessor :time
+
     def initialize(opts = @@empty_hash)
       @template =
         @template_proc =
@@ -89,6 +93,13 @@ class Currency::Formatter
   # If true, append currency code.
   attr_accessor :code
 
+  # If true, append the time.
+  attr_accessor :time
+
+  # The number of fractional digits in the time.
+  # Defaults to 4.
+  attr_accessor :time_fractional_digits
+
   # If true, use html formatting.
   #
   #   Currency::Money(12.45, :EUR).to_s(:html => true; :code => true)
@@ -98,7 +109,7 @@ class Currency::Formatter
   # A template string used to format a money value.
   # Defaults to:
   # 
-  #   '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'
+  #   '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}#{time && " "}#{time}'
   attr_accessor :template
 
 
@@ -112,6 +123,8 @@ class Currency::Formatter
       self.symbol = false
       self.code = false
       self.html = false
+      self.time = false
+      self.time_fractional_digits = nil
     end
     x
   end
@@ -138,7 +151,10 @@ class Currency::Formatter
     @symbol = true
     @code = false
     @html = false
-    @template = '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}'
+    @time = false
+    @time_fractional_digits = 4
+    @template = '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}#{time && " "}#{time}'
+    @template_object = nil
 
     opt.each_pair{ | k, v | self.send("#{k}=", v) }
   end
@@ -171,9 +187,12 @@ class Currency::Formatter
   end
 
 
-  def _format(m, currency = nil) # :nodoc:
+  def _format(m, currency = nil, time = nil) # :nodoc:
     # Get currency.
     currency ||= m.currency
+
+    # Get time.
+    time ||= m.time
 
     # Setup template
     tmpl = self.template_object.clone
@@ -219,8 +238,11 @@ class Currency::Formatter
     tmpl.symbol = @symbol ? ((@html && currency.symbol_html) || currency.symbol) : nil
 
     
-    # Suffix with currency code.
+    # Add currency code.
     tmpl.code = @code ? _format_Currency(currency) : nil
+
+    # Add time.
+    tmpl.time = @time ? time && _format_Time(time) : nil
     
     # Ask template to format the components.
     tmpl.format
@@ -232,6 +254,13 @@ class Currency::Formatter
     x << '<span class="currency_code">' if @html
     x << c.code.to_s
     x << '</span>' if @html
+    x
+  end
+
+
+  def _format_Time(t) # :nodoc:
+    x = ''
+    x << t.getutc.xmlschema(@time_fractional_digits) if t
     x
   end
 

@@ -54,6 +54,51 @@ class ParserTest < TestBase
     assert_equal m.inspect, m2.inspect
   end
 
+
+  def test_round_trip_time
+    ::Currency::Currency.default = :USD
+    time = Time.now.getutc
+    assert_not_nil m = ::Currency::Money("1234567.89", :CAD, time)
+    assert_not_nil m.time
+    assert_not_nil m2 = ::Currency::Money(m.inspect)
+    assert_not_nil m2.time
+    assert_equal m.rep, m2.rep
+    assert_equal m.currency, m2.currency
+    assert_equal m.time.to_i, m2.time.to_i
+    assert_equal m.inspect, m2.inspect
+  end
+
+
+  def test_time_nil
+    parser = ::Currency::Parser.new
+    parser.time = nil
+
+    assert_not_nil m = parser.parse("$1234.55")
+    assert_equal nil, m.time
+  end
+
+
+  def test_time
+    parser = ::Currency::Parser.new
+    parser.time = Time.new
+
+    assert_not_nil m = parser.parse("$1234.55")
+   assert_equal parser.time, m.time
+  end
+
+
+  def test_time_now
+    parser = ::Currency::Parser.new
+    parser.time = :now
+
+    assert_not_nil m = parser.parse("$1234.55")
+    assert_not_nil m1_time = m.time
+
+    assert_not_nil m = parser.parse("$1234.55")
+    assert_not_nil m2_time = m.time
+
+    assert_not_equal m1_time, m2_time
+  end
 end
 
 end # module

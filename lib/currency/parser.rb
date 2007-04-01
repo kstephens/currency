@@ -2,6 +2,9 @@
 # See LICENSE.txt for details.
 
 
+require 'rss/rss' # Time#xmlschema
+
+
 # This class parses a Money value from a String.
 # Each Currency has a default Parser.
 class Currency::Parser
@@ -16,6 +19,7 @@ class Currency::Parser
   attr_accessor :enforce_currency
 
   # The default Time to use if no Time is specified in the string.
+  # If :now, time is set to Time.new.
   attr_accessor :time
 
   @@default = nil
@@ -34,6 +38,7 @@ class Currency::Parser
 
   def initialize(opt = { })
     @time =
+      @enforce_currency =
       @currency =
       nil
     opt.each_pair{ | k, v | self.send("#{k}=", v) }
@@ -50,15 +55,28 @@ class Currency::Parser
 
     # $stderr.puts "'#{x}'.Money_rep(#{self})"
     
+    # Parse time.
+    time = nil
+    if (md = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z)/.match(x))
+      time = Time.xmlschema(md[1])
+      unless time
+        raise ::Currency::Exception::InvalidMoneyString.new("time: #{str.inspect} #{currency} #{x.inspect}")
+      end
+      x = md.pre_match + md.post_match
+    end
+    # Default time
+    time ||= @time
+    time = Time.new if time == :now
+    
     # $stderr.puts "x = #{x}"
     convert_currency = nil
-    # Handle currency code at front of string.
+    # Handle currency code in string.
     if (md = /([A-Z][A-Z][A-Z])/.match(x)) 
       curr = ::Currency::Currency.get(md[1])
       x = md.pre_match + md.post_match
       if @currency && @currency != curr
         if @enforce_currency
-          raise ::Currency::Exception::IncompatibleCurrency.new("#{str.inspect} #{@currency.code}")
+          raise ::Currency::Exception::IncompatibleCurrency.new("currency: #{str.inspect} #{@currency.code}")
         end
         convert_currency = @currency
       end
@@ -67,7 +85,7 @@ class Currency::Parser
       currency = @currency || ::Currency::Currency.default
       currency = ::Currency::Currency.get(currency)
     end
-    
+
     # Remove placeholders and symbol.
     x = x.gsub(/[, ]/, '')
     symbol = currency.symbol # FIXME
@@ -107,7 +125,7 @@ class Currency::Parser
       
       x = whole.to_i
       
-      x = ::Currency::Money.new_rep(x, currency, @time)
+      x = ::Currency::Money.new_rep(x, currency, time)
     else
       # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
       #x.to_f.Money_rep(self)
@@ -130,13 +148,13 @@ class Currency::Parser
   # Parse a Money string in this Currency.
   #
   #   "123.45".money       # Using default Currency.
-  #   => $123.45 USD
+  #   => USD $123.45
   #
-  #   "123.45 USD".money   # Explicit Currency.
-  #   => $123.45 USD
+  #   "$123.45 USD".money   # Explicit Currency.
+  #   => USD $123.45
   #
-  #   "123.45 CAD".money
-  #   => $123.45 CAD
+  #   "CAD 123.45".money
+  #   => CAD $123.45
   #  
   #   "123.45 CAD".money(:USD)  # Incompatible explicit Currency.
   #     !!! "123.45 CAD" USD (Currency::Exception::IncompatibleCurrency)

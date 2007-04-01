@@ -26,6 +26,7 @@ Can store/retrieve Money values using ActiveRecord.
 
 For more details, see:
 
+http://rubyforge.org/projects/currency/
 http://currency.rubyforge.org/
 http://currency.rubyforge.org/files/README_txt.html
 
@@ -68,7 +69,7 @@ PKG_SVN_ROOT="svn+ssh://rubyforge.org/var/svn/#{PKG_NAME}/#{PKG_NAME}"
 
 release, release_notes = get_release_notes
 
-hoe = Hoe.new("currency", release) do |p|
+hoe = Hoe.new(PKG_Name.downcase, release) do |p|
   p.author = 'Kurt Stephens'
   p.description = PKG_DESCRIPTION
   p.email = "ruby-#{PKG_NAME}@umleta.com"

@@ -15,11 +15,12 @@ class FormatterTest < TestBase
   # Simple stuff.
   #
 
-  def test_default
-    assert_kind_of Money, m = ::Currency::Money.new_rep(123456789)
-    assert_equal m.currency, Currency.default
-    assert_equal m.currency.code, :USD
+  def test_default(time = nil)
+    assert_kind_of Money, m = ::Currency::Money.new_rep(123456789, :USD, time)
+    assert_equal Currency.default, m.currency
+    assert_equal :USD, m.currency.code
     assert_equal "$1,234,567.89", m.to_s
+    assert_equal time, m.time
 
     m
   end
@@ -60,6 +61,7 @@ class FormatterTest < TestBase
     m
   end
 
+
   def test_misc
     m = ::Currency::Money(12.45, :USD)
     assert_equal "<span class=\"currency_code\">USD</span> $12.45", 
@@ -74,6 +76,15 @@ class FormatterTest < TestBase
     m.to_s(:html => true, :code => true, :thousands_separator => '_')
   end
 
+
+  def test_time
+    time = Time.new
+    m = test_default(time)
+    assert_equal "$1,234,567.89", m.to_s(:time => false)
+    assert_equal "$1,234,567.89 #{time.getutc.xmlschema(4)}", m.to_s(:time => true)
+
+    m
+  end
 
 end
 
