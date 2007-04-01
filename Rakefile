@@ -27,7 +27,7 @@ Can store/retrieve Money values using ActiveRecord.
 For more details, see:
 
 http://currency.rubyforge.org/
-http://currency.rubyforge.org/files/README.txt
+http://currency.rubyforge.org/files/README_txt.html
 
 }
 

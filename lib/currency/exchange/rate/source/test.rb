@@ -34,7 +34,7 @@ class Currency::Exchange::Rate::Source::Test < Currency::Exchange::Rate::Source:
     def self.USD_EUR; 0.7737; end
 
 
-    # Test rate from :USD to :EUR.
+    # Test rate from :USD to :GBP.
     def self.USD_GBP; 0.5098; end
 
 
