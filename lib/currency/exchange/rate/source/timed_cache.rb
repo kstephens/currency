@@ -26,6 +26,14 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   attr_accessor :time_to_live_fudge
 
 
+  # Returns the time of the last load.
+  attr_reader :rate_load_time
+
+
+  # Returns the time of the next load.
+  attr_reader :rate_reload_time
+  
+
   # Returns source's name.
   def name
     source.name
@@ -35,15 +43,18 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   def initialize(*opt)
     self.time_to_live = 600
     self.time_to_live_fudge = 30
-    @rate_timestamp = nil
+    @rate_load_time = nil
+    @rate_reload_time = nil
     @processing_rates = false
+    @cached_rates = { }
+    @cached_rates_old = nil
     super(*opt)
   end
   
   
   # Clears current rates.
   def clear_rates
-    @cached_rates.clear
+    @cached_rates = { }
     @source.clear_rates
     super
   end
@@ -53,16 +64,16 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   # is expired.
   def expired?
     if @time_to_live &&
-        @rates_renew_time &&
-        (Time.now > @rates_renew_time)
+        @rate_reload_time &&
+        (Time.now > @rate_reload_time)
       
       if @cached_rates 
-        $stderr.puts "#{self}: rates expired on #{@rates_renew_time}" if @verbose
+        $stderr.puts "#{self}: rates expired on #{@rate_reload_time}" if @verbose
         
-        @cached_rates_old ||= @cashed_rates
-        
-        @cached_rates = nil
+        @cached_rates_old = @cached_rates
       end
+  
+      clear_rates
       
       true
     else
@@ -79,7 +90,17 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
     super(c1, c2, time)
   end
 
+
+  def get_rate(c1, c2, time)
+    # STDERR.puts "get_rate #{c1} #{c2} #{time}"
+    rates = load_rates(time)
+    # STDERR.puts "rates = #{rates.inspect}"
+    rate = rates && (rates.select{|x| x.c1 == c1 && x.c2 == c2}[0])
+    # STDERR.puts "rate = #{rate.inspect}"
+    rate
+  end
   
+
   # Returns an array of all the cached Rates.
   def rates(time = nil)
     load_rates(time)
@@ -92,49 +113,82 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
     expired?
     
     # Return rates, if cached.
-    return @cached_rates if @cashed_rates
+    return rates if rates = @cached_rates["#{time}"]
     
-    # Force load of rates
-    @cached_rates = _load_rates_from_source(time)
-    
-    # Flush old rates.
-    @cached_rates_old = nil
+    # Force load of rates.
+    rates = @cached_rates["#{time}"] = _load_rates_from_source(time)
     
     # Update expiration.
-    if time_to_live
-      @rates_renew_time = @rate_timestamp + (time_to_live + (time_to_live_fudge || 0))
-      $stderr.puts "#{self}: rates expire on #{@rates_renew_time}" if @verbose
-    end
-    
-    @rates
+    _calc_rate_reload_time
+
+    return nil unless rates
+
+    # Flush old rates.
+    @cached_rates_old = nil
+        
+    rates
   end
   
 
-  def _load_rates_from_source(time = nil) # :nodoc:
-    # Do not allow re-entrancy
-    raise "Reentry!" if @processing_rates
+  def time_to_live=(x)
+    @time_to_live = x
+    _calc_rate_reload_time
+    x
+  end
 
-    # Begin processing new rate request.
-    @processing_rates = true
 
-    # Clear cached Rates.
-    clear_rates
+  def time_to_live_fudge=(x)
+    @time_to_live_fudge = x
+    _calc_rate_reload_time
+    x
+  end
 
-    # Load rates from the source.
-    rates = source.load_rates(time)
-      
-    unless rates 
-      # FIXME: raise Exception::???
-      return rates 
+
+  def _calc_rate_reload_time
+    if @time_to_live && @rate_load_time
+      @rate_reload_time = @rate_load_time + (@time_to_live + (@time_to_live_fudge || 0))
+      $stderr.puts "#{self}: rates expire on #{@rate_reload_time}" if @verbose
     end
 
-    # Compute new rate timestamp.
-    @rate_timestamp = Time.now
+  end
 
-    # End processsing new rate request.
-    @processing_rates = false
+
+
+  def _load_rates_from_source(time = nil) # :nodoc:
+    rates = nil
+
+    begin
+      # Do not allow re-entrancy
+      raise "Reentry!" if @processing_rates
+      
+      # Begin processing new rate request.
+      @processing_rates = true
+
+      # Clear cached Rates.
+      clear_rates
+
+      # Load rates from the source.
+      rates = source.load_rates(time)
+      
+      # Compute new rate timestamp.
+      @rate_load_time = Time.now
+
+      # STDERR.puts "rate_load_time = #{@rate_load_time}"
+    ensure
+      # End processsing new rate request.
+      @processing_rates = false
     
+    end
+
+    # STDERR.puts "_load_rates => #{rates.inspect}"
+
     rates
+  end
+
+
+  # Returns true if the underlying rate provider is available.
+  def available?(time = nil)
+    source.available?(time)
   end
 
 

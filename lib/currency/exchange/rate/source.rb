@@ -41,10 +41,15 @@ require 'currency/exchange/rate'
 #
 # Somewhere at initialization of application:
 #
-#   provider = Currency::Exchange::Rate::Source::Xe.new
-#   deriver  = Currency::Exchange::Rate::Deriver.new(:source => provider)
-#   cache    = Currency::Exchange::Rate::Source::TimedCache.new(:source => deriver)
-#   Currency::Exchange::Rate::Source.default = cache
+#    require 'currency'
+#    require 'currency/exchange/rate/deriver'
+#    require 'currency/exchange/rate/source/xe'
+#    require 'currency/exchange/rate/source/timed_cache'
+# 
+#    provider = Currency::Exchange::Rate::Source::Xe.new
+#    deriver  = Currency::Exchange::Rate::Deriver.new(:source => provider)
+#    cache    = Currency::Exchange::Rate::Source::TimedCache.new(:source => deriver)
+#    Currency::Exchange::Rate::Source.default = cache
 #
 module Currency::Exchange::Rate::Source
 

@@ -26,7 +26,9 @@
 # exchange rates from http://xe.com/ :
 #
 #    require 'currency'
+#    require 'currency/exchange/rate/deriver'
 #    require 'currency/exchange/rate/source/xe'
+#    require 'currency/exchange/rate/source/timed_cache'
 #    
 #    # Rate source initialization
 #    provider = Currency::Exchange::Rate::Source::Xe.new

@@ -41,9 +41,9 @@ class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
 
   # Flush all cached Rates.
   def clear_rates
-    @derived_rate.clear
+    @derived_rates.clear
     @all_rates.clear
-    @source.clear
+    @source.clear_rates
     super
   end
  
@@ -137,6 +137,11 @@ class Currency::Exchange::Rate::Deriver < Currency::Exchange::Rate::Source::Base
     else
       source.rate(c1, c2, time)
     end
+  end
+
+
+  def load_rates(time = nil)
+    all_rates(time)
   end
 
 
