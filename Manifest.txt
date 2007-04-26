@@ -50,4 +50,5 @@ test/new_york_fed_test.rb
 test/parser_test.rb
 test/test_base.rb
 test/time_quantitizer_test.rb
+test/timed_cache_test.rb
 test/xe_test.rb
