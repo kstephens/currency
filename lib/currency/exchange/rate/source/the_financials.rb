@@ -17,9 +17,10 @@ class Currency::Exchange::Rate::Source::TheFinancials < ::Currency::Exchange::Ra
   PIVOT_CURRENCY = :USD
   
   def initialize(*opt)
-    self.uri = 'http://www.thefinancials.com/XXXXXXX'
     @raw_rates = nil
+    self.uri_path = 'syndicated/UNKNOWN/fxrates.xml'
     super(*opt)
+    self.uri = "http://www.thefinancials.com/#{self.uri_path}"
   end
   
 
@@ -29,9 +30,9 @@ class Currency::Exchange::Rate::Source::TheFinancials < ::Currency::Exchange::Ra
   end
 
 
-  def get_page_content
-    test_content
-  end
+#  def get_page_content
+#    test_content
+#  end
 
 
   def clear_rates

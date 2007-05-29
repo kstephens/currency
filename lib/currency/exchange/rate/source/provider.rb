@@ -14,6 +14,9 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   # The URI used to access the rate source.
   attr_accessor :uri
   
+  # The URI path relative to uri used to access the rate source.
+  attr_accessor :uri_path
+  
   # The Time used to query the rate source.
   # Typically set by #load_rates.
   attr_accessor :date
