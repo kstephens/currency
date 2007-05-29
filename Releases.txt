@@ -1,5 +1,9 @@
 = Currency Release History
 
+== Release 0.4.6: 2007/05/29
+
+* NewYorkFed: changed FEXtime to FEXTIME.
+
 == Release 0.4.5: 2007/05/29
 
 * Historical::Rate table name can be configured in Currency::Config.current.historical_table_name
