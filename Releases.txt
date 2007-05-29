@@ -1,11 +1,20 @@
 = Currency Release History
 
+== Release 0.4.5: 2007/05/29
+
+* Historical::Rate table name can be configured in Currency::Config.current.historical_table_name
+* Fixed Rate::Source::TheFinancials.
+* Examples: use Currency.Money(), not Currency::Money.new().
+
 == Release 0.4.4: 2007/04/01
+
+MAY NOT BE BACKWARDS-COMPATIBLE
 
 * Fixed TimedCache.
 * Updated documentation.
 * Added support for Parser#time = :now.
 * Added support for Time in Formatter and Parser using Time#xmlschema.
+* Money#inspect now appends Money#time, if set.
 
 == Release 0.4.3: 2007/04/01
 
