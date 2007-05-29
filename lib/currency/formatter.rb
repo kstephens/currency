@@ -242,7 +242,7 @@ class Currency::Formatter
     tmpl.code = @code ? _format_Currency(currency) : nil
 
     # Add time.
-    tmpl.time = @time ? time && _format_Time(time) : nil
+    tmpl.time = @time && time ? _format_Time(time) : nil
     
     # Ask template to format the components.
     tmpl.format
