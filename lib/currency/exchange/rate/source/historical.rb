@@ -5,7 +5,7 @@ require 'currency/exchange/rate/source/base'
 
 # Gets historical rates from database using Active::Record.
 # Rates are retrieved using Currency::Exchange::Rate::Source::Historical::Rate as
-# a database proxy.
+# a database record proxy.
 #
 # See Currency::Exchange::Rate::Source::Historical::Writer for a rate archiver.
 #

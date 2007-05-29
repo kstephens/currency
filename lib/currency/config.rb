@@ -78,5 +78,14 @@ class Currency::Config
   def float_ref_filter=(x)
     @float_ref_filter = x
   end
+
+  
+  # Defines the table name for Historical::Rate records.
+  # Defaults to 'currency_historical_rates'.
+  attr_accessor :historical_table_name
+  def historical_table_name
+    @historical_table_name ||= 'currency_historical_rates'
+  end
+
 end # module
 

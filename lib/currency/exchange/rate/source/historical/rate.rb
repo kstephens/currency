@@ -6,12 +6,12 @@ require 'currency/exchange/rate/source/historical'
 # It requires ActiveRecord.
 #
 class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
-   TABLE_NAME = 'currency_historical_rates'
-   set_table_name TABLE_NAME
+   @@_table_name ||= Currency::Config.current.historical_table_name
+   set_table_name @@_table_name
 
    # Can create a table and indices for this class
    # when passed a Migration.
-   def self.__create_table(m, table_name = TABLE_NAME)
+   def self.__create_table(m, table_name = @@_table_name)
      table_name = table_name.intern 
      m.instance_eval do 
        create_table table_name do |t|
