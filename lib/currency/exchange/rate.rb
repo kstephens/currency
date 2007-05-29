@@ -115,7 +115,7 @@ class Currency::Exchange::Rate
     end
 
 
-    # Collect rate samples into rate_avg, rate_hi, rate_lo, rate_0, rate_1, date_0, date_1.
+    # Collect rate samples into rate_avg, rate_hi, rate_lo, rate_date_0, rate_date_1, date_0, date_1.
     def collect_rates(rates)
       rates = [ rates ] unless rates.kind_of?(Enumerable)
       rates.each do | r |
@@ -129,12 +129,11 @@ class Currency::Exchange::Rate
       # Initial.
       @rate_samples ||= 0
       @rate_sum ||= 0
-      @src ||= rate
+      @source ||= rate.source
       @c1 ||= rate.c1
       @c2 ||= rate.c2
       @date ||= rate.date
-      @src ||= rate.src
-
+ 
       # Reciprocal?
       if @c1 == rate.c2 && @c2 == rate.c1
         collect_rate(rate.reciprocal)
@@ -142,7 +141,7 @@ class Currency::Exchange::Rate
         raise("Cannot collect rates between different currency pairs")
       else
         # Multisource?
-        @src = "<<multiple-sources>>" unless @src == rate.source
+        @source = "<<multiple-sources>>" unless @source == rate.source
 
         # Calculate rate average.
         @rate_samples += 1
@@ -164,14 +163,14 @@ class Currency::Exchange::Rate
         d = rate.date_0 || rate.date
         unless @date_0 && @date_0 < d
           @date_0 = d
-          @rate_0 = r
+          @rate_date_0 = r
         end
 
         r = rate.rate_date_1 || rate.rate
         d = rate.date_1 || rate.date
         unless @date_1 && @date_1 > d
           @date_1 = d 
-          @rate_0 = r
+          @rate_date_0 = r
         end
 
         @date ||= rate.date || rate.date0 || rate.date1
@@ -181,7 +180,7 @@ class Currency::Exchange::Rate
 
 
     def to_s(extended = false)
-      extended = "#{date_0} #{rate_0} |< #{rate_lo} #{rate} #{rate_hi} >| #{rate_1} #{date_1}" if extended
+      extended = "#{date_0} #{rate_date_0} |< #{rate_lo} #{rate} #{rate_hi} >| #{rate_date_1} #{date_1}" if extended
       extended ||= ''
       "#<#{self.class.name} #{c1.code} #{c2.code} #{rate} #{source.inspect} #{date ? date.strftime('%Y/%m/%d-%H:%M:%S') : 'nil'} #{derived && derived.inspect} #{extended}>"
     end

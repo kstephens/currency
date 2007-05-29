@@ -3,6 +3,7 @@
 == Release 0.4.6: 2007/05/29
 
 * NewYorkFed: changed FEXtime to FEXTIME.
+* Fixed Rate#collect_rates, source, rate_date_0, rate_date_1.
 
 == Release 0.4.5: 2007/05/29
 
