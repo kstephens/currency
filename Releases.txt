@@ -1,5 +1,10 @@
 = Currency Release History
 
+== Release 0.4.7: 2007/06/25
+
+* FederalReserve: Added support for historical rates from http://www.federalreserve.gov/releases/H10/hist
+* Provider#get_rate(): Return first rate immediately.
+
 == Release 0.4.6: 2007/05/29
 
 * NewYorkFed: changed FEXtime to FEXTIME.

@@ -94,14 +94,16 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   end
 
 
-  # Return a matching base rate?
+  # Return a matching base rate.
   def get_rate(c1, c2, time)
-    matching_rates = rates.select do | rate |
-      rate.c1 == c1 &&
-      rate.c2 == c2 &&
-      (! time || normalize_time(rate.date) == time)
+    rates.each do | rate |
+      return rate if 
+        rate.c1 == c1 &&
+        rate.c2 == c2 &&
+        (! time || normalize_time(rate.date) == time)
     end
-    matching_rates[0]
+
+    nil
   end
 
   alias :get_rate_base :get_rate

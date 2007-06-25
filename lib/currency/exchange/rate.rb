@@ -1,6 +1,8 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
+require 'currency/exchange'
+
 # Represents a convertion rate between two currencies at a given period of time.
 class Currency::Exchange::Rate
     # The first Currency.
