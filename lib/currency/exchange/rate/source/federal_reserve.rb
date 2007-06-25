@@ -54,33 +54,36 @@ class Currency::Exchange::Rate::Source::FederalReserve < ::Currency::Exchange::R
   # Maps bizzare federalreserve.gov country codes to ISO currency codes.
   # May only work for the dat00_XX.txt data files.
   # See http://www.jhall.demon.co.uk/currency/by_country.html
+  #
+  # Some data files list reciprocal rates!
   @@country_to_currency = 
     {
-    'al' => :AUD,
+    'al' => [ :AUD, :USD ],
     # 'au' => :ASH, # AUSTRIAN SHILLING: pre-EUR?
-    'bz' => :BRR,
-    'ca' => :CAD,
-    'ch' => :CNY,
-    'dn' => :DKK,
-    'eu' => :EUR,
+    'bz' => [ :USD, :BRL ],
+    'ca' => [ :USD, :CAD ],
+    'ch' => [ :USD, :CNY ],
+    'dn' => [ :USD, :DKK ],
+    'eu' => [ :EUR, :USD ],
     # 'gr' => :XXX, # Greece Drachma: pre-EUR?
-    'hk' => :HKD,
-    'in' => :INR,
-    'ja' => :JPY,
-    'ma' => :MYR,
-    'mx' => :MXN, # OR MXP?
-    'nz' => :NZD,
-    'no' => :NOK,
-    'sf' => :ZAR,
-    'si' => :KRW,
-    'sl' => :LKR,
-    'sd' => :SEK,
-    'sz' => :CHF,
-    'ta' => :TWD, # New Taiwan Dollar.
-    'th' => :THB,
-    'uk' => :GBP,
-    've' => :VEB,
+    'hk' => [ :USD, :HKD ],
+    'in' => [ :USD, :INR ],
+    'ja' => [ :USD, :JPY ],
+    'ma' => [ :USD, :MYR ],
+    'mx' => [ :USD, :MXN ], # OR MXP?
+    'nz' => [ :NZD, :USD ],
+    'no' => [ :USD, :NOK ],
+    'ko' => [ :USD, :KRW ],
+    'sf' => [ :USD, :ZAR ],
+    'sl' => [ :USD, :LKR ],
+    'sd' => [ :USD, :SEK ],
+    'sz' => [ :USD, :CHF ],
+    'ta' => [ :USD, :TWD ], # New Taiwan Dollar.
+    'th' => [ :USD, :THB ],
+    'uk' => [ :GBP, :USD ],
+    've' => [ :USD, :VEB ],
   }
+
 
   # Parses text file for rates.
   def parse_rates(data = nil)
@@ -95,10 +98,12 @@ class Currency::Exchange::Rate::Source::FederalReserve < ::Currency::Exchange::R
     # Rates are USD/currency so
     # c1 = currency
     # c2 = :USD
-    c1 = @@country_to_currency[country_code] || raise(::Currency::Exception::UnavailableRates, "Cannot determine currency code for federalreserve.gov country code #{country_code.inspect}")
+    c1, c2 = @@country_to_currency[country_code]
 
-    c2 = PIVOT_CURRENCY
-    
+    unless c1 && c2
+      raise(::Currency::Exception::UnavailableRates, "Cannot determine currency code for federalreserve.gov country code #{country_code.inspect}")
+    end
+
     data.split(/\r?\n\r?/).each do | line |
       #        day     month             yy       rate
       m = /^\s*(\d\d?)-([A-Z][a-z][a-z])-(\d\d)\s+([\d\.]+)/.match(line)
