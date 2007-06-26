@@ -134,7 +134,6 @@ class Currency::Exchange::Rate
       @source ||= rate.source
       @c1 ||= rate.c1
       @c2 ||= rate.c2
-      @date ||= rate.date
  
       # Reciprocal?
       if @c1 == rate.c2 && @c2 == rate.c1
@@ -172,7 +171,7 @@ class Currency::Exchange::Rate
         d = rate.date_1 || rate.date
         unless @date_1 && @date_1 > d
           @date_1 = d 
-          @rate_date_0 = r
+          @rate_date_1 = r
         end
 
         @date ||= rate.date || rate.date0 || rate.date1
@@ -191,4 +190,14 @@ class Currency::Exchange::Rate
 
 end # class
 
+
+class Currency::Exchange::Rate::Writable < Currency::Exchange::Rate
+  attr_writer :source
+  attr_writer :derived
+  attr_writer :rate
+  def initialize(c1 = nil, c2 = nil, rate = nil, *opts)
+    super(c1, c2, 0.0, *opts)
+    @rate = rate
+  end
+end # class
 

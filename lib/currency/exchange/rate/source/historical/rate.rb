@@ -56,6 +56,7 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
      self.c2 = rate.c2.code.to_s
      self.rate = rate.rate
      self.rate_avg = rate.rate_avg
+     self.rate_samples = rate.rate_samples
      self.rate_lo  = rate.rate_lo
      self.rate_hi  = rate.rate_hi
      self.rate_date_0  = rate.rate_date_0
@@ -78,24 +79,25 @@ class Currency::Exchange::Rate::Source::Historical::Rate < ::ActiveRecord::Base
 
 
    # Creates a new Currency::Exchange::Rate object.
-   def to_rate
-     Currency::Exchange::Rate.new(
-                                  ::Currency::Currency.get(self.c1), 
-                                  ::Currency::Currency.get(self.c2),
-                                  self.rate,
-                                  "historical #{self.source}",
-                                  self.date,
-                                  self.derived,
-                                  {
-                                    :rate_avg => self.rate_avg,
-                                    :rate_samples => self.rate_samples,
-                                    :rate_lo => self.rate_lo,
-                                    :rate_hi => self.rate_hi,
-                                    :rate_date_0 => self.rate_date_0,
-                                    :rate_date_1 => self.rate_date_1,
-                                    :date_0 => self.date_0,
-                                    :date_1 => self.date_1
-                                  })
+   def to_rate(cls = ::Currency::Exchange::Rate)
+     cls.
+       new(
+           ::Currency::Currency.get(self.c1), 
+           ::Currency::Currency.get(self.c2),
+           self.rate,
+           "historical #{self.source}",
+           self.date,
+           self.derived,
+           {
+             :rate_avg => self.rate_avg,
+             :rate_samples => self.rate_samples,
+             :rate_lo => self.rate_lo,
+             :rate_hi => self.rate_hi,
+             :rate_date_0 => self.rate_date_0,
+             :rate_date_1 => self.rate_date_1,
+             :date_0 => self.date_0,
+             :date_1 => self.date_1
+           })
    end
 
 

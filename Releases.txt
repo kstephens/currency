@@ -2,8 +2,19 @@
 
 == Release 0.4.7: 2007/06/25
 
+CRITICAL FIXES
+
+* NewYorkFed: CRITICAL FIX:
+
+  Rates for USDAUD, USDEUR, USDNZD and USDGBP were reciprocals.
+  See http://www.newyorkfed.org/markets/fxrates/noon.cfm
+
 * FederalReserve: Added support for historical rates from http://www.federalreserve.gov/releases/H10/hist
 * Provider#get_rate(): Return first rate immediately.
+* Rate::Writable for rate summary computation support.
+* Rate: collect_rate(): fixed rate_date_1.
+* Historical::Rate: to_rate(): takes optional class.
+* Historical::Rate: from_rate(): fixed rate_samples.
 
 == Release 0.4.6: 2007/05/29
 

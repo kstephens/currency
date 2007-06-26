@@ -47,6 +47,17 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
     rates
     @raw_rates
   end
+  
+
+  # The fed swaps rates on some currency pairs!
+  # See http://www.newyorkfed.org/markets/fxrates/noon.cfm (LISTS AUD!)
+  # http://www.newyorkfed.org/xml/fx.html (DOES NOT LIST AUD!)
+  @@swap_units = {
+    :AUD => true,
+    :EUR => true,
+    :NZD => true,
+    :GBP => true,
+  }
 
 
   # Parses XML for rates.
@@ -79,6 +90,11 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
       raise ParserError, 'no frbny:TIME_PERIOD' unless date
       date = date.text
       date = Time.parse("#{date} 12:00:00 -05:00") # USA NY => EST
+
+      # Handle arbitrary rate reciprocals!
+      if @@swap_units[c1] || @@swap_units[c2]
+        c1, c2 = c2, c1
+      end
 
       rates << new_rate(c1, c2, rate, date)
 
