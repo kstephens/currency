@@ -1,0 +1,6 @@
+development:
+  adapter:  mysql
+  host:     localhost
+  username: test
+  password: test
+  database: test

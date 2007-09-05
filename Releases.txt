@@ -1,5 +1,9 @@
 = Currency Release History
 
+== Release 0.4.8: 2007/09/04
+
+* bin/currency_historical_rate_load - script for pulling rates from sources into historical rate table.
+
 == Release 0.4.7: 2007/06/25
 
 CRITICAL FIXES

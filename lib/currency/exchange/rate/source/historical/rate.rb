@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_record/base'
 
 require 'currency/exchange/rate/source/historical'
