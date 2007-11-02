@@ -63,9 +63,9 @@ class Currency::Parser
         raise Currency::Exception::InvalidMoneyString,
         [
          "time: #{str.inspect} #{currency} #{x.inspect}",
-         :string => str,
-         :currency => currency,
-         :state => x,
+         :string, str,
+         :currency, currency,
+         :state, x,
         ]
       end
       x = md.pre_match + md.post_match
@@ -144,9 +144,9 @@ class Currency::Parser
       raise ::Currency::Exception::InvalidMoneyString, 
       [
        "#{str.inspect} #{currency} #{x.inspect}",
-       :string => str,
-       :currency => currency,
-       :state => x,
+       :string, str,
+       :currency, currency,
+       :state, x,
       ]
     end
 
