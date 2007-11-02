@@ -1,5 +1,11 @@
 = Currency Release History
 
+== Release 0.4.11: 2007/11/02
+
+CRITICAL FIXES
+
+* parser.rb - uncommitted typos.
+
 == Release 0.4.10: 2007/11/01
 
 CRITICAL FIXES
