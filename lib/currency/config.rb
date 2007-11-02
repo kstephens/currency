@@ -32,7 +32,7 @@ class Currency::Config
   def self.current
     Thread.current[:Currency__Config] ||= 
       self.default || 
-      (raise ::Currency::Exception::UndefinedConfig.new("Currency::Config.default not defined"))
+      (raise ::Currency::Exception::UndefinedConfig, "Currency::Config.default not defined")
   end
   
   # Sets the current Currency::Config object used

@@ -103,7 +103,11 @@ class Currency::Exchange::Rate::Source::NewYorkFed < ::Currency::Exchange::Rate:
     end
 
     # $stderr.puts "rates = #{rates.inspect}"
-    raise ::Currency::Exception::UnavailableRates, "No rates found in #{get_uri.inspect}" if rates.empty?
+    raise ::Currency::Exception::UnavailableRates, 
+    [
+     "No rates found in #{get_uri.inspect}",
+     :uri, get_uri,
+    ] if rates.empty?
 
     rates
   end

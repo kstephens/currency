@@ -83,7 +83,7 @@ class Currency::Currency::Factory
 
     # Installs a new Currency for #get_by_symbol and #get_by_code.
     def install(currency)
-      raise ::Currency::Exception::UnknownCurrency.new() unless currency
+      raise ::Currency::Exception::UnknownCurrency unless currency
       @currency_by_symbol[currency.symbol] ||= currency unless currency.symbol.nil?
       @currency_by_code[currency.code] = currency
     end

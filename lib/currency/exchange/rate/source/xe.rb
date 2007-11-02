@@ -83,8 +83,16 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
     rate = { }
     cur_i = -1 
     eat_lines_until /^\s*<\/tr>/i do 
-      if md = /<td[^>]+?>\s*?(\d+\.\d+)\s*?<\/td>/i.match(@line)
-        usd_to_cur = md[1].to_f
+      # Grok:
+      #
+      #   <td align="center" class="cur2 currencyA">114.676</td>\n
+      #
+      # AND
+      #
+      #   <td align="center" class="cur2 currencyA"><div id="positionImage">0.9502\n
+      #
+      if md = /<td[^>]+?>\s*(<div[^>]+?>\s*)?(\d+\.\d+)\s*(<\/td>)?/i.match(@line)
+        usd_to_cur = md[2].to_f
         cur_i = cur_i + 1
         cur = currency[cur_i]
         raise ParserError, "Currency not found at column #{cur_i}" unless cur
@@ -96,8 +104,15 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
     end
 
     raise ::Currency::Exception::UnavailableRates, "No rates found in #{get_uri.inspect}" if rate.keys.empty?
-    raise ParserError, "Not all rates found" if rate.keys.size != currency.size
-    
+
+    raise ParserError, 
+    [
+     "Not all currencies found", 
+     :expected_currences, currency,
+     :found_currencies, rate.keys,
+     :missing_currencies, currency - rate.keys,
+    ] if rate.keys.size != currency.size
+
     @lines = @line = nil
 
     raise ParserError, "Rate date not found" unless @rate_timestamp
@@ -115,7 +130,9 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
       end
       yield @line if block_given?
     end
-    raise ParserError, rx.inspect
+
+    raise ParserError, [ 'eat_lines_until failed', :rx, rx ]
+
     false
   end
 
@@ -129,7 +146,11 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
 
     rates = raw_rates # Load rates
     rates_pivot = rates[PIVOT_CURRENCY]
-    raise ::Currency::Exception::UnknownRate.new("#{self}: cannot get base rate #{PIVOT_CURRENCY.inspect}") unless rates_pivot
+    raise ::Currency::Exception::UnknownRate,
+    [ 
+     "Cannot get base rate #{PIVOT_CURRENCY.inspect}",
+     :pivot_currency, PIVOT_CURRENCY,
+    ] unless rates_pivot
     
     result = rates_pivot.keys.collect do | c2 | 
       new_rate(PIVOT_CURRENCY, c2, rates_pivot[c2], @rate_timestamp)

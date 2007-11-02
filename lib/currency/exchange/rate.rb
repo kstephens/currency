@@ -57,7 +57,13 @@ class Currency::Exchange::Rate
       @c1 = c1
       @c2 = c2
       @rate = c1_to_c2_rate
-      raise ::Currency::Exception::InvalidRate.new(@rate) unless @rate && @rate >= 0.0
+      raise ::Currency::Exception::InvalidRate, 
+      [ 
+       "rate is not positive",
+       :rate, @rate,
+       :c1, c1,
+       :c2, c2,
+      ] unless @rate && @rate >= 0.0
       @source = source
       @date = date
       @derived = derived
@@ -139,7 +145,12 @@ class Currency::Exchange::Rate
       if @c1 == rate.c2 && @c2 == rate.c1
         collect_rate(rate.reciprocal)
       elsif ! (@c1 == rate.c1 && @c2 == rate.c2)
-        raise("Cannot collect rates between different currency pairs")
+        raise ::Currency::Exception::InvalidRate,
+        [ 
+         "Cannot collect rates between different currency pairs",
+          :rate1, self,
+          :rate2, rate,
+        ]
       else
         # Multisource?
         @source = "<<multiple-sources>>" unless @source == rate.source

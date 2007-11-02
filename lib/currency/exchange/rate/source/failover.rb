@@ -38,13 +38,19 @@ class Currency::Exchange::Rate::Source::Failover < ::Currency::Exchange::Base
 
 
     if rate == nil || err
-      $stderr.put "Failover: primary failed for get_rate(#{c1}, #{c2}, #{time}) : #{err.inspect}"
+      $stderr.puts "Failover: primary failed for get_rate(#{c1}, #{c2}, #{time}) : #{err.inspect}"
       rate = @secondary.get_rate(c1, c2, time)
     end
 
 
     unless rate
-      raise("Failover: secondary failed for get_rate(#{c1}, #{c2}, #{time})")
+      raise Currency::Exception::UnknownRate, 
+      [ 
+       "Failover: secondary failed for get_rate(#{c1}, #{c2}, #{time})", 
+       :c1, c1,
+       :c2, c2, 
+       :time, time,
+      ]
     end
 
     rate

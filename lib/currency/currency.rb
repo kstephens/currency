@@ -69,8 +69,8 @@ class Currency::Currency
     # Symbol format.
     def self.cast_code(x)
       x = x.upcase.intern if x.kind_of?(String)
-      raise ::Currency::Exception::InvalidCurrencyCode.new(x) unless x.kind_of?(Symbol)
-      raise ::Currency::Exception::InvalidCurrencyCode.new(x) unless x.to_s.length == 3
+      raise ::Currency::Exception::InvalidCurrencyCode, x unless x.kind_of?(Symbol)
+      raise ::Currency::Exception::InvalidCurrencyCode, x unless x.to_s.length == 3
       x
     end
 

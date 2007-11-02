@@ -60,7 +60,13 @@ class Currency::Parser
     if (md = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z)/.match(x))
       time = Time.xmlschema(md[1])
       unless time
-        raise ::Currency::Exception::InvalidMoneyString.new("time: #{str.inspect} #{currency} #{x.inspect}")
+        raise Currency::Exception::InvalidMoneyString,
+        [
+         "time: #{str.inspect} #{currency} #{x.inspect}",
+         :string => str,
+         :currency => currency,
+         :state => x,
+        ]
       end
       x = md.pre_match + md.post_match
     end
@@ -76,7 +82,13 @@ class Currency::Parser
       x = md.pre_match + md.post_match
       if @currency && @currency != curr
         if @enforce_currency
-          raise ::Currency::Exception::IncompatibleCurrency.new("currency: #{str.inspect} #{@currency.code}")
+          raise ::Currency::Exception::IncompatibleCurrency, 
+          [ 
+           "currency: #{str.inspect} #{@currency.code}",
+           :string, str,
+           :default_currency, @currency,
+           :parsed_currency, curr,
+          ]
         end
         convert_currency = @currency
       end
@@ -129,7 +141,13 @@ class Currency::Parser
     else
       # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
       #x.to_f.Money_rep(self)
-      raise ::Currency::Exception::InvalidMoneyString.new("#{str.inspect} #{currency} #{x.inspect}")
+      raise ::Currency::Exception::InvalidMoneyString, 
+      [
+       "#{str.inspect} #{currency} #{x.inspect}",
+       :string => str,
+       :currency => currency,
+       :state => x,
+      ]
     end
 
     # Do conversion.

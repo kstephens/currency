@@ -41,6 +41,16 @@ class Currency::Exchange::Rate::Source::Base
     end 
 
 
+    def __subclass_responsibility(meth)
+      raise ::Currency::Exception::SubclassResponsibility, 
+      [
+       "#{self.class}#\#{meth}", 
+       :class, self.class, 
+       :method, method,
+      ]
+    end
+
+
     # Converts Money m in Currency c1 to a new
     # Money value in Currency c2.
     def convert(m, c2, time = nil, c1 = nil)
@@ -90,7 +100,7 @@ class Currency::Exchange::Rate::Source::Base
     # Gets all rates available by this source.
     #
     def rates(time = nil)
-      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#rate"
+      __subclass_responsibility(:rates)
     end
 
 
@@ -108,14 +118,14 @@ class Currency::Exchange::Rate::Source::Base
     # rates.
     #
     def get_rate(c1, c2, time)
-      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate"
+      __subclass_responsibility(:get_rate)
     end
 
     # Returns a base Rate.
     #
     # Subclasses are required to implement this method.
     def get_rate_base(c1, c2, time)
-      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate_base"
+      __subclass_responsibility(:get_rate_base)
     end
 
 
@@ -123,7 +133,7 @@ class Currency::Exchange::Rate::Source::Base
     #
     # Subclasses must override this method.
     def get_rates(time = nil)
-      raise ::Currency::Exception::SubclassResponsibility, "#{self.class}#get_rate"
+      __subclass_responsibility(:get_rates)
     end
 
 

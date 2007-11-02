@@ -78,7 +78,12 @@ class Currency::Exchange::Rate::Source::Historical::Writer
 
       self.required_currencies.each do | c |
         unless currencies.include?(c)
-          raise("Required currency #{c.inspect} not in #{currencies.inspect}")
+          raise ::Currency::Exception::MissingCurrency, 
+          [ 
+           "Required currency #{c.inspect} not in #{currencies.inspect}", 
+           :currency, c, 
+           :required_currency, currencies,
+          ]
         end
       end
     end
@@ -194,7 +199,11 @@ class Currency::Exchange::Rate::Source::Historical::Writer
           begin
             rr.save!
           rescue Object => err
-            raise Error, "During save of #{rr.inspect} : #{err.inspect}"
+            raise ::Currency::Exception::Generic, 
+            [ 
+             "During save of #{rr.inspect}", 
+             :error, err,
+            ]
           end
           stored_h_rates << rr # Written.
         end

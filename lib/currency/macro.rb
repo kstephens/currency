@@ -190,7 +190,7 @@ end_eval
           when :integer
             to_rep = 'to_i'
           else
-            throw ::Currency::Exception::InvalidMoneyValue.new("Cannot use value representation: #{rep.inspect}")
+            raise ::Currency::Exception::InvalidMoneyValue, "Cannot use value representation: #{rep.inspect}"
           end
           from_rep = '::Currency::Money.new'
         end
@@ -293,7 +293,7 @@ def #{attr_name}=(value)
     #{write_preferred_currency}
     #{convert_currency}
   else
-    throw ::Currency::Exception::InvalidMoneyValue.new(value)
+    raise ::Currency::Exception::InvalidMoneyValue, value
   end
 
   @#{attr_name} = #{attr_name}_money

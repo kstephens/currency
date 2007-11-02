@@ -76,7 +76,7 @@ module Currency::Exchange::Rate::Source
     # If #current= has not been called and #default= has not been called,
     # then UndefinedExchange is raised.
     def self.current
-      @@current || self.default || (raise ::Currency::Exception::UndefinedExchange.new("Currency::Exchange.current not defined"))
+      @@current || self.default || (raise ::Currency::Exception::UndefinedExchange, "Currency::Exchange.current not defined")
     end
 
     # Sets the current Currency::Exchange object used during

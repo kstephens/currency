@@ -90,7 +90,7 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   #
   # Subclasses must define this method.
   def load_rates(time = nil)
-    raise('Subclass responsiblity')
+    raise Currency::Exception::SubclassResponsibility, :load_rates
   end
 
 

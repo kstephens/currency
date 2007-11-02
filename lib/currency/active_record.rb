@@ -235,7 +235,7 @@ def #{attr_name}=(value)
     #{write_preferred_currency}
     #{write_currency ? write_currency : "#{attr_name}_money = #{attr_name}_money.convert(#{currency})"}
   else
-    throw ::Currency::Exception::InvalidMoneyValue.new(value)
+    raise ::Currency::Exception::InvalidMoneyValue, value
   end
 
   @#{attr_name} = #{attr_name}_money

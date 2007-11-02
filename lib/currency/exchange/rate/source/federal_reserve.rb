@@ -101,7 +101,7 @@ class Currency::Exchange::Rate::Source::FederalReserve < ::Currency::Exchange::R
     c1, c2 = @@country_to_currency[country_code]
 
     unless c1 && c2
-      raise(::Currency::Exception::UnavailableRates, "Cannot determine currency code for federalreserve.gov country code #{country_code.inspect}")
+      raise ::Currency::Exception::UnavailableRates, "Cannot determine currency code for federalreserve.gov country code #{country_code.inspect}"
     end
 
     data.split(/\r?\n\r?/).each do | line |
@@ -122,7 +122,7 @@ class Currency::Exchange::Rate::Source::FederalReserve < ::Currency::Exchange::R
 
       rate = m[4].to_f
 
-      STDERR.puts "#{c1} #{c2} #{rate} #{date}" if @verbose
+      STDERR.puts "#{c1} #{c2} #{rate}\t#{date}" if @verbose
 
       rates << new_rate(c1, c2, rate, date)
 

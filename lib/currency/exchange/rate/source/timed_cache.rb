@@ -159,7 +159,7 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
 
     begin
       # Do not allow re-entrancy
-      raise "Reentry!" if @processing_rates
+      raise Currency::Exception::InvalidReentrancy, "Reentry!" if @processing_rates
       
       # Begin processing new rate request.
       @processing_rates = true
