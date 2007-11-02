@@ -6,6 +6,7 @@ README.txt
 Rakefile
 Releases.txt
 TODO.txt
+bin/currency_historical_rate_load
 examples/ex1.rb
 examples/xe1.rb
 lib/currency.rb
@@ -22,8 +23,10 @@ lib/currency/exchange/rate/deriver.rb
 lib/currency/exchange/rate/source.rb
 lib/currency/exchange/rate/source/base.rb
 lib/currency/exchange/rate/source/failover.rb
+lib/currency/exchange/rate/source/federal_reserve.rb
 lib/currency/exchange/rate/source/historical.rb
 lib/currency/exchange/rate/source/historical/rate.rb
+lib/currency/exchange/rate/source/historical/rate_loader.rb
 lib/currency/exchange/rate/source/historical/writer.rb
 lib/currency/exchange/rate/source/new_york_fed.rb
 lib/currency/exchange/rate/source/provider.rb
@@ -42,6 +45,7 @@ test/ar_simple_test.rb
 test/ar_test_base.rb
 test/ar_test_core.rb
 test/config_test.rb
+test/federal_reserve_test.rb
 test/formatter_test.rb
 test/historical_writer_test.rb
 test/macro_test.rb
