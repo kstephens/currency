@@ -1,17 +1,21 @@
 = Currency Release History
 
-== Release 0.4.9: 2007/11/01
+== Release 0.4.10: 2007/11/01
 
 CRITICAL FIXES
 
 * xe.rb - http://xe.com format change: Handle inline div in rates table.
+* bin/currency_historical_rate_load - script for pulling rates from sources into historical rate table.
 * exception.rb - Currency::Exception::Base can take Array with optional key/values.
 * exception.rb - Additional exception classes.
 * ALL - use raise instead of throw throughout.
 
-== Release 0.4.8: 2007/09/04
 
-* bin/currency_historical_rate_load - script for pulling rates from sources into historical rate table.
+== Release 0.4.9: 2007/11/01
+
+** IGNORE THIS RELEASE**
+
+* Broken rubyforge config.
 
 == Release 0.4.7: 2007/06/25
 
