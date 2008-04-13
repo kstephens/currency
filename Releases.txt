@@ -1,6 +1,6 @@
 = Currency Release History
 
-== Releate 0.4.12: 2008/04/12
+== Release 0.4.12: 2008/04/12
 
 CRITICAL FIXES
 
@@ -8,6 +8,7 @@ CRITICAL FIXES
 * Added Money#cmp, Money#rep_diff.
 * Removed syntax warnings.
 * Rakefile: rcov_test: run tests under rcov.
+* Test coverage published at http://currency.rubyforge.org/rcov.
 
 == Release 0.4.11: 2007/11/02
 
