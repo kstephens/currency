@@ -144,6 +144,8 @@ class Currency::Money
     # Convert Money to another Currency.
     # currency can be a Symbol or a Currency object.
     # If currency is nil, the Currency.default is used.
+    #
+    # time argument is currently unsupported.
     def convert(currency, time = nil)
       currency = ::Currency::Currency.default if currency.nil?
       currency = ::Currency::Currency.get(currency) unless currency.kind_of?(Currency)
@@ -179,11 +181,41 @@ class Currency::Money
 
     # Compares Money values.
     # Will convert x to self.currency before comparision.
+    #
+    # NOTE: due to rate conversion rounding the following may not
+    # be true.
+    #
+    #   usd = Money(123.45, :USD)
+    #   cad = usd.convert(:CAD)
+    #   (usd <=> cad) == 0
     def <=>(x)
+      rep_diff(x) <=> 0
+    end
+
+    # Compares self and x.
+    # If difference between reps is <= tolerance, returns 0.
+    def cmp(x, tolerance = 0)
+      diff = rep_diff(x)
+      if tolerance != 0
+        tolerance = tolerance.Money_rep(@currency) 
+      end
+      diff.abs <= tolerance ? 0 : diff <=> 0
+    end
+
+    # Returns the difference in currencies.
+    # Will convert x to self.currency before comparision.
+    #
+    # NOTE: due to rate conversion rounding the following may not
+    # be true.
+    #
+    #   usd = Money(123.45, :USD)
+    #   cad = usd.convert(:CAD)
+    #   usd.rep_diff(cad) == 0
+    def rep_diff(x)
       if @currency == x.currency
-        @rep <=> x.rep
+        @rep - x.rep
       else
-        @rep <=> convert(@currency, @time).rep
+        @rep - x.convert(@currency, @time).rep
       end
     end
 

@@ -71,23 +71,23 @@ class MoneyTest < TestBase
     z = test_zero
     p = test_positive
 
-    assert   (n < p)
-    assert ! (n > p)
-    assert ! (p < n)
-    assert   (p > n)
-    assert   (p != n)
+    assert(   (n < p))
+    assert( ! (n > p))
+    assert( ! (p < n))
+    assert(   (p > n))
+    assert(   (p != n))
 
-    assert   (z <= z)
-    assert   (z >= z)
+    assert(   (z <= z))
+    assert(   (z >= z))
 
-    assert   (z <= p)
-    assert   (n <= z)
-    assert   (z >= n)
+    assert(   (z <= p))
+    assert(   (n <= z))
+    assert(   (z >= n))
 
-    assert   n == n
-    assert   p == p
+    assert(   n == n)
+    assert(   p == p)
 
-    assert   z == test_zero
+    assert(   z == test_zero)
   end
 
   def test_compare
@@ -95,13 +95,13 @@ class MoneyTest < TestBase
     z = test_zero
     p = test_positive
 
-    assert (n <=> p) == -1
-    assert (p <=> n) == 1
-    assert (p <=> z) == 1
+    assert( (n <=> p) == -1)
+    assert( (p <=> n) == 1)
+    assert( (p <=> z) == 1)
 
-    assert (n <=> n) == 0
-    assert (z <=> z) == 0
-    assert (p <=> p) == 0    
+    assert( (n <=> n) == 0)
+    assert( (z <=> z) == 0)
+    assert( (p <=> p) == 0)    
   end
 
   def test_rep
@@ -220,6 +220,27 @@ class MoneyTest < TestBase
     
     assert_kind_of Numeric, m = (usd / cad)
     assert_equal_float Exchange::Rate::Source::Test.USD_CAD, m, 0.0001
+  end
+
+
+  def test_cmp
+    assert_not_nil usd    = Money.new(123.45, :USD)
+    assert_not_nil usd_le = usd - 1
+    assert_not_nil usd_gt = usd + 1
+    assert_not_nil cad    = usd.convert(:CAD)
+    assert_not_nil cad_le = cad - 1.00
+    assert_not_nil cad_gt = cad + 1.00
+
+    assert((usd <=> usd) == 0)
+    assert((cad <=> cad) == 0)
+
+    assert((usd <=> usd_le) > 0)
+    assert((usd <=> usd_gt) < 0)
+
+    assert((usd <=> cad_gt) < 0)
+    assert((cad <=> usd_le) > 0)
+
+    assert((usd.cmp(cad, 0.05)) == 0)
   end
 
 
