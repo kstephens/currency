@@ -32,7 +32,8 @@ class Currency::Exchange::Rate::Source::Provider < Currency::Exchange::Rate::Sou
   # Returns the date to query for rates.
   # Defaults to yesterday.
   def date
-    @date || (Time.now - 24 * 60 * 60) # yesterday.
+    @date || 
+      (Time.now - 24 * 60 * 60) # yesterday.
   end
 
 

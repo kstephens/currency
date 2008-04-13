@@ -16,7 +16,7 @@ class Currency::Formatter
     @@empty_hash.freeze
 
     # The template string.
-    attr_accessor :template
+    attr_reader :template
 
     # The Currency::Money object being formatted.
     attr_accessor :money
@@ -110,7 +110,7 @@ class Currency::Formatter
   # Defaults to:
   # 
   #   '#{code}#{code && " "}#{symbol}#{sign}#{whole}#{fraction}#{time && " "}#{time}'
-  attr_accessor :template
+  attr_reader :template
 
 
   # If passed true, formats for an input field (i.e.: as a number).

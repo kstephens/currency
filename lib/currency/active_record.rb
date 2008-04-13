@@ -207,7 +207,7 @@ end_eval
  
         alias_accessor ||= ''
 
-        module_eval (opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__
+        module_eval((opts[:module_eval] = x = <<-"end_eval"), __FILE__, __LINE__)
 #{validate}
 
 #{alias_accessor}

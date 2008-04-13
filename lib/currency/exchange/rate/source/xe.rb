@@ -59,13 +59,13 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
     time = Time.at(Time.new.to_i).getutc
     @rate_timestamp = time
 
-    eat_lines_until /More currencies\.\.\.<\/a>/i
-    eat_lines_until /^\s*<tr>/i
-    eat_lines_until /^\s*<tr>/i
+    eat_lines_until(/More currencies\.\.\.<\/a>/i)
+    eat_lines_until(/^\s*<tr>/i)
+    eat_lines_until(/^\s*<tr>/i)
     
     # Read first table row to get position for each currency
     currency = [ ]
-    eat_lines_until /^\s*<\/tr>/i do 
+    eat_lines_until(/^\s*<\/tr>/i) do 
       if md = /<td[^>]+?>.*?\/> ([A-Z][A-Z][A-Z])<\/td>/.match(@line)
         cur = md[1].intern
         cur_i = currency.size
@@ -77,12 +77,12 @@ class Currency::Exchange::Rate::Source::Xe < ::Currency::Exchange::Rate::Source:
     
 
     # Skip until "1 USD ="
-    eat_lines_until /^\s*<td[^>]+?> 1&nbsp;+USD&nbsp;=/
+    eat_lines_until(/^\s*<td[^>]+?> 1&nbsp;+USD&nbsp;=/)
      
     # Read first row of 1 USD = ...
     rate = { }
     cur_i = -1 
-    eat_lines_until /^\s*<\/tr>/i do 
+    eat_lines_until(/^\s*<\/tr>/i) do 
       # Grok:
       #
       #   <td align="center" class="cur2 currencyA">114.676</td>\n
