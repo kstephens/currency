@@ -78,6 +78,7 @@ hoe = Hoe.new(PKG_Name.downcase, release) do |p|
   p.url = "http://rubyforge.org/projects/#{PKG_NAME}"
   
   p.test_globs = ['test/**/*.rb']
+  p.remote_rdoc_dir = '.'
 end
 
 PKG_VERSION = hoe.version
