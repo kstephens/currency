@@ -164,6 +164,8 @@ task :make_manifest do
   end
 end
 
+task :docs => :rcov_test
+
 desc "Run tests under rcov"
 task :rcov_test do
   test = ENV['test'] || 'test/**/*.rb'
