@@ -1,5 +1,14 @@
 = Currency Release History
 
+== Releate 0.4.12: 2008/04/12
+
+CRITICAL FIXES
+
+* money.rb - Fix in Money#<=>; contributed by Dmitri Koulikoff. 
+* Added Money#cmp, Money#rep_diff.
+* Removed syntax warnings.
+* Rakefile: rcov_test: run tests under rcov.
+
 == Release 0.4.11: 2007/11/02
 
 CRITICAL FIXES

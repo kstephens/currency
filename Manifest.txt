@@ -5,6 +5,9 @@ Manifest.txt
 README.txt
 Rakefile
 Releases.txt
+Releases.txt.mine
+Releases.txt.r133
+Releases.txt.r139
 TODO.txt
 bin/currency_historical_rate_load
 examples/ex1.rb

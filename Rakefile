@@ -164,9 +164,19 @@ task :make_manifest do
   end
 end
 
+desc "Run tests under rcov"
 task :rcov_test do
-  tests = Dir['test/**/*.rb']
-  tests.unshift 'test/unit'
-  sh "rcov -w -Ilib:ext:bin:test -e '#{tests.map{|x| "require #{x.inspect};"}.join(' ')}'"
+  test = ENV['test'] || 'test/**/*.rb'
+
+  rcov_opts = "-Ilib --html"
+  rcov_opts << " -i '\\Atest/,\\Alib/'"
+
+  tests = Dir[test].sort
+  tests.each do | t |
+    out_dir = "doc/rcov/#{t}"
+    sh "mkdir -p #{out_dir}"
+    sh "rm -rf #{out_dir}/*"
+    sh "rcov #{rcov_opts} -o #{out_dir} #{t}"
+  end
 end
 
