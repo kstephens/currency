@@ -164,4 +164,9 @@ task :make_manifest do
   end
 end
 
+task :rcov_test do
+  tests = Dir['test/**/*.rb']
+  tests.unshift 'test/unit'
+  sh "rcov -w -Ilib:ext:bin:test -e '#{tests.map{|x| "require #{x.inspect};"}.join(' ')}'"
+end
 
