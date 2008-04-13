@@ -29,6 +29,10 @@ See also: http://umleta.com/node/5
 [./test/...]     unit and functional test
 [./examples/...] example programs
 
+== Test Coverage ==
+
+Output of test coverage is available at: http://currency.rubyforge.org/rcov .
+
 == Credits
 
 Currency was developed by:
@@ -41,11 +45,12 @@ Currency was developed by:
 
 == Copyright
 
-* Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
+* Copyright (C) 2006-2008 Kurt Stephens <ruby-currency(at)umleta.com>
 
 == Contributors
 
 * Steffen Rusitschka
+* Dmitri Koulikoff
 
 
 

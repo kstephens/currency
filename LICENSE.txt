@@ -1,4 +1,4 @@
-This software distribution is Copyright (c) 2006-2007 
+This software distribution is Copyright (c) 2006-2008
 by Kurt Stephens <ruby-currency(at)umleta.com>.
 
 THERE IS ABSOLUTELY NO WARRANTY: SEE COPYING.txt
