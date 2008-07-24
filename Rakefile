@@ -5,6 +5,7 @@
 "
 rake make_manifest
 rake update_version
+rake test
 svn status
 rake package
 rake release VERSION=x.x.x
@@ -165,7 +166,7 @@ task :make_manifest do
   end
 end
 
-task :docs => :rcov_test
+# task :docs => :rcov_test
 
 desc "Run tests under rcov"
 task :rcov_test do

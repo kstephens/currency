@@ -50,6 +50,14 @@ class XeTest < TestBase
     assert_equal_float((1.0 / usd_cad) * usd_eur, m, 0.001)
   end
 
+  def test_xe_gbp_usd
+    assert_not_nil gbp = Money.new(123.45, :GBP)
+    assert_not_nil usd = gbp.convert(:USD)
+
+    assert_kind_of Numeric, m = (usd.to_f / gbp.to_f)
+    # $stderr.puts "gbp = #{gbp}, usd = #{usd}, m = #{m}"
+  end
+
 end
 
 end # module
