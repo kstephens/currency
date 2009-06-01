@@ -1,5 +1,11 @@
 = Currency Release History
 
+== Release 0.4.13: 2009/06/01
+
+* Added support for exact/inexact Money values.
+* newyorkfed and federalreserver no longer vend rates.
+* Fixed minor bugs in Parser. 
+
 == Release 0.4.12: 2008/04/12
 
 CRITICAL FIXES
@@ -25,7 +31,6 @@ CRITICAL FIXES
 * exception.rb - Currency::Exception::Base can take Array with optional key/values.
 * exception.rb - Additional exception classes.
 * ALL - use raise instead of throw throughout.
-
 
 == Release 0.4.9: 2007/11/01
 
