@@ -190,6 +190,30 @@ class MoneyTest < TestBase
      assert usd1 != usd2
   end
 
+  def test_exact_coersion
+    assert_not_nil usd1 = Money.new(123, :USD)
+    assert_not_nil usd2 = Money.new(123.45, :USD)
+
+    assert_equal true, usd1.exact?
+    assert_equal false, usd2.exact?
+
+
+    assert_not_nil usd1x = usd1.exact
+    assert_not_nil usd2x = usd2.exact
+
+    assert_equal true, usd1x.exact?
+    assert_equal true, usd2x.exact?
+
+    assert_not_nil usd1x = usd1x.inexact
+    assert_not_nil usd2x = usd2x.inexact
+
+    assert_equal false, usd1x.exact?
+    assert_equal false, usd2x.exact?
+
+    assert_equal 12300, usd1x.rep
+    assert_equal 12345, usd2x.rep
+  end
+
   def test_op
     # Using default get_rate
     assert_not_nil usd = Money.new(123.45, :USD)

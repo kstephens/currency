@@ -261,14 +261,14 @@ class Currency::Money
     end
 
 
-    #   - Money => Money
+    #   - Money(c1) => Money(c1)
     #
     # Negates a Money value.
     def -@
       new_rep(- @rep)
     end
 
-    #    Money + (Money | Number) => Money
+    #    Money(c1) + (Money(c2) | Number) => Money(c1)
     #
     # Right side may be coerced to left side's Currency.
     def +(x)
@@ -277,7 +277,7 @@ class Currency::Money
       new_rep(@rep + r, nil, @exact && e)
     end
 
-    #    Money - (Money | Number) => Money
+    #    Money(c1) - (Money(c2) | Number) => Money(c1)
     #
     # Right side may be coerced to left side's Currency.
     def -(x)
@@ -292,10 +292,11 @@ class Currency::Money
       new_rep(@rep * x, nil, @exact && (! Integer === e))
     end
 
-    #    Money / Money => Rational | Integer (exact)
-    #    Money / Number => Money (inexact)
+    #    Money(c1) / Money(c2) => Rational | Integer (exact)
+    #    Money(c1) / Number => Money(c1) (inexact)
     #
     # Right side must be Money or Number.
+    # Right side may be coerced to left side's Currency.
     # Right side Integers are not coerced to Float before
     # division.
     def /(x)
