@@ -1,6 +1,8 @@
 # Copyright (C) 2006-2007 Kurt Stephens <ruby-currency(at)umleta.com>
 # See LICENSE.txt for details.
 
+require 'rational' # to_r
+
 #
 # Represents an amount of money in a particular currency.
 #
@@ -47,15 +49,22 @@ class Currency::Money
     #
     # See #Money_rep(currency) mixin.
     #
-    def initialize(x, currency = nil, time = nil)
+    def initialize(x, currency = nil, time = nil, exact = nil)
       opts ||= @@empty_hash
+
+      raise ArgumentError, "exact (#{exact.inspect}) is not true, false or nil" unless 
+        exact == true || exact == false || exact == nil
+
+      exact = true if exact.nil?
 
       # Set ivars.
       currency = ::Currency::Currency.get(currency)
       @currency = currency
       @time = time || ::Currency::Money.default_time
       @time = ::Currency::Money.now if @time == :now
-      if x.kind_of?(String)
+      @exact = exact
+      case x
+      when String
         if currency
           m = currency.parser_or_default.parse(x, :currency => currency)
         else
@@ -64,11 +73,13 @@ class Currency::Money
         @currency = m.currency unless @currency
         @time = m.time if m.time
         @rep = m.rep
+        @exact &&= m.exact?
       else
         @currency = ::Currency::Currency.default unless @currency
-        @rep = x.Money_rep(@currency)
+        @rep, exact = x.Money_rep(@currency)
+        @exact &&= exact
       end
-
+      raise TypeError, "@exact (#{@exact.inspect}) is not true or false" unless @exact == true || @exact == false
     end
 
     # Returns a Time.new
@@ -90,8 +101,8 @@ class Currency::Money
 
 
     # Construct from post-scaled internal representation.
-    def self.new_rep(r, currency = nil, time = nil)
-      x = self.new(0, currency, time)
+    def self.new_rep(r, currency = nil, time = nil, exact = nil)
+      x = self.new(0, currency, time, exact)
       x.set_rep(r)
       x
     end
@@ -104,18 +115,21 @@ class Currency::Money
     #    x.new_rep(123) => USD $1.23
     #
     # time defaults to self.time.
-    def new_rep(r, time = nil)
+    # exact defaults to self.exact?.
+    def new_rep(r, time = nil, exact = nil)
       time ||= @time
-      x = self.class.new(0, @currency, time)
+      exact = @exact if exact.nil?
+      x = self.class.new(0, @currency, time, exact)
       x.set_rep(r)
       x
     end
+
 
     # Do not call this method directly.
     # CLIENTS SHOULD NEVER CALL set_rep DIRECTLY.
     # You have been warned in ALL CAPS.
     def set_rep(r) # :nodoc:
-      r = r.to_i unless r.kind_of?(Integer)
+      r = r.to_i unless Integer === r
       @rep = r
     end
 
@@ -141,6 +155,33 @@ class Currency::Money
       @time
     end
 
+
+    # Is the Money value known to be exact?
+    def exact?
+      ! ! @exact
+    end
+
+
+    # Coerce Money value into exact Money value.
+    def exact
+      if @exact == false
+        new_rep(@rep, nil, true)
+      else
+        self
+      end
+    end
+
+
+    # Coerce Money value into an inexact Money value.
+    def inexact
+      if @exact == true
+        new_rep(@rep, nil, false)
+      else
+        self
+      end
+    end
+
+
     # Convert Money to another Currency.
     # currency can be a Symbol or a Currency object.
     # If currency is nil, the Currency.default is used.
@@ -164,7 +205,6 @@ class Currency::Money
       @rep.hash ^ @currency.hash
     end
 
-
     # True if money values have the same value and currency.
     def eql?(x)
       self.class == x.class && 
@@ -172,11 +212,12 @@ class Currency::Money
         @currency == x.currency
     end
 
-    # True if money values have the same value and currency.
+    # True if money values have the same value and currency and exactness.
     def ==(x)
        self.class == x.class && 
         @rep == x.rep && 
-        @currency == x.currency
+        @currency == x.currency &&
+        @exact == x.exact?
     end
 
     # Compares Money values.
@@ -197,7 +238,7 @@ class Currency::Money
     def cmp(x, tolerance = 0)
       diff = rep_diff(x)
       if tolerance != 0
-        tolerance = tolerance.Money_rep(@currency) 
+        tolerance, e = tolerance.Money_rep(@currency) 
       end
       diff.abs <= tolerance ? 0 : diff <=> 0
     end
@@ -231,34 +272,41 @@ class Currency::Money
     #
     # Right side may be coerced to left side's Currency.
     def +(x)
-      new_rep(@rep + x.Money_rep(@currency))
+      r, e = x.Money_rep(@currency)
+      # $stderr.puts "   #{self.class}#+  x = #{x.inspect} r = #{r.inspect}, e = #{e.inspect}" 
+      new_rep(@rep + r, nil, @exact && e)
     end
 
     #    Money - (Money | Number) => Money
     #
     # Right side may be coerced to left side's Currency.
     def -(x)
-      new_rep(@rep - x.Money_rep(@currency))
+      x, e = x.Money_rep(@currency)
+      new_rep(@rep - x, nil, @exact && e)
     end
 
     #    Money * Number => Money
     #
     # Right side must be Number.
     def *(x)
-       new_rep(@rep * x)
+      new_rep(@rep * x, nil, @exact && (! Integer === e))
     end
 
-    #    Money / Money => Float (ratio)
-    #    Money / Number => Money
+    #    Money / Money => Rational | Integer (exact)
+    #    Money / Number => Money (inexact)
     #
     # Right side must be Money or Number.
     # Right side Integers are not coerced to Float before
     # division.
     def /(x)
-      if x.kind_of?(self.class)
-        (@rep.to_f) / (x.Money_rep(@currency).to_f)
+      case x
+      when self.class
+        x, e = x.Money_rep(@currency)
+        r = (@rep.to_r) / (x.to_r)
+        r = r.numerator if r.denominator == 1
+        r
       else
-        new_rep(@rep / x)
+        new_rep(@rep / x, nil, @exact && (! Integer === x))
       end
     end
 
@@ -275,10 +323,17 @@ class Currency::Money
     # Coerces the Money's value to a Float.
     # May cause loss of precision.
     def to_f
-      Float(@rep) / @currency.scale
+      @rep.to_f / @currency.scale
+    end
+
+    # Coerces the Money's value to a Rational
+    # No loss of precision.
+    def to_r
+      @rep.to_r / @currency.scale
     end
 
     # Coerces the Money's value to an Integer.
+    # Fractional units (e.g.: US cents) are discarded.
     # May cause loss of precision.
     def to_i
       @rep / @currency.scale
@@ -302,12 +357,16 @@ class Currency::Money
     # Returns the Money's value representation in another currency.
     def Money_rep(currency, time = nil)
       # Attempt conversion?
-      if @currency != currency || (time && @time != time)
-	self.convert(currency, time).rep
+      r = if @currency != currency || (time && @time != time)
+	x = self.convert(currency, time)
+        [ x.rep, x.exact? ]
         # raise ::Currency::Exception::Generic, "Incompatible Currency: #{@currency} != #{currency}"
       else
-        @rep
+        [ @rep, @exact ]
       end
+      # $stderr.puts "  #{self.class}#Money_rep self = #{[ @rep, @currency, @exact ].inspect}, #{currency.inspect}, #{time.inspect}"
+      # $stderr.puts "     #{r.inspect}"
+      r
     end
 
     # Basic inspection, with symbol, currency code and time.

@@ -22,6 +22,10 @@ class Currency::Parser
   # If :now, time is set to Time.new.
   attr_accessor :time
 
+  # True if the string could be parsed with no ambiguity.
+  attr_accessor :exact
+
+
   @@default = nil
   # Get the default Formatter.
   def self.default
@@ -40,6 +44,7 @@ class Currency::Parser
     @time =
       @enforce_currency =
       @currency =
+      @exact =
       nil
     opt.each_pair{ | k, v | self.send("#{k}=", v) }
   end
@@ -74,6 +79,10 @@ class Currency::Parser
     time ||= @time
     time = Time.new if time == :now
     
+    # Not truncated?
+    exact = @exact
+    exact = true if exact.nil?
+
     # $stderr.puts "x = #{x}"
     convert_currency = nil
     # Handle currency code in string.
@@ -105,28 +114,32 @@ class Currency::Parser
     
     # $stderr.puts "x = #{x.inspect}"
     # Match: whole Currency value.
-    if md = /^([-+]?\d+)\.?$/.match(x)
+    if md = /\A([-+]?\d+)\.?\Z/.match(x)
       # $stderr.puts "'#{self}'.parse(#{str}) => EXACT"
-      x = ::Currency::Money.new_rep(md[1].to_i * currency.scale, currency, @time)
+      x = ::Currency::Money.new_rep(md[1].to_i * currency.scale, currency, @time, @exact)
       
       # Match: fractional Currency value.
-    elsif md = /^([-+]?)(\d*)\.(\d+)$/.match(x)
+    elsif md = /\A([-+]?)(\d*)\.(\d+)\Z/.match(x)
       sign = md[1]
       whole = md[2]
       part = md[3]
       
       # $stderr.puts "'#{self}'.parse(#{str}) => DECIMAL (#{sign} #{whole} . #{part})"
       
-      if part.length != currency.scale
+      if part.length != currency.scale_exp
         
         # Pad decimal places with additional '0'
         while part.length < currency.scale_exp
           part << '0'
         end
         
-        # Truncate to Currency's decimal size. 
-        part = part[0 ... currency.scale_exp]
-        
+        if part.length > currency.scale_exp
+          exact = false
+
+          # Truncate to Currency's decimal size. 
+          part = part[0 ... currency.scale_exp]
+        end
+
         # $stderr.puts "  => INEXACT DECIMAL '#{whole}'"
       end
       
@@ -137,7 +150,7 @@ class Currency::Parser
       
       x = whole.to_i
       
-      x = ::Currency::Money.new_rep(x, currency, time)
+      x = ::Currency::Money.new_rep(x, currency, time, exact)
     else
       # $stderr.puts "'#{self}'.parse(#{str}) => ??? '#{x}'"
       #x.to_f.Money_rep(self)
@@ -154,7 +167,6 @@ class Currency::Parser
     if convert_currency
       x = x.convert(convert_currency)
     end
-
 
     x
   end

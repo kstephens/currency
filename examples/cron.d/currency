@@ -1,0 +1,6 @@
+#
+PATH=/home/stephens/local/src/currency/bin:/usr/local/bin:/usr/bin:/bin
+MAILTO=void@asdf.com
+
+0 12 * * *	nobody	currency_historical_rate_load -s xe 
+

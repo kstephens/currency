@@ -41,13 +41,13 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
   
   
   def initialize(*opt)
-    self.time_to_live = 600
-    self.time_to_live_fudge = 30
     @rate_load_time = nil
     @rate_reload_time = nil
     @processing_rates = false
     @cached_rates = { }
     @cached_rates_old = nil
+    self.time_to_live = 600
+    self.time_to_live_fudge = 30
     super(*opt)
   end
   
@@ -149,7 +149,6 @@ class Currency::Exchange::Rate::Source::TimedCache < ::Currency::Exchange::Rate:
       @rate_reload_time = @rate_load_time + (@time_to_live + (@time_to_live_fudge || 0))
       $stderr.puts "#{self}: rates expire on #{@rate_reload_time}" if @verbose
     end
-
   end
 
 

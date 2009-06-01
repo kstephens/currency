@@ -12,7 +12,6 @@ require 'currency' # For :type => :money
 require 'currency/exchange/rate/source/historical'
 require 'currency/exchange/rate/source/historical/writer'
 require 'currency/exchange/rate/source/xe'
-require 'currency/exchange/rate/source/new_york_fed'
 
 
 module Currency
@@ -38,7 +37,6 @@ class HistoricalWriterTest < ArTestBase
     super
 
     @src = Exchange::Rate::Source::Xe.new
-    @src2 = Exchange::Rate::Source::NewYorkFed.new
   end
 
 
@@ -99,7 +97,7 @@ class HistoricalWriterTest < ArTestBase
   def test_historical_rates
     # Make sure there are historical Rates avail for today.
     writer_src
-    writer_src2
+    # writer_src2
     
     # Force Historical Rate Source.
     source = Exchange::Rate::Source::Historical.new

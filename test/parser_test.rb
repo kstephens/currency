@@ -38,6 +38,17 @@ class ParserTest < TestBase
   end
 
 
+  def test_exact
+    assert_equal  true,  @parser.parse("1234567.89").exact?
+    assert_equal  true,  @parser.parse("1234567").exact?
+    assert_equal  true,  @parser.parse("1234567.").exact?
+    assert_equal  true,  @parser.parse("1234567.8").exact?
+    assert_equal  false, @parser.parse("1234567.891").exact?
+    assert_equal( true,  @parser.parse("-1234567").exact?)
+    assert_equal  true,  @parser.parse("+1234567").exact?
+  end
+
+
   def test_misc
     assert_not_nil m = "123.45 USD".money + "100 CAD"
     assert ! (m.rep == 200.45)

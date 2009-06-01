@@ -14,7 +14,8 @@ class NewYorkFedTest < TestBase
   end
 
 
-  @@available = nil
+  # New York Fed no longer supplies rates.
+  @@available = false
 
   # New York Fed rates are not available on Saturday and Sunday.
   def available?
@@ -64,7 +65,7 @@ class NewYorkFedTest < TestBase
 
     assert_kind_of Numeric, m = (eur.to_f / cad.to_f)
     # $stderr.puts "m = #{m}"
-    assert_equal_float (1.0 / usd_cad) * usd_eur, m, 0.001
+    assert_equal_float((1.0 / usd_cad) * usd_eur, m, 0.001)
   end
 
 end

@@ -202,7 +202,7 @@ class Currency::Formatter
 
     # Get scaled integer representation for this Currency.
     # $stderr.puts "m.currency = #{m.currency}, currency => #{currency}"
-    x = m.Money_rep(currency)
+    x, e = m.Money_rep(currency)
 
     # Remove sign.
     x = - x if ( neg = x < 0 )

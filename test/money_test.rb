@@ -133,18 +133,24 @@ class MoneyTest < TestBase
     
     assert_equal usd1.rep, usd2.rep
 
-    assert usd1 == usd2
+    assert_equal true, usd1.instance_variable_get("@exact")
+    assert_equal true, usd2.instance_variable_get("@exact")
 
+    assert_equal usd1.exact?, usd2.exact?
+
+    assert usd1 == usd2
   end
 
-  def test_not_eql  
- 
+  def test_not_eql
     assert_not_nil usd1 = Money.new(123, :USD)
     assert_not_nil usd2 = Money.new("123.01", :USD)
 
     assert_equal :USD, usd1.currency.code
     assert_equal :USD, usd2.currency.code
     
+    assert_equal true, usd1.instance_variable_get("@exact")
+    assert_equal true, usd2.instance_variable_get("@exact")
+
     assert_not_equal usd1.rep, usd2.rep
 
     assert usd1 != usd2
@@ -161,9 +167,27 @@ class MoneyTest < TestBase
 
     assert_equal usd.rep, cad.rep
     assert usd.currency != cad.currency
+    assert_equal true, usd.instance_variable_get("@exact")
+    assert_equal true, cad.instance_variable_get("@exact")
 
     assert usd != cad
+  end
 
+  def test_not_eql_exact
+    assert_not_nil usd1 = Money.new(123, :USD)
+    assert_not_nil usd2 = Money.new(123.0, :USD)
+
+    assert_equal 12300, usd1.rep
+    assert_equal 12300, usd2.rep
+    assert_equal usd1.rep, usd2.rep
+
+    assert_equal :USD, usd1.currency.code
+    assert_equal :USD, usd2.currency.code
+    
+    assert_equal true, usd1.instance_variable_get("@exact")
+    assert_equal false, usd2.instance_variable_get("@exact")
+
+     assert usd1 != usd2
   end
 
   def test_op
@@ -201,7 +225,7 @@ class MoneyTest < TestBase
     assert_equal :USD, m.currency.code
 
     assert_kind_of Money, m = (cad - usd)
-    assert_equal -2108, m.rep
+    assert_equal(-2108, m.rep)
     assert_equal :CAD, m.currency.code
 
     # Money * Numeric => Money
